@@ -1,6 +1,6 @@
 class StringUtils {
   /**
-   * Return a localized time based on the miliseconds value given.
+   * Return a localized time based on the milliseconds value given.
    *
    * If passing seconds, multiply by 1000.
    *

@@ -31,7 +31,8 @@ class TimeParser {
     let job = undefined;
 
     const lastRecord = profile[events[events.length - 1]];
-    let onBreak = lastRecord !== undefined ? lastRecord.type === 'break' : false;
+    let onBreak =
+      lastRecord !== undefined ? lastRecord.type === 'break' : false;
 
     for (const key of events) {
       const packet = profile[key];

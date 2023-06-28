@@ -6,7 +6,7 @@ import { PermissionLevel } from '../../lib';
 import { RECORDS } from '../../utils/constants/routes.constants';
 
 const DashboardPage = () => {
-  const { user } = useAuth();
+  const auth = useAuth();
   const router = useRouter();
 
   const onClick = () => {
@@ -16,12 +16,12 @@ const DashboardPage = () => {
   return (
     <ProtectedRoute>
       <div className='flex py-2 container mx-auto'>
-        <div className='text-gray-600 px-12 py-24 mt-24 overflow-y-hidden mx-auto'>
-          <h2 className='text-2xl font-semibold'>You are logged in!</h2>
+        <div className='text-gray-600 flex flex-col justify-center items-center px-12 py-24 mx-auto'>
+          <p className='text-2xl text-white font-semibold'>{`Welcome ${auth.user?.displayName}`}</p>
 
-          {user.permissionLevel >= PermissionLevel.MANAGER && (
+          {auth.permissionLevel >= PermissionLevel.MANAGER && (
             <SubmitButton
-              message={'Click Here To View Records'}
+              message={'Click Here To Manage Records'}
               onClick={onClick}
             />
           )}

@@ -35,42 +35,47 @@ const SignUpPage = () => {
     }
   };
   return (
-    <div className='flex justify-center items-center py-2 mx-auto'>
-      <div className='sign-up-form container mx-auto w-96 border-2 bg-gray-400 border-gray-400'>
-        <h2 className='px-12 mt-8 text-center text-2xl font-semibold text-blue-900'>
-          Sign Up
-        </h2>
-        <FormProvider {...methods}>
-          <form
-            action=''
-            className='w-80 mx-auto pb-12 px-4'
-            onSubmit={handleSubmit(onSubmit)}
-          >
-            <FormInput
-              label='Email'
-              name='email'
-              type='email'
-              formOptions={signupSchema.fields.email}
-              errors={errors.email}
-            />
-            <FormInput
-              label='Password'
-              name='password'
-              type='password'
-              formOptions={signupSchema.fields.password}
-              errors={errors.password}
-            />
-            <FormInput
-              label='Confirm Password'
-              name='confirm_password'
-              type='password'
-              formOptions={signupSchema.fields.confirm_password}
-              errors={errors.confirm_password}
-            />
-            <SubmitButton message={'Sign Up'} />
-          </form>
-        </FormProvider>
-      </div>
+    <div className='sign-up-form container rounded-md w-96 border-2 bg-gray-400 border-gray-400'>
+      <h2 className='px-12 mt-8 text-center text-2xl font-semibold text-blue-900'>
+        Sign Up
+      </h2>
+      <FormProvider {...methods}>
+        <form
+          action=''
+          className='w-80 mx-auto pb-12 px-4'
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <FormInput
+            label='Organization'
+            name='org'
+            type='text'
+            formOptions={signupSchema.fields.organization}
+            errors={errors.email}
+          />
+          <FormInput
+            label='Email'
+            name='email'
+            type='email'
+            formOptions={signupSchema.fields.email}
+            errors={errors.email}
+          />
+          <FormInput
+            label='Password'
+            name='password'
+            type='password'
+            formOptions={signupSchema.fields.password}
+            errors={errors.password}
+          />
+          <FormInput
+            label='Confirm Password'
+            name='confirm_password'
+            type='password'
+            formOptions={signupSchema.fields.confirm_password}
+            errors={errors.confirm_password}
+          />
+          <SubmitButton message={'Sign Up'} />
+        </form>
+      </FormProvider>
     </div>
   );
 };

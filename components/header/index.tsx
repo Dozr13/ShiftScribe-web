@@ -30,8 +30,6 @@ const Header = ({ children }: { children: React.ReactNode }) => {
     },
   ];
 
-  console.log('USER', user);
-
   const handleLogout = async () => {
     const toastId = toast.loading('Logging out...');
     try {
@@ -42,6 +40,7 @@ const Header = ({ children }: { children: React.ReactNode }) => {
       toast.error(error.message, { id: toastId });
     }
   };
+
   return (
     <>
       <header className='bg-slate-950 flex flex-wrap container mx-auto max-w-full items-center p-6 justify-between shadow-md sticky top-0 z-50'>

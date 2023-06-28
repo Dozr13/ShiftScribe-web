@@ -12,7 +12,7 @@ import { loginSchema } from '../../validations/login.validation';
 const LoginPage = () => {
   type FormData = Yup.InferType<typeof loginSchema>;
 
-  const { logIn } = useAuth();
+  const { signIn } = useAuth();
   const router = useRouter();
 
   const methods = useForm<FormData>({
@@ -28,7 +28,7 @@ const LoginPage = () => {
   const onSubmit = async (data: FormData) => {
     const toastId = toast.loading('Logging in...');
     try {
-      await logIn(data.email, data.password);
+      await signIn(data.email, data.password);
       toast.success('Successfully logged in!', { id: toastId });
       router.push(DASHBOARD);
     } catch (error: any) {

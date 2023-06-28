@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { QueryConstraint, endAt, orderByKey } from 'firebase/database';
 
 import { useRouter } from 'next/router';
+import toast from 'react-hot-toast';
+import ProtectedRoute from '../../components/protected-route';
 import { useAuth } from '../../context/AuthContext';
 import { useFirebase } from '../../context/FirebaseContext';
 import { PermissionLevel, StringUtils, TimeParser } from '../../lib';
@@ -16,6 +18,7 @@ export const ViewRecordsPage = () => {
 
   const [csv, setCsv] = useState<string>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingCSV, setLoadingCSV] = useState<boolean>(false);
 
   const fetchData = async (...query: QueryConstraint[]) => {
     setLoading(true);
@@ -23,12 +26,8 @@ export const ViewRecordsPage = () => {
     setLoading(false);
 
     if (!res.exists()) {
-      // Toast.show({
-      //   type: 'info',
-      //   text1: 'No records match this request.',
-      // });
-
-      return;
+      let errorMessage = 'No records match this request.';
+      toast.error(errorMessage);
     }
 
     return res.toJSON() as TimeRecords;
@@ -38,11 +37,11 @@ export const ViewRecordsPage = () => {
     const weekMs = 6.048e8 * timeInWeeks;
     const threshold = Date.now() - weekMs;
 
-    console.log(threshold.toString());
+    // console.log(threshold.toString());
 
     const json = await fetchData(orderByKey(), endAt(threshold.toString()));
 
-    console.log(json);
+    // console.log(json);
 
     const toDelete = new Array<number>();
 
@@ -70,15 +69,16 @@ export const ViewRecordsPage = () => {
     }
   };
 
-  console.log(auth.orgId);
-  console.log(auth.user);
-
   const GenerateCSV = async () => {
     if (!auth.orgId || !auth.user) return;
-    console.log('clicked');
+
+    setLoadingCSV(true);
 
     const json = await fetchData();
-    if (!json) return;
+    if (!json) {
+      setLoadingCSV(false);
+      return;
+    }
 
     const headers = [
       'Employee',
@@ -118,6 +118,8 @@ export const ViewRecordsPage = () => {
     }
 
     setCsv(resCSV);
+
+    setLoadingCSV(false);
   };
 
   useEffect(() => {
@@ -128,59 +130,73 @@ export const ViewRecordsPage = () => {
     }
   }, [auth.permissionLevel, auth.user, router]);
 
-  // if (loading) return <Spinner />;
-
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 10,
-      }}
-    >
-      <div
-        style={{ fontSize: 32, fontFamily: 'monospace', color: Colors.White }}
-      >
-        ADMIN PANEL v0
-      </div>
+    <ProtectedRoute>
+      <div className='admin-panel flex flex-col justify-center items-center'>
+        <div className='p-10 container flex flex-col justify-center items-center mx-auto w-96 border-2 bg-gray-400 border-gray-400 rounded-md'>
+          <div className='flex py-2 container mx-auto'></div>
 
-      <div
-        style={{ fontSize: 15, fontFamily: 'monospace', color: Colors.White }}
-      >
-        {`ORG ID: ${auth.orgId?.toUpperCase()}`}
-      </div>
+          <div
+            className='text-3xl text-white'
+            style={{ fontFamily: 'monospace' }}
+          >
+            ADMIN PANEL v0
+          </div>
 
-      {csv ? (
-        <>
-          <a
-            style={{ backgroundColor: Colors.White, padding: 10 }}
-            href={'data:text/csv;charset=utf-8,' + encodeURI(csv)}
-            onClick={() => {
-              setCsv(undefined);
-            }}
+          <div
+            className='text-xl text-white'
+            style={{ fontFamily: 'monospace' }}
           >
-            <div>DOWNLOAD</div>
-          </a>
-        </>
-      ) : (
-        <>
-          <button
-            style={{ marginTop: 10, padding: 10, backgroundColor: 'yellow' }}
-            onClick={GenerateCSV}
-          >
-            Generate CSV of ALL work Records
-          </button>
-          <button
-            style={{ marginTop: 25, padding: 10, backgroundColor: 'red' }}
-            onClick={() => purgeOldRecords(2)}
-          >
-            Purge records older than 2 weeks
-          </button>
-        </>
-      )}
-    </div>
+            {`ORG ID: ${auth.orgId?.toUpperCase()}`}
+          </div>
+          {csv ? (
+            <>
+              <a
+                style={{ backgroundColor: Colors.White, padding: 10 }}
+                href={'data:text/csv;charset=utf-8,' + encodeURI(csv)}
+                onClick={() => {
+                  setCsv(undefined);
+                }}
+              >
+                <div>DOWNLOAD</div>
+              </a>
+            </>
+          ) : (
+            <>
+              <button
+                className='w-full mt-10 p-4 bg-green-500 rounded-md'
+                onClick={async () => {
+                  await toast.promise(
+                    GenerateCSV(),
+                    {
+                      loading: 'Generating CSV...', // Show loading message
+                      success: 'CSV generated successfully!',
+                      error: 'Error generating CSV.',
+                    },
+                    {
+                      duration: 3000, // Optional: Specify the duration for success/error messages
+                    },
+                  );
+                }}
+                disabled={loadingCSV} // Disable the button when loadingCSV is true
+              >
+                <p className='text-md font-semibold'>
+                  Generate CSV of ALL work Records
+                </p>
+              </button>
+              <button
+                className='w-full mt-8 p-4 bg-red-600 rounded-md'
+                onClick={() => purgeOldRecords(2)}
+              >
+                <p className='text-md font-semibold'>
+                  Purge records older than 2 weeks
+                </p>
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </ProtectedRoute>
   );
 };
 

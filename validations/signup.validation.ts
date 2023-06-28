@@ -7,8 +7,12 @@ import {
 
 //fetch from firebase
 const emailAddresses = ['test@gmail.com', 'test1@gmail.com', 'test2@gmail.com'];
+const organizations = ['wcci', 'wcc'];
 
 export const signupSchema = Yup.object({
+  organization: Yup.string()
+    .required('Organization is required')
+    .notOneOf(organizations, 'Organization is already in use.'),
   email: Yup.string()
     .email('Email must be a valid email address.')
     .notOneOf(emailAddresses, 'Email address is already taken.')
@@ -18,7 +22,7 @@ export const signupSchema = Yup.object({
     .matches(LOWERCASE_REGEX, 'At least one lowercase letter required.')
     .matches(UPPERCASE_REGEX, 'At least one uppercase letter required.')
     .matches(NUMERIC_REGEX, 'At least one number required.')
-    .min(8, 'Minimum 8 characters required'),
+    .min(5, 'Minimum 5 characters required'),
 
   confirm_password: Yup.string()
     .required('Re-enter your password')

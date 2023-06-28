@@ -9,7 +9,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useFirebase } from '../../context/FirebaseContext';
 import { PermissionLevel, StringUtils, TimeParser } from '../../lib';
 import { TimeRecords, UserData } from '../../types/data';
-import Colors from '../../utils/constants/colors.constants';
 
 export const ViewRecordsPage = () => {
   const router = useRouter();
@@ -152,13 +151,14 @@ export const ViewRecordsPage = () => {
           {csv ? (
             <>
               <a
-                style={{ backgroundColor: Colors.White, padding: 10 }}
                 href={'data:text/csv;charset=utf-8,' + encodeURI(csv)}
                 onClick={() => {
                   setCsv(undefined);
                 }}
               >
-                <div>DOWNLOAD</div>
+                <button className='w-full mt-10 p-4 bg-blue-500 rounded-md'>
+                  <p className='text-md font-semibold'>Click to Download CSV</p>
+                </button>
               </a>
             </>
           ) : (
@@ -169,16 +169,16 @@ export const ViewRecordsPage = () => {
                   await toast.promise(
                     GenerateCSV(),
                     {
-                      loading: 'Generating CSV...', // Show loading message
+                      loading: 'Generating CSV...',
                       success: 'CSV generated successfully!',
                       error: 'Error generating CSV.',
                     },
                     {
-                      duration: 3000, // Optional: Specify the duration for success/error messages
+                      duration: 3000,
                     },
                   );
                 }}
-                disabled={loadingCSV} // Disable the button when loadingCSV is true
+                disabled={loadingCSV}
               >
                 <p className='text-md font-semibold'>
                   Generate CSV of ALL work Records

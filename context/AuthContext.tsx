@@ -47,6 +47,28 @@ interface ExtendedContext extends ContextType {
   orgId: string | undefined;
   isReady: boolean;
 }
+interface AuthContextValue {
+  user: User | undefined;
+  permissionLevel: PermissionLevel;
+  isReady: boolean;
+  orgId: string | undefined;
+  signIn: (
+    email: string,
+    password: string,
+  ) => Promise<SignupResponse<UserCredential>>;
+  deleteAccount: () => Promise<void>;
+  validateOrg: (Name: string) => Promise<boolean>;
+  signUp: (
+    username: string,
+    email: string,
+    password: string,
+    organization: string,
+  ) => Promise<SignupResponse<UserCredential>>;
+  getUserData: (user: User) => Promise<UserData>;
+  getUserByUID: (UID: string) => Promise<UserData>;
+  onAuthChange: (Fn: (user: User | null) => void) => Unsubscribe;
+  doesUserExist: (email: string) => Promise<boolean>;
+}
 
 async function writeUser(user: User, organization: string) {
   await set(ref(getDatabase(), `/users/${user.uid}`), {
@@ -206,7 +228,7 @@ const Context = {
   },
 };
 
-const AuthContext = createContext({});
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 export const useAuth = () => useContext<any>(AuthContext);
 
@@ -218,13 +240,13 @@ export const AuthContextProvider = ({
   const [user, setUser] = useState<User>();
   const [permissionLevel, setPermissionLevel] = useState<PermissionLevel>(0);
   const [orgId, setOrgId] = useState<string>();
-  const [isReady, setIsReady] = useState(true);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [isReady, setIsReady] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    // On Auth state change, load all the user data into the states.
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, async (authUser) => {
       setIsReady(false);
+      setIsLoading(true);
 
       if (authUser) {
         const userDoc = await get(
@@ -262,17 +284,17 @@ export const AuthContextProvider = ({
       }
       setUser(authUser || undefined);
       setIsReady(true);
+      setIsLoading(false);
     });
-    setLoading(false);
 
     return () => unsubscribe();
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ ...Context, user, permissionLevel, isReady, orgId }}
+      value={{ ...Context, user, permissionLevel, orgId, isReady }}
     >
-      {loading ? null : children}
+      {isLoading ? null : children}
     </AuthContext.Provider>
   );
 };

@@ -65,7 +65,7 @@ const LoginPage = () => {
               formOptions={loginSchema.fields.password}
               errors={errors.password}
             />
-            <SubmitButton message={'Sign In'} />
+            <SubmitButton message={'Sign In'} disabled={isSubmitting} />
           </form>
         </FormProvider>
       </div>

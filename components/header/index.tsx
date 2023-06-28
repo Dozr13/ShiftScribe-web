@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { toast } from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import {
   DASHBOARD,
@@ -8,6 +7,7 @@ import {
   LOGIN,
   SIGN_UP,
 } from '../../utils/constants/routes.constants';
+import { showToast } from '../../utils/toast';
 
 const Header = ({ children }: { children: React.ReactNode }) => {
   const { user, signOut } = useAuth();
@@ -31,13 +31,13 @@ const Header = ({ children }: { children: React.ReactNode }) => {
   ];
 
   const handleLogout = async () => {
-    const toastId = toast.loading('Logging out...');
+    showToast('Logging out...');
     try {
       await signOut();
-      toast.success('You are now logged out', { id: toastId });
+      showToast('You are now logged out');
       router.push(LOGIN);
     } catch (error: any) {
-      toast.error(error.message, { id: toastId });
+      showToast(error.message, false);
     }
   };
 

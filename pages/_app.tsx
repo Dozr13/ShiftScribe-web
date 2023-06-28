@@ -2,7 +2,7 @@ import type { AppProps } from 'next/app';
 import { useEffect } from 'react';
 import toast, { Toaster, useToasterStore } from 'react-hot-toast';
 import Header from '../components/header';
-import { AuthContextProvider, useAuth } from '../context/AuthContext';
+import { AuthContextProvider } from '../context/AuthContext';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -16,9 +16,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   }, [toasts]);
 
   return (
-    <div className='h-screen overflow-y-hidden flex flex-col justify-center align-middle items-center'>
-      <Toaster position='bottom-right' reverseOrder={false} />
-      <AuthContextProvider>
+    <AuthContextProvider>
+      <div className='h-screen overflow-y-hidden flex flex-col justify-center align-middle items-center'>
+        <Toaster position='bottom-right' reverseOrder={false} />
         <Header>
           <div
             className='h-full w-full flex justify-center items-center overflow-hidden'
@@ -27,8 +27,8 @@ function MyApp({ Component, pageProps }: AppProps) {
             <Component {...pageProps} />
           </div>
         </Header>
-      </AuthContextProvider>
-    </div>
+      </div>
+    </AuthContextProvider>
   );
 }
 

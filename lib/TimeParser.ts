@@ -74,4 +74,5 @@ class TimeParser {
   }
 }
 
-export default new TimeParser();
+const timeParser = new TimeParser();
+export default timeParser;

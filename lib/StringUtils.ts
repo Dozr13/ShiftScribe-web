@@ -82,4 +82,5 @@ class StringUtils {
   }
 }
 
-export default new StringUtils();
+const stringUtils = new StringUtils();
+export default stringUtils;

@@ -37,10 +37,13 @@ const LoginPage = () => {
   };
 
   return (
-    <div className='bg-slate-800 flex justify-center items-center py-2 mx-auto'>
-      <div className='sign-up-form container mx-auto w-96 border-2 bg-gray-400 border-gray-400'>
+    <div className='flex justify-center items-center'>
+      <div
+        className='sign-up-form container mx-auto w-96 border-2 bg-gray-400 border-gray-400 rounded-md'
+        style={{ marginTop: '20%' }}
+      >
         <h2 className='px-12 mt-8 text-center text-2xl font-semibold text-blue-900'>
-          Log In
+          Welcome
         </h2>
         <FormProvider {...methods}>
           <form
@@ -62,7 +65,7 @@ const LoginPage = () => {
               formOptions={loginSchema.fields.password}
               errors={errors.password}
             />
-            <SubmitButton />
+            <SubmitButton message={'Sign In'} />
           </form>
         </FormProvider>
       </div>

@@ -10,7 +10,7 @@ import {
 } from '../../utils/constants/routes.constants';
 
 const Header = ({ children }: { children: React.ReactNode }) => {
-  const { user, logOut } = useAuth();
+  const { user, signOut } = useAuth();
   const router = useRouter();
   const menuItems = [
     {
@@ -35,7 +35,7 @@ const Header = ({ children }: { children: React.ReactNode }) => {
   const handleLogout = async () => {
     const toastId = toast.loading('Logging out...');
     try {
-      await logOut();
+      await signOut();
       toast.success('You are now logged out', { id: toastId });
       router.push(LOGIN);
     } catch (error: any) {

@@ -18,7 +18,10 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Toaster position='bottom-right' reverseOrder={false} />
       <AuthContextProvider>
         <Header>
-          <div className='h-screen w-screen bg-slate-800'>
+          <div
+            className='h-screen w-screen'
+            style={{ backgroundColor: '#262626' }}
+          >
             <Component {...pageProps} />
           </div>
         </Header>

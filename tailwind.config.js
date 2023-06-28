@@ -7,10 +7,10 @@ module.exports = {
   theme: {
     extend: {
       minHeight: {
-        screen: '100vh', // Set minimum height to 100% of the viewport height
+        screen: '100vh',
       },
       minWidth: {
-        screen: '100vw', // Set minimum width to 100% of the viewport width
+        screen: '100vw',
       },
     },
   },

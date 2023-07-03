@@ -23,13 +23,13 @@ class TimeParser {
     // Sort the event keys
     events.sort((a, b) => a - b);
 
-    let meta = null;
+    let meta = undefined;
     let time = 0;
     let breakTime = 0;
     let breakStart;
     let breakEnd;
     let origin = events[0];
-    let job = undefined;
+    let job = '';
     let calledIn = false;
 
     const lastRecord = profile[events[events.length - 1]];

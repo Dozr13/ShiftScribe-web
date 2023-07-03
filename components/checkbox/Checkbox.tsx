@@ -1,3 +1,4 @@
+// Checkbox component
 import { ChangeEvent } from 'react';
 
 interface CheckboxProps {
@@ -6,7 +7,6 @@ interface CheckboxProps {
   inRequest: string;
   outRequest: string;
   onChange: (checked: boolean) => void;
-  handleContainerClick: () => void;
 }
 
 const Checkbox = ({
@@ -15,7 +15,6 @@ const Checkbox = ({
   inRequest,
   outRequest,
   onChange,
-  handleContainerClick,
 }: CheckboxProps) => {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     event.stopPropagation();
@@ -24,9 +23,11 @@ const Checkbox = ({
 
   return (
     <div
-      // className='min-w-full h-20 inline-flex items-stretch flex-col'
       className='grid grid-cols-1 divide-y my-5'
-      onClick={handleContainerClick}
+      onClick={() => {
+        // Toggle the checkbox when the checkbox column is clicked
+        onChange(!checked);
+      }}
     >
       <label className='inline-flex items-center'>
         <input

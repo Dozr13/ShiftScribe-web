@@ -1,7 +1,7 @@
 export interface UserData {
-  organization?: string;
-  email?: string;
-  displayName?: string;
+  organization: string;
+  email: string;
+  displayName: string;
 }
 
 export interface OrgData {
@@ -30,13 +30,13 @@ export type RecordEventType =
   | 'calledin';
 
 export interface EventObject {
-  job?: string;
+  job: string;
   type?: RecordEventType;
   meta?: string;
 }
 
 /**
- * JS doesn't like numbers as keys to objects. We must conver this on the client.
+ * JS doesn't like numbers as keys to objects. We must convert this on the client.
  */
 type Events = Record<string, EventObject>;
 
@@ -51,3 +51,16 @@ interface TimeRecord {
 }
 
 export type TimeRecords = Record<number, TimeRecord>;
+
+type CSVRowData = {
+  displayName: string;
+  email: string;
+  job: string;
+  timestamp: Date;
+  outTimestamp: Date;
+  localeWorkTime: string;
+  localeBreakTime: string;
+  localeTotalTime: string;
+  calledIn: boolean;
+  reasonMissed?: string;
+};

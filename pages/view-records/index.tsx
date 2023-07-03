@@ -64,7 +64,7 @@ export const ViewRecordsPage = () => {
     }
   };
 
-  const GenerateCSV = async () => {
+  const generateCSV = async () => {
     if (!auth.orgId || !auth.user) return;
 
     setLoadingCSV(true);
@@ -85,6 +85,7 @@ export const ViewRecordsPage = () => {
       'Time Worked',
       'Time On Break',
       'Combined Time',
+      'Called In',
       'Reason Missed',
     ];
 
@@ -107,10 +108,10 @@ export const ViewRecordsPage = () => {
       const localeTotalTime = StringUtils.timestampHM(timeWorked + breakTime);
 
       resCSV += `${userInfo.displayName},${userInfo.email},${
-        calledIn ? 'Out sick' : job
-      },${timestamp.toLocaleDateString()},${timestamp.toLocaleTimeString()},${outTimestamp.toLocaleTimeString()},${localeWorkTime},${localeBreakTime},${localeTotalTime},${calledIn},${
-        calledIn ? meta : ''
-      }`;
+        calledIn ? '' : job
+      },${timestamp.toLocaleDateString()},${timestamp.toLocaleTimeString()},${outTimestamp.toLocaleTimeString()},${localeWorkTime},${localeBreakTime},${localeTotalTime},${
+        calledIn ? 'Out Today' : ''
+      },${calledIn ? meta : ''}`;
 
       resCSV += '\n';
     }
@@ -166,7 +167,7 @@ export const ViewRecordsPage = () => {
                 className='w-full mt-10 p-4 bg-green-500 rounded-md'
                 onClick={async () => {
                   await toast.promise(
-                    GenerateCSV(),
+                    generateCSV(),
                     {
                       loading: 'Generating CSV...',
                       success: 'CSV generated successfully!',

@@ -21,22 +21,6 @@ const ViewRequestsPage = () => {
   );
   const [selectedItemsData, setSelectedItemsData] = useState<any[]>([]);
 
-  const handleToggle = (employeeName: string) => {
-    const index = requests.findIndex(
-      (request) => request.employeeName === employeeName,
-    );
-    if (index !== -1) {
-      const newCheckedItems = [...isChecked];
-      newCheckedItems[index] = !newCheckedItems[index];
-      setIsChecked(newCheckedItems);
-    }
-  };
-
-  const handleContainerClick = (index: number) => {
-    const employeeName = requests[index].employeeName;
-    handleToggle(employeeName);
-  };
-
   const handleCheckboxChange = () => {
     const newSelectedItemsData = requests.filter((_, i) => isChecked[i]);
     setSelectedItemsData(newSelectedItemsData);
@@ -44,6 +28,10 @@ const ViewRequestsPage = () => {
 
   return (
     <div className='admin-panel flex flex-col justify-center items-center'>
+      <div className='text-8xl text-white font-extrabold'>Coming soon</div>
+      <div className='text-2xl text-gray-300 font-extrabold p-10'>
+        Will look something like:
+      </div>
       <div className='p-10 container flex flex-col justify-center items-center mx-auto w-96 border-2 bg-gray-400 border-gray-400 rounded-md'>
         <div className='flex flex-col items-start justify-around py-2 container mx-auto'>
           {requests.map((request, index) => (
@@ -53,8 +41,11 @@ const ViewRequestsPage = () => {
               checked={isChecked[index]}
               inRequest={request.inRequest}
               outRequest={request.outRequest}
-              onChange={() => handleToggle(request.employeeName)}
-              handleContainerClick={() => handleContainerClick(index)}
+              onChange={(checked) => {
+                const newCheckedItems = [...isChecked];
+                newCheckedItems[index] = checked;
+                setIsChecked(newCheckedItems);
+              }}
             />
           ))}
         </div>
@@ -70,6 +61,9 @@ const ViewRequestsPage = () => {
             width='100%'
           />
         </div>
+      </div>
+      <div className='text-2xl text-gray-300 font-extrabold p-10'>
+        If implemented
       </div>
     </div>
   );

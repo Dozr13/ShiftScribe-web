@@ -22,11 +22,17 @@ export interface OrgJob {
 
 export type OrgJobs = Record<string, OrgJob>;
 
-export type RecordEventType = 'clockin' | 'clockout' | 'break' | 'endbreak';
+export type RecordEventType =
+  | 'clockin'
+  | 'clockout'
+  | 'break'
+  | 'endbreak'
+  | 'calledin';
 
 export interface EventObject {
   job?: string;
   type?: RecordEventType;
+  meta?: string;
 }
 
 /**

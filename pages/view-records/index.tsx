@@ -98,7 +98,7 @@ export const ViewRecordsPage = () => {
       const userInfo = userData.toJSON() as UserData;
 
       const end = Number(item);
-      const { origin, timeWorked, breakTime, job } =
+      const { origin, timeWorked, breakTime, job, calledIn, meta } =
         TimeParser.parseCurrentRecord(obj.events);
       const timestamp = new Date(origin);
       const outTimestamp = new Date(end);
@@ -106,9 +106,11 @@ export const ViewRecordsPage = () => {
       const localeBreakTime = StringUtils.timestampHM(breakTime);
       const localeTotalTime = StringUtils.timestampHM(timeWorked + breakTime);
 
-      resCSV += `${userInfo.displayName},${
-        userInfo.email
-      },${job},${timestamp.toLocaleDateString()},${timestamp.toLocaleTimeString()},${outTimestamp.toLocaleTimeString()},${localeWorkTime},${localeBreakTime},${localeTotalTime}`;
+      resCSV += `${userInfo.displayName},${userInfo.email},${
+        calledIn ? 'Out sick' : job
+      },${timestamp.toLocaleDateString()},${timestamp.toLocaleTimeString()},${outTimestamp.toLocaleTimeString()},${localeWorkTime},${localeBreakTime},${localeTotalTime},${calledIn},${
+        calledIn ? meta : ''
+      }`;
 
       resCSV += '\n';
     }

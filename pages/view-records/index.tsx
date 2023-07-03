@@ -36,11 +36,7 @@ export const ViewRecordsPage = () => {
     const weekMs = 6.048e8 * timeInWeeks;
     const threshold = Date.now() - weekMs;
 
-    // console.log(threshold.toString());
-
     const json = await fetchData(orderByKey(), endAt(threshold.toString()));
-
-    // console.log(json);
 
     const toDelete = new Array<number>();
 
@@ -89,6 +85,7 @@ export const ViewRecordsPage = () => {
       'Time Worked',
       'Time On Break',
       'Combined Time',
+      'Reason Missed',
     ];
 
     let resCSV = `${headers.join(',')}\n`;

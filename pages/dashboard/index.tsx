@@ -3,17 +3,23 @@ import SubmitButton from '../../components/form-components/SubmitButton';
 import ProtectedRoute from '../../components/protected-route';
 import { useAuth } from '../../context/AuthContext';
 import { PermissionLevel } from '../../lib';
-import { LOGIN, RECORDS } from '../../utils/constants/routes.constants';
+import {
+  LOGIN,
+  RECORDS,
+  REQUESTS,
+} from '../../utils/constants/routes.constants';
 import { showToast } from '../../utils/toast';
 
 const DashboardPage = () => {
   const auth = useAuth();
   const router = useRouter();
 
-  const onClick = () => {
-    auth.permissionLevel >= PermissionLevel.MANAGER
-      ? router.push(RECORDS)
-      : router.back();
+  const onClickManageRecords = () => {
+    router.push(RECORDS);
+  };
+
+  const onClickViewRequests = () => {
+    router.push(REQUESTS);
   };
 
   const handleLogout = async () => {
@@ -34,10 +40,16 @@ const DashboardPage = () => {
           <p className='text-2xl text-white font-semibold'>{`Welcome ${auth.user?.displayName}`}</p>
 
           {auth.permissionLevel >= PermissionLevel.MANAGER ? (
-            <SubmitButton
-              message={'Click Here To Manage Records'}
-              onClick={onClick}
-            />
+            <>
+              <SubmitButton
+                message={'Click Here To Manage Records'}
+                onClick={onClickManageRecords}
+              />
+              <SubmitButton
+                message={'Click Here To View Requests'}
+                onClick={onClickViewRequests}
+              />
+            </>
           ) : (
             <>
               <p className='text-2xl text-white font-semibold'>

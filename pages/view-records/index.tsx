@@ -91,6 +91,11 @@ export const ViewRecordsPage = () => {
 
     let resCSV = `${headers.join(',')}\n`;
 
+    let summary: Record<
+      string,
+      { localeWorkTime: string; localeTotalTime: string; calledInDays: number }
+    > = {};
+
     for (const item in json) {
       const obj = json[item];
       if (!obj.events) continue; // no bueno
@@ -113,6 +118,37 @@ export const ViewRecordsPage = () => {
         calledIn ? 'Out Today' : ''
       },${calledIn ? meta : ''}`;
 
+      const combinedTime = timeWorked + breakTime;
+      const submitterId = obj.submitter;
+
+      if (submitterId) {
+        if (summary[submitterId]) {
+          summary[submitterId].localeWorkTime = StringUtils.addTimeHM(
+            summary[submitterId].localeWorkTime || '00:00',
+            localeWorkTime,
+          );
+          summary[submitterId].localeTotalTime = StringUtils.addTimeHM(
+            summary[submitterId].localeTotalTime || '00:00',
+            localeTotalTime,
+          );
+          summary[submitterId].calledInDays += calledIn ? 1 : 0;
+        } else {
+          summary[submitterId] = {
+            localeWorkTime,
+            localeTotalTime,
+            calledInDays: calledIn ? 1 : 0,
+          };
+        }
+
+        resCSV += '\n';
+      }
+    }
+
+    for (const userId in summary) {
+      const userData = await db.read(`/users/${userId}`);
+      const userInfo = userData.toJSON() as UserData;
+
+      resCSV += `${userInfo.displayName},,,${userInfo.email},,,${summary[userId].localeWorkTime},,,${summary[userId].localeTotalTime},${summary[userId].calledInDays},`;
       resCSV += '\n';
     }
 

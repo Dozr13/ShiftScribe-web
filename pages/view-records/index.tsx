@@ -10,6 +10,13 @@ import { useFirebase } from '../../context/FirebaseContext';
 import { PermissionLevel, StringUtils, TimeParser } from '../../lib';
 import { TimeRecords, UserData } from '../../types/data';
 
+type UserDataTotals = UserData & {
+  totalWorkTime: string;
+  totalBreakTime: string;
+  totalCombinedTime: string;
+  totalCallIns: string;
+};
+
 export const ViewRecordsPage = () => {
   const router = useRouter();
   const auth = useAuth();
@@ -64,6 +71,11 @@ export const ViewRecordsPage = () => {
     }
   };
 
+  const workTimes: number[] = [];
+  const breakTimes: number[] = [];
+  const totalTimes: number[] = [];
+  const callIns: boolean[] = [];
+
   const generateCSV = async () => {
     if (!auth.orgId || !auth.user) return;
 
@@ -89,7 +101,32 @@ export const ViewRecordsPage = () => {
       'Reason Missed',
     ];
 
+    const summaryHeaders = [
+      'Employee',
+      'E-Mail',
+      'Total Time Worked',
+      'Total Time On Break',
+      'Total Combined Time',
+      'Total Call Ins',
+    ];
+
     let resCSV = `${headers.join(',')}\n`;
+
+    let summary: Record<
+      string,
+      {
+        totalWorkTime: string;
+        totalBreakTime: string;
+        totalCombinedTime: string;
+        calledInCount: string;
+      }
+    > = {};
+
+    // Calculate the sums for the user
+    const totalWorkTime = StringUtils.sumTimestamps(workTimes);
+    const totalBreakTime = StringUtils.sumTimestamps(breakTimes);
+    const totalCombinedTime = StringUtils.sumTimestamps(totalTimes);
+    const totalCallIns = StringUtils.sumCallIns(callIns);
 
     for (const item in json) {
       const obj = json[item];
@@ -114,6 +151,73 @@ export const ViewRecordsPage = () => {
       },${calledIn ? meta : ''}`;
 
       resCSV += '\n';
+
+      const userId = obj.submitter as string;
+      if (summary[userId]) {
+        summary[userId].totalWorkTime = StringUtils.timestampHM(
+          Number(totalWorkTime),
+        );
+        summary[userId].totalBreakTime = StringUtils.timestampHM(
+          Number(totalBreakTime),
+        );
+        summary[userId].totalCombinedTime = StringUtils.timestampHM(
+          Number(totalCombinedTime),
+        );
+        summary[userId].calledInCount = totalCallIns;
+      } else {
+        summary[userId] = {
+          totalWorkTime: '0',
+          totalBreakTime: '0',
+          totalCombinedTime: '0',
+          calledInCount: '0',
+        };
+      }
+    }
+
+    resCSV += `\nSummary,\n,${summaryHeaders.join(',')}\n`;
+
+    workTimes.length = 0;
+    breakTimes.length = 0;
+    totalTimes.length = 0;
+    callIns.length = 0;
+
+    for (const userId in summary) {
+      const userData = await db.read(`/users/${userId}`);
+      const userInfo = userData.toJSON() as UserDataTotals;
+      console.log('userInfo ', userInfo);
+      console.log('SUMMARY: ', summary);
+
+      for (const combinedItem in json) {
+        const obj = json[combinedItem];
+        if (!obj.events) continue;
+
+        if (obj.submitter !== userId) continue;
+
+        const { timeWorked, breakTime, calledIn } =
+          TimeParser.parseCurrentRecord(obj.events);
+
+        workTimes.push(timeWorked);
+        breakTimes.push(breakTime);
+        totalTimes.push(timeWorked - breakTime);
+        callIns.push(calledIn);
+      }
+
+      // Calculate the sums for the user
+      const totalWorkTime = StringUtils.sumTimestamps(workTimes);
+      const totalBreakTime = StringUtils.sumTimestamps(breakTimes);
+      const totalCombinedTime = StringUtils.sumTimestamps(totalTimes);
+      const totalCallIns = StringUtils.sumCallIns(callIns);
+
+      // Assign the values to the individual user for display
+      userInfo.totalWorkTime = totalWorkTime;
+      userInfo.totalBreakTime = totalBreakTime;
+      userInfo.totalCombinedTime = totalCombinedTime;
+      userInfo.totalCallIns = totalCallIns;
+
+      console.log('userInfo.totalCombinedTime:', userInfo.totalCombinedTime);
+
+      resCSV += '\n';
+      resCSV += `,${userInfo.displayName},${userInfo.email},${userInfo.totalWorkTime},${userInfo.totalBreakTime},${userInfo.totalCombinedTime},${userInfo.totalCallIns},`;
     }
 
     setCsv(resCSV);

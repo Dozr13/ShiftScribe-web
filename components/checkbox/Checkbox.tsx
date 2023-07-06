@@ -1,9 +1,9 @@
-// Checkbox component
 import { ChangeEvent } from 'react';
 
 interface CheckboxProps {
   label: string;
   checked: boolean;
+  dateRequest: Date;
   inRequest: string;
   outRequest: string;
   onChange: (checked: boolean) => void;
@@ -12,6 +12,7 @@ interface CheckboxProps {
 const Checkbox = ({
   label,
   checked,
+  dateRequest,
   inRequest,
   outRequest,
   onChange,
@@ -22,25 +23,25 @@ const Checkbox = ({
   };
 
   return (
-    <div
-      className='grid grid-cols-1 divide-y my-5'
-      onClick={() => {
-        // Toggle the checkbox when the checkbox column is clicked
-        onChange(!checked);
-      }}
-    >
-      <label className='inline-flex items-center'>
+    <div className='grid grid-cols-3 w-fit p-4'>
+      <div className='flex items-center col-span-1'>
         <input
           type='checkbox'
           checked={checked}
           onChange={handleChange}
-          className='form-checkbox h-6 w-6 text-red-600 rounded-full focus:ring-0 focus:outline-none'
+          className='form-checkbox h-6 w-6 text-red-600 rounded-full focus:ring-0 focus:outline-none mx-auto my-auto'
         />
-        <span className='ml-2 text-gray-800'>{label}</span>
-        <span className='text-gray-600 '>
-          - In: {inRequest}, Out: {outRequest}
-        </span>
-      </label>
+      </div>
+      <div className='col-span-1 flex flex-col justify-center'>
+        <span className='m-2 text-gray-800'>{label}</span>
+      </div>
+      <div className='col-span-1'>
+        <div className='text-gray-600'>
+          Date: {dateRequest.toLocaleDateString()}
+        </div>
+        <div className='text-gray-600'>In: {inRequest}</div>
+        <div className='text-gray-600'>Out: {outRequest}</div>
+      </div>
     </div>
   );
 };

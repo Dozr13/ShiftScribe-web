@@ -1,20 +1,76 @@
-// pages/view-requests.tsx
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import Checkbox from '../../components/checkbox/Checkbox';
 import SubmitButton from '../../components/form-components/SubmitButton';
 
+const requests = [
+  {
+    id: 1,
+    employeeName: 'Juan',
+    dateRequest: new Date(),
+    inRequest: '5am',
+    outRequest: '6pm',
+  },
+  {
+    id: 2,
+    employeeName: 'Ceasar',
+    dateRequest: new Date(),
+    inRequest: '5am',
+    outRequest: '6pm',
+  },
+  {
+    id: 3,
+    employeeName: 'Alfred',
+    dateRequest: new Date(),
+    inRequest: '5am',
+    outRequest: '6pm',
+  },
+  {
+    id: 4,
+    employeeName: 'Bobby',
+    dateRequest: new Date(),
+    inRequest: '5am',
+    outRequest: '6pm',
+  },
+  {
+    id: 5,
+    employeeName: 'Lou',
+    dateRequest: new Date(),
+    inRequest: '5am',
+    outRequest: '6pm',
+  },
+  {
+    id: 6,
+    employeeName: 'Pan',
+    dateRequest: new Date(),
+    inRequest: '5am',
+    outRequest: '6pm',
+  },
+  {
+    id: 7,
+    employeeName: 'Bobby',
+    dateRequest: new Date(),
+    inRequest: '5am',
+    outRequest: '6pm',
+  },
+  {
+    id: 8,
+    employeeName: 'Lou',
+    dateRequest: new Date(),
+    inRequest: '5am',
+    outRequest: '6pm',
+  },
+  {
+    id: 9,
+    employeeName: 'Pan',
+    dateRequest: new Date(),
+    inRequest: '5am',
+    outRequest: '6pm',
+  },
+];
+
 const ViewRequestsPage = () => {
   const router = useRouter();
-
-  const requests = [
-    { id: 1, employeeName: 'Juan', inRequest: '5am', outRequest: '6pm' },
-    { id: 2, employeeName: 'Ceasar', inRequest: '5am', outRequest: '6pm' },
-    { id: 3, employeeName: 'Alfred', inRequest: '5am', outRequest: '6pm' },
-    { id: 4, employeeName: 'Bobby', inRequest: '5am', outRequest: '6pm' },
-    { id: 5, employeeName: 'Lou', inRequest: '5am', outRequest: '6pm' },
-    { id: 6, employeeName: 'Pan', inRequest: '5am', outRequest: '6pm' },
-  ];
 
   const [isChecked, setIsChecked] = useState<boolean[]>(
     Array(requests.length).fill(false),
@@ -32,13 +88,14 @@ const ViewRequestsPage = () => {
       <div className='text-2xl text-gray-300 font-extrabold p-10'>
         Will look something like:
       </div>
-      <div className='p-10 container flex flex-col justify-center items-center mx-auto w-96 border-2 bg-gray-400 border-gray-400 rounded-md'>
+      <div className='p-8 container flex flex-col justify-center items-center mx-auto max-h-[50vh] w-fit border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll'>
         <div className='flex flex-col items-start justify-around py-2 container mx-auto'>
           {requests.map((request, index) => (
             <Checkbox
               key={request.id}
               label={request.employeeName}
               checked={isChecked[index]}
+              dateRequest={request.dateRequest}
               inRequest={request.inRequest}
               outRequest={request.outRequest}
               onChange={(checked) => {
@@ -49,18 +106,18 @@ const ViewRequestsPage = () => {
             />
           ))}
         </div>
-        <div className='flex flex-row w-full justify-around'>
-          <SubmitButton
-            message={'Approve'}
-            onClick={handleCheckboxChange}
-            width='100%'
-          />
-          <SubmitButton
-            message={'Deny'}
-            onClick={handleCheckboxChange}
-            width='100%'
-          />
-        </div>
+      </div>
+      <div className='flex flex-row w-full justify-around'>
+        <SubmitButton
+          message={'Approve'}
+          onClick={handleCheckboxChange}
+          width='100%'
+        />
+        <SubmitButton
+          message={'Deny'}
+          onClick={handleCheckboxChange}
+          width='100%'
+        />
       </div>
       <div className='text-2xl text-gray-300 font-extrabold p-10'>
         If implemented

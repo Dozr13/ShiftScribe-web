@@ -23,8 +23,8 @@ const Checkbox = ({
   };
 
   return (
-    <div className='border-b-4'>
-      <div className='grid grid-cols-4 my-4'>
+    <div className='border-b-2'>
+      <div className='grid grid-cols-5 my-4'>
         <div className='flex items-center'>
           <input
             type='checkbox'
@@ -36,7 +36,7 @@ const Checkbox = ({
         <div className='col-span-1 flex flex-col justify-center'>
           <span className='m-2 text-gray-800'>{label}</span>
         </div>
-        <div className='col-span-1 flex flex-col justify-center'>
+        <div className='col-span-2 flex flex-col justify-center'>
           <div className='text-gray-600'>
             Date: {dateRequest.toLocaleDateString()}
           </div>

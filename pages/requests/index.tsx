@@ -61,7 +61,28 @@ const requests = [
     outRequest: '6pm',
   },
   {
-    id: 9,
+    id: 10,
+    employeeName: 'Pan',
+    dateRequest: new Date(),
+    inRequest: '5am',
+    outRequest: '6pm',
+  },
+  {
+    id: 11,
+    employeeName: 'Bobby',
+    dateRequest: new Date(),
+    inRequest: '5am',
+    outRequest: '6pm',
+  },
+  {
+    id: 8,
+    employeeName: 'Lou',
+    dateRequest: new Date(),
+    inRequest: '5am',
+    outRequest: '6pm',
+  },
+  {
+    id: 12,
     employeeName: 'Pan',
     dateRequest: new Date(),
     inRequest: '5am',
@@ -88,24 +109,22 @@ const ViewRequestsPage = () => {
       <div className='text-2xl text-gray-300 font-extrabold p-10'>
         Will look something like:
       </div>
-      <div className='p-8 container flex flex-col justify-center items-center mx-auto max-h-[50vh] w-fit border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll'>
-        <div className='flex flex-col items-start justify-around py-2 container mx-auto'>
-          {requests.map((request, index) => (
-            <Checkbox
-              key={request.id}
-              label={request.employeeName}
-              checked={isChecked[index]}
-              dateRequest={request.dateRequest}
-              inRequest={request.inRequest}
-              outRequest={request.outRequest}
-              onChange={(checked) => {
-                const newCheckedItems = [...isChecked];
-                newCheckedItems[index] = checked;
-                setIsChecked(newCheckedItems);
-              }}
-            />
-          ))}
-        </div>
+      <div className='p-8 container flex flex-col justify-center items-center mx-auto  border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll h-[50vh] w-[40vw]'>
+        {requests.map((request, index) => (
+          <Checkbox
+            key={request.id}
+            label={request.employeeName}
+            checked={isChecked[index]}
+            dateRequest={request.dateRequest}
+            inRequest={request.inRequest}
+            outRequest={request.outRequest}
+            onChange={(checked) => {
+              const newCheckedItems = [...isChecked];
+              newCheckedItems[index] = checked;
+              setIsChecked(newCheckedItems);
+            }}
+          />
+        ))}
       </div>
       <div className='flex flex-row w-full justify-around'>
         <SubmitButton

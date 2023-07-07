@@ -109,7 +109,7 @@ const ViewRequestsPage = () => {
       <div className='text-2xl text-gray-300 font-extrabold p-10'>
         Will look something like:
       </div>
-      <div className='p-8 container flex flex-col justify-center items-center mx-auto  border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll h-[50vh] w-[40vw]'>
+      <div className='p-8 container items-center mx-auto  border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[40vw]'>
         {requests.map((request, index) => (
           <Checkbox
             key={request.id}

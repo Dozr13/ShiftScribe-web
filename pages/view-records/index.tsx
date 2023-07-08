@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
-
 import { QueryConstraint, endAt, orderByKey } from 'firebase/database';
-
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import ProtectedRoute from '../../components/protected-route';
 import { useAuth } from '../../context/AuthContext';
@@ -10,10 +8,13 @@ import { useFirebase } from '../../context/FirebaseContext';
 import { PermissionLevel, StringUtils, TimeParser } from '../../lib';
 import { TimeRecords, UserData } from '../../types/data';
 
-type UserDataTotals = UserData & {
+type UserDataTotals = {
+  id: string;
+  displayName: string;
+  email: string;
   totalWorkTime: string;
   totalBreakTime: string;
-  totalCombinedTime: string;
+  totalPaidTime: string;
   totalCallIns: string;
 };
 
@@ -43,14 +44,14 @@ export const ViewRecordsPage = () => {
     const weekMs = 6.048e8 * timeInWeeks;
     const threshold = Date.now() - weekMs;
 
-    const json = await fetchData(orderByKey(), endAt(threshold.toString()));
+    const data = await fetchData(orderByKey(), endAt(threshold.toString()));
 
     const toDelete = new Array<number>();
 
-    if (json) {
+    if (data) {
       setLoading(true);
 
-      for (const key in json) {
+      for (const key in data) {
         const numeric = Number(key);
 
         if (!isNaN(numeric)) {
@@ -59,30 +60,25 @@ export const ViewRecordsPage = () => {
           }
         }
       }
-      const obj: Record<string, null> = {};
+      const record: Record<string, null> = {};
 
       for (const val of toDelete) {
-        obj[val.toString()] = null;
+        record[val.toString()] = null;
       }
 
-      if (obj) await db.update(`orgs/${auth.orgId}/timeRecords`, obj);
+      if (record) await db.update(`orgs/${auth.orgId}/timeRecords`, record);
 
       setLoading(false);
     }
   };
-
-  const workTimes: number[] = [];
-  const breakTimes: number[] = [];
-  const totalTimes: number[] = [];
-  const callIns: boolean[] = [];
 
   const generateCSV = async () => {
     if (!auth.orgId || !auth.user) return;
 
     setLoadingCSV(true);
 
-    const json = await fetchData();
-    if (!json) {
+    const data = await fetchData();
+    if (!data) {
       setLoadingCSV(false);
       return;
     }
@@ -115,109 +111,130 @@ export const ViewRecordsPage = () => {
     let summary: Record<
       string,
       {
-        totalWorkTime: string;
-        totalBreakTime: string;
-        totalCombinedTime: string;
-        calledInCount: string;
+        employeeName: string;
+        employeeEmail: string;
+        totalWorkTime: number;
+        totalBreakTime: number;
+        totalPaidTime: number;
+        calledInCount: number;
       }
     > = {};
 
-    // Calculate the sums for the user
-    const totalWorkTime = StringUtils.sumTimestamps(workTimes);
-    const totalBreakTime = StringUtils.sumTimestamps(breakTimes);
-    const totalCombinedTime = StringUtils.sumTimestamps(totalTimes);
-    const totalCallIns = StringUtils.sumCallIns(callIns);
+    let totalMilliseconds = 0;
 
-    for (const item in json) {
-      const obj = json[item];
-      if (!obj.events) continue; // no bueno
+    for (const key in data) {
+      const record = data[key];
+      if (!record.events) continue; // no bueno
 
-      const userData = await db.read(`/users/${obj.submitter}`);
+      const userData = await db.read(`/users/${record.submitter}`);
       const userInfo = userData.toJSON() as UserData;
 
-      const end = Number(item);
+      const end = Number(key);
       const { origin, timeWorked, breakTime, job, calledIn, meta } =
-        TimeParser.parseCurrentRecord(obj.events);
+        TimeParser.parseCurrentRecord(record.events);
+
+      console.log('timeWorked', timeWorked);
+
+      totalMilliseconds += timeWorked;
+
       const timestamp = new Date(origin);
       const outTimestamp = new Date(end);
-      const localeWorkTime = StringUtils.timestampHM(timeWorked);
-      const localeBreakTime = StringUtils.timestampHM(breakTime);
-      const localeTotalTime = StringUtils.timestampHM(timeWorked + breakTime);
+      const daysWorkTime = StringUtils.timestampHM(timeWorked);
+      const daysBreakTime = StringUtils.timestampHM(breakTime);
+      const daysPaidTime = StringUtils.timestampHM(timeWorked + breakTime);
 
-      resCSV += `${userInfo.displayName},${userInfo.email},${
+      let employeeName = userInfo.displayName;
+      let employeeEmail = userInfo.email;
+
+      // console.log('daysWorkTime', daysWorkTime);
+      resCSV += `${employeeName},${employeeEmail},${
         calledIn ? '' : job
-      },${timestamp.toLocaleDateString()},${timestamp.toLocaleTimeString()},${outTimestamp.toLocaleTimeString()},${localeWorkTime},${localeBreakTime},${localeTotalTime},${
+      },${timestamp.toLocaleDateString()},${timestamp.toLocaleTimeString()},${outTimestamp.toLocaleTimeString()},${daysWorkTime},${daysBreakTime},${daysPaidTime},${
         calledIn ? 'Out Today' : ''
       },${calledIn ? meta : ''}`;
 
       resCSV += '\n';
 
-      const userId = obj.submitter as string;
+      const userId = record.submitter as string;
       if (summary[userId]) {
-        summary[userId].totalWorkTime = StringUtils.timestampHM(
-          Number(totalWorkTime),
-        );
-        summary[userId].totalBreakTime = StringUtils.timestampHM(
-          Number(totalBreakTime),
-        );
-        summary[userId].totalCombinedTime = StringUtils.timestampHM(
-          Number(totalCombinedTime),
-        );
-        summary[userId].calledInCount = totalCallIns;
+        const {
+          employeeName,
+          employeeEmail,
+          totalWorkTime,
+          totalBreakTime,
+          calledInCount,
+        } = summary[userId];
+
+        const updatedEmployeeName = employeeName;
+        const updatedEmployeeEmail = employeeEmail;
+        const updatedTotalWorkTime = totalWorkTime + timeWorked;
+        const updatedTotalBreakTime = totalBreakTime + breakTime;
+        const updatedTotalPaidTime =
+          updatedTotalWorkTime - updatedTotalBreakTime;
+        const updatedCalledInCount = calledIn
+          ? calledInCount + 1
+          : calledInCount;
+        summary[userId] = {
+          employeeName: updatedEmployeeName,
+          employeeEmail: updatedEmployeeEmail,
+          totalWorkTime: updatedTotalWorkTime,
+          totalBreakTime: updatedTotalBreakTime,
+          totalPaidTime: updatedTotalPaidTime,
+          calledInCount: updatedCalledInCount,
+        };
       } else {
         summary[userId] = {
-          totalWorkTime: '0',
-          totalBreakTime: '0',
-          totalCombinedTime: '0',
-          calledInCount: '0',
+          employeeName: userInfo.displayName,
+          employeeEmail: userInfo.email,
+          totalWorkTime: timeWorked,
+          totalBreakTime: breakTime,
+          totalPaidTime: timeWorked - breakTime,
+          calledInCount: calledIn ? 1 : 0,
         };
       }
     }
+    console.log(' totalMilliseconds', totalMilliseconds);
+
+    // const totalHours = Math.floor(totalMilliseconds / (1000 * 60 * 60));
+    // const totalMinutes = Math.floor(
+    //   (totalMilliseconds % (1000 * 60 * 60)) / (1000 * 60),
+    // );
+    // const totalTimeFormatted = `${totalHours}h:${totalMinutes
+    //   .toString()
+    //   .padStart(2, '0')}m`;
+
+    // console.log('totalTimeFormatted', totalTimeFormatted);
+
+    let totalWorkTime = 0;
+    let totalBreakTime = 0;
+    let totalPaidTime = 0;
+    let totalCallIns = 0;
 
     resCSV += `\nSummary,\n,${summaryHeaders.join(',')}\n`;
 
-    workTimes.length = 0;
-    breakTimes.length = 0;
-    totalTimes.length = 0;
-    callIns.length = 0;
-
     for (const userId in summary) {
-      const userData = await db.read(`/users/${userId}`);
-      const userInfo = userData.toJSON() as UserDataTotals;
-      console.log('userInfo ', userInfo);
-      console.log('SUMMARY: ', summary);
+      const {
+        employeeName,
+        employeeEmail,
+        totalWorkTime: userWorkTime,
+        totalBreakTime: userBreakTime,
+        calledInCount,
+      } = summary[userId];
 
-      for (const combinedItem in json) {
-        const obj = json[combinedItem];
-        if (!obj.events) continue;
+      totalWorkTime += userWorkTime;
+      totalBreakTime += userBreakTime;
+      totalPaidTime += userWorkTime - userBreakTime;
+      totalCallIns += calledInCount;
 
-        if (obj.submitter !== userId) continue;
+      const totalWorkTimeFormatted = StringUtils.timestampHM(totalWorkTime);
+      const totalBreakTimeFormatted = StringUtils.timestampHM(totalBreakTime);
+      const totalPaidTimeFormatted = StringUtils.timestampHM(totalPaidTime);
 
-        const { timeWorked, breakTime, calledIn } =
-          TimeParser.parseCurrentRecord(obj.events);
-
-        workTimes.push(timeWorked);
-        breakTimes.push(breakTime);
-        totalTimes.push(timeWorked - breakTime);
-        callIns.push(calledIn);
-      }
-
-      // Calculate the sums for the user
-      const totalWorkTime = StringUtils.sumTimestamps(workTimes);
-      const totalBreakTime = StringUtils.sumTimestamps(breakTimes);
-      const totalCombinedTime = StringUtils.sumTimestamps(totalTimes);
-      const totalCallIns = StringUtils.sumCallIns(callIns);
-
-      // Assign the values to the individual user for display
-      userInfo.totalWorkTime = totalWorkTime;
-      userInfo.totalBreakTime = totalBreakTime;
-      userInfo.totalCombinedTime = totalCombinedTime;
-      userInfo.totalCallIns = totalCallIns;
-
-      console.log('userInfo.totalCombinedTime:', userInfo.totalCombinedTime);
+      console.log('totalWorkTime', totalWorkTime);
+      console.log('totalWorkTimeFormatted', totalWorkTimeFormatted);
 
       resCSV += '\n';
-      resCSV += `,${userInfo.displayName},${userInfo.email},${userInfo.totalWorkTime},${userInfo.totalBreakTime},${userInfo.totalCombinedTime},${userInfo.totalCallIns},`;
+      resCSV += `,${employeeName},${employeeEmail},${totalWorkTimeFormatted},${totalBreakTimeFormatted},${totalPaidTimeFormatted},${totalCallIns},`;
     }
 
     setCsv(resCSV);
@@ -226,10 +243,8 @@ export const ViewRecordsPage = () => {
   };
 
   useEffect(() => {
-    if (auth.user) {
-      if (auth.permissionLevel < PermissionLevel.MANAGER) {
-        router.back();
-      }
+    if (auth.user && auth.permissionLevel < PermissionLevel.MANAGER) {
+      router.back();
     }
   }, [auth.permissionLevel, auth.user, router]);
 
@@ -291,6 +306,7 @@ export const ViewRecordsPage = () => {
               <button
                 className='w-full mt-8 p-4 bg-red-600 rounded-md'
                 onClick={() => purgeOldRecords(2)}
+                disabled={loadingCSV}
               >
                 <p className='text-md font-semibold'>
                   Purge records older than 2 weeks

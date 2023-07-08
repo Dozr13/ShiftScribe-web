@@ -120,8 +120,6 @@ export const ViewRecordsPage = () => {
       }
     > = {};
 
-    let totalMilliseconds = 0;
-
     for (const key in data) {
       const record = data[key];
       if (!record.events) continue; // no bueno
@@ -133,21 +131,13 @@ export const ViewRecordsPage = () => {
       const { origin, timeWorked, breakTime, job, calledIn, meta } =
         TimeParser.parseCurrentRecord(record.events);
 
-      console.log('timeWorked', timeWorked);
-
-      totalMilliseconds += timeWorked;
-
       const timestamp = new Date(origin);
       const outTimestamp = new Date(end);
       const daysWorkTime = StringUtils.timestampHM(timeWorked);
       const daysBreakTime = StringUtils.timestampHM(breakTime);
-      const daysPaidTime = StringUtils.timestampHM(timeWorked + breakTime);
+      const daysPaidTime = StringUtils.timestampHM(timeWorked - breakTime);
 
-      let employeeName = userInfo.displayName;
-      let employeeEmail = userInfo.email;
-
-      // console.log('daysWorkTime', daysWorkTime);
-      resCSV += `${employeeName},${employeeEmail},${
+      resCSV += `${userInfo.displayName},${userInfo.email},${
         calledIn ? '' : job
       },${timestamp.toLocaleDateString()},${timestamp.toLocaleTimeString()},${outTimestamp.toLocaleTimeString()},${daysWorkTime},${daysBreakTime},${daysPaidTime},${
         calledIn ? 'Out Today' : ''
@@ -193,22 +183,6 @@ export const ViewRecordsPage = () => {
         };
       }
     }
-    console.log(' totalMilliseconds', totalMilliseconds);
-
-    // const totalHours = Math.floor(totalMilliseconds / (1000 * 60 * 60));
-    // const totalMinutes = Math.floor(
-    //   (totalMilliseconds % (1000 * 60 * 60)) / (1000 * 60),
-    // );
-    // const totalTimeFormatted = `${totalHours}h:${totalMinutes
-    //   .toString()
-    //   .padStart(2, '0')}m`;
-
-    // console.log('totalTimeFormatted', totalTimeFormatted);
-
-    let totalWorkTime = 0;
-    let totalBreakTime = 0;
-    let totalPaidTime = 0;
-    let totalCallIns = 0;
 
     resCSV += `\nSummary,\n,${summaryHeaders.join(',')}\n`;
 
@@ -218,23 +192,27 @@ export const ViewRecordsPage = () => {
         employeeEmail,
         totalWorkTime: userWorkTime,
         totalBreakTime: userBreakTime,
-        calledInCount,
+        calledInCount: userCallIns,
       } = summary[userId];
 
-      totalWorkTime += userWorkTime;
-      totalBreakTime += userBreakTime;
-      totalPaidTime += userWorkTime - userBreakTime;
-      totalCallIns += calledInCount;
+      console.log('userworkTime', userWorkTime);
 
-      const totalWorkTimeFormatted = StringUtils.timestampHM(totalWorkTime);
-      const totalBreakTimeFormatted = StringUtils.timestampHM(totalBreakTime);
-      const totalPaidTimeFormatted = StringUtils.timestampHM(totalPaidTime);
-
-      console.log('totalWorkTime', totalWorkTime);
-      console.log('totalWorkTimeFormatted', totalWorkTimeFormatted);
+      const totalWorkTimeFormatted = StringUtils.addTimeValues(
+        StringUtils.timestampHM(userWorkTime),
+        // ... add other individual time values here
+      );
+      const totalBreakTimeFormatted = StringUtils.addTimeValues(
+        StringUtils.timestampHM(userBreakTime),
+        // ... add other individual time values here
+      );
+      const totalPaidTimeFormatted = StringUtils.addTimeValues(
+        StringUtils.timestampHM(userWorkTime - userBreakTime),
+        // ... add other individual time values here
+      );
+      console.log('totalworktime', totalWorkTimeFormatted);
 
       resCSV += '\n';
-      resCSV += `,${employeeName},${employeeEmail},${totalWorkTimeFormatted},${totalBreakTimeFormatted},${totalPaidTimeFormatted},${totalCallIns},`;
+      resCSV += `,${employeeName},${employeeEmail},${totalWorkTimeFormatted},${totalBreakTimeFormatted},${totalPaidTimeFormatted},${userCallIns},`;
     }
 
     setCsv(resCSV);
@@ -289,6 +267,7 @@ export const ViewRecordsPage = () => {
                     generateCSV(),
                     {
                       loading: 'Generating CSV...',
+
                       success: 'CSV generated successfully!',
                       error: 'Error generating CSV.',
                     },

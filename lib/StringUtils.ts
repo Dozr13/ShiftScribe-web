@@ -33,7 +33,7 @@ class StringUtils {
   }
 
   timestampHM(ms: number) {
-    const seconds = ms / 1000;
+    const seconds = Math.round(ms / 1000);
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
 
@@ -84,6 +84,26 @@ class StringUtils {
   sumCallIns(callIns: boolean[]): number {
     const total = callIns.reduce((sum, value) => sum + (value ? 1 : 0), 0);
     return total;
+  }
+
+  addTimeValues(...timeValues: string[]): string {
+    let totalMinutes = 0;
+
+    // Convert each time value to minutes and sum them up
+    timeValues.forEach((timeValue) => {
+      const [hours, minutes] = timeValue.split('h:');
+      totalMinutes += parseInt(hours) * 60 + parseInt(minutes);
+    });
+
+    // Convert the total minutes back to hh:mm format
+    const totalHours = Math.floor(totalMinutes / 60);
+    const remainingMinutes = totalMinutes % 60;
+
+    function padZero(num: number): string {
+      return num.toString().padStart(2, '0');
+    }
+
+    return `${padZero(totalHours)}h:${padZero(remainingMinutes)}m`;
   }
 }
 

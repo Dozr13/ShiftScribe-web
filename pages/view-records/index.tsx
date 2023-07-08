@@ -10,12 +10,12 @@ import { TimeRecords, UserData } from '../../types/data';
 
 type UserDataTotals = {
   id: string;
-  displayName: string;
-  email: string;
+  employeeName: string;
+  employeeEmail: string;
   totalWorkTime: string;
   totalBreakTime: string;
   totalPaidTime: string;
-  totalCallIns: string;
+  totalCallIns: number;
 };
 
 export const ViewRecordsPage = () => {
@@ -108,17 +108,7 @@ export const ViewRecordsPage = () => {
 
     let resCSV = `${headers.join(',')}\n`;
 
-    let summary: Record<
-      string,
-      {
-        employeeName: string;
-        employeeEmail: string;
-        totalWorkTime: number;
-        totalBreakTime: number;
-        totalPaidTime: number;
-        calledInCount: number;
-      }
-    > = {};
+    let summary: UserDataTotals[] = [];
 
     for (const key in data) {
       const record = data[key];
@@ -135,7 +125,8 @@ export const ViewRecordsPage = () => {
       const outTimestamp = new Date(end);
       const daysWorkTime = StringUtils.timestampHM(timeWorked);
       const daysBreakTime = StringUtils.timestampHM(breakTime);
-      const daysPaidTime = StringUtils.timestampHM(timeWorked - breakTime);
+      const paidTime = Math.max(timeWorked - breakTime, 0);
+      const daysPaidTime = StringUtils.timestampHM(paidTime);
 
       resCSV += `${userInfo.displayName},${userInfo.email},${
         calledIn ? '' : job
@@ -146,73 +137,40 @@ export const ViewRecordsPage = () => {
       resCSV += '\n';
 
       const userId = record.submitter as string;
-      if (summary[userId]) {
-        const {
-          employeeName,
-          employeeEmail,
-          totalWorkTime,
-          totalBreakTime,
-          calledInCount,
-        } = summary[userId];
+      const userSummary = summary.find((item) => item.id === userId);
 
-        const updatedEmployeeName = employeeName;
-        const updatedEmployeeEmail = employeeEmail;
-        const updatedTotalWorkTime = totalWorkTime + timeWorked;
-        const updatedTotalBreakTime = totalBreakTime + breakTime;
-        const updatedTotalPaidTime =
-          updatedTotalWorkTime - updatedTotalBreakTime;
-        const updatedCalledInCount = calledIn
-          ? calledInCount + 1
-          : calledInCount;
-        summary[userId] = {
-          employeeName: updatedEmployeeName,
-          employeeEmail: updatedEmployeeEmail,
-          totalWorkTime: updatedTotalWorkTime,
-          totalBreakTime: updatedTotalBreakTime,
-          totalPaidTime: updatedTotalPaidTime,
-          calledInCount: updatedCalledInCount,
-        };
+      if (userSummary) {
+        userSummary.totalWorkTime = StringUtils.addTimeValues(
+          userSummary.totalWorkTime,
+          StringUtils.timestampHM(timeWorked),
+        );
+        userSummary.totalBreakTime = StringUtils.addTimeValues(
+          userSummary.totalBreakTime,
+          StringUtils.timestampHM(breakTime),
+        );
+        userSummary.totalPaidTime = StringUtils.addTimeValues(
+          userSummary.totalPaidTime,
+          StringUtils.timestampHM(paidTime),
+        );
+        userSummary.totalCallIns += calledIn ? 1 : 0;
       } else {
-        summary[userId] = {
+        summary.push({
+          id: userId,
           employeeName: userInfo.displayName,
           employeeEmail: userInfo.email,
-          totalWorkTime: timeWorked,
-          totalBreakTime: breakTime,
-          totalPaidTime: timeWorked - breakTime,
-          calledInCount: calledIn ? 1 : 0,
-        };
+          totalWorkTime: StringUtils.timestampHM(timeWorked),
+          totalBreakTime: StringUtils.timestampHM(breakTime),
+          totalPaidTime: StringUtils.timestampHM(timeWorked - breakTime),
+          totalCallIns: calledIn ? 1 : 0,
+        });
       }
     }
 
     resCSV += `\nSummary,\n,${summaryHeaders.join(',')}\n`;
 
-    for (const userId in summary) {
-      const {
-        employeeName,
-        employeeEmail,
-        totalWorkTime: userWorkTime,
-        totalBreakTime: userBreakTime,
-        calledInCount: userCallIns,
-      } = summary[userId];
-
-      console.log('userworkTime', userWorkTime);
-
-      const totalWorkTimeFormatted = StringUtils.addTimeValues(
-        StringUtils.timestampHM(userWorkTime),
-        // ... add other individual time values here
-      );
-      const totalBreakTimeFormatted = StringUtils.addTimeValues(
-        StringUtils.timestampHM(userBreakTime),
-        // ... add other individual time values here
-      );
-      const totalPaidTimeFormatted = StringUtils.addTimeValues(
-        StringUtils.timestampHM(userWorkTime - userBreakTime),
-        // ... add other individual time values here
-      );
-      console.log('totalworktime', totalWorkTimeFormatted);
-
+    for (const userSummary of summary) {
       resCSV += '\n';
-      resCSV += `,${employeeName},${employeeEmail},${totalWorkTimeFormatted},${totalBreakTimeFormatted},${totalPaidTimeFormatted},${userCallIns},`;
+      resCSV += `,${userSummary.employeeName},${userSummary.employeeEmail},${userSummary.totalWorkTime},${userSummary.totalBreakTime},${userSummary.totalPaidTime},${userSummary.totalCallIns},`;
     }
 
     setCsv(resCSV);

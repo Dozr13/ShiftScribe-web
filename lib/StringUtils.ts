@@ -33,6 +33,11 @@ class StringUtils {
   }
 
   timestampHM(ms: number) {
+    // TODO: Look into implementing this instead of Math.max() unsure of best route.
+    // if (ms < 0) {
+    //   return '00h:00m check';
+    // }
+
     const seconds = Math.round(ms / 1000);
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);

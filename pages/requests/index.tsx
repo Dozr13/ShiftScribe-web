@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import Checkbox from '../../components/checkbox/Checkbox';
 import SubmitButton from '../../components/form-components/SubmitButton';
+import { DASHBOARD } from '../../utils/constants/routes.constants';
 
 const requests = [
   {
@@ -103,44 +104,61 @@ const ViewRequestsPage = () => {
     setSelectedItemsData(newSelectedItemsData);
   };
 
+  const onClickDashboard = () => {
+    router.push(DASHBOARD);
+  };
+
   return (
     <div className='admin-panel flex flex-col justify-center items-center'>
-      <div className='text-8xl text-white font-extrabold'>Coming soon</div>
       <div className='text-2xl text-gray-300 font-extrabold p-10'>
-        Will look something like:
+        Time Adjustment Requests
       </div>
-      <div className='p-8 container items-center mx-auto  border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[40vw]'>
-        {requests.map((request, index) => (
-          <Checkbox
-            key={request.id}
-            label={request.employeeName}
-            checked={isChecked[index]}
-            dateRequest={request.dateRequest}
-            inRequest={request.inRequest}
-            outRequest={request.outRequest}
-            onChange={(checked) => {
-              const newCheckedItems = [...isChecked];
-              newCheckedItems[index] = checked;
-              setIsChecked(newCheckedItems);
-            }}
+      {requests.length > 0 ? (
+        <>
+          <div className='p-8 container items-center mx-auto border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[40vw]'>
+            <div className='border-t-2'></div>
+            {requests.map((request, index) => (
+              <Checkbox
+                key={request.id}
+                label={request.employeeName}
+                checked={isChecked[index]}
+                dateRequest={request.dateRequest}
+                inRequest={request.inRequest}
+                outRequest={request.outRequest}
+                onChange={(checked) => {
+                  const newCheckedItems = [...isChecked];
+                  newCheckedItems[index] = checked;
+                  setIsChecked(newCheckedItems);
+                }}
+              />
+            ))}
+          </div>
+          <div className='flex flex-row w-full justify-around'>
+            <SubmitButton
+              message={'Approve'}
+              onClick={handleCheckboxChange}
+              width='100%'
+            />
+            <SubmitButton
+              message={'Deny'}
+              onClick={handleCheckboxChange}
+              width='100%'
+            />
+          </div>
+        </>
+      ) : (
+        <>
+          <div className='p-8 container items-center mx-auto border-2 bg-gray-400 border-gray-400 rounded-md h-fit w-[40vw]'>
+            <p className='text-black text-3xl text-center'>
+              No Requests at this time.
+            </p>
+          </div>
+          <SubmitButton
+            message={'Back to Dashboard'}
+            onClick={onClickDashboard}
           />
-        ))}
-      </div>
-      <div className='flex flex-row w-full justify-around'>
-        <SubmitButton
-          message={'Approve'}
-          onClick={handleCheckboxChange}
-          width='100%'
-        />
-        <SubmitButton
-          message={'Deny'}
-          onClick={handleCheckboxChange}
-          width='100%'
-        />
-      </div>
-      <div className='text-2xl text-gray-300 font-extrabold p-10'>
-        If implemented
-      </div>
+        </>
+      )}
     </div>
   );
 };

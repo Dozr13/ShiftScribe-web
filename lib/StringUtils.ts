@@ -33,15 +33,20 @@ class StringUtils {
   }
 
   timestampHM(ms: number) {
-    const seconds = ms / 1000;
-    const h = Math.floor((seconds % (3600 * 24)) / 3600);
+    // TODO: Look into implementing this instead of Math.max() unsure of best route.
+    // if (ms < 0) {
+    //   return '00h:00m check';
+    // }
+
+    const seconds = Math.round(ms / 1000);
+    const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
 
     function f(x: number) {
       return String('0' + x).slice(-2);
     }
 
-    return `${f(h)}h:${f(m)}m`;
+    return `${h}h:${f(m)}m`;
   }
 
   /**
@@ -81,35 +86,29 @@ class StringUtils {
     };
   }
 
-  formatTime(durationInSeconds: number): string {
-    const hours = Math.floor(durationInSeconds / 3600);
-    const minutes = Math.floor((durationInSeconds % 3600) / 60);
-
-    const formattedHours = String(hours).padStart(2, '0');
-    const formattedMinutes = String(minutes).padStart(2, '0');
-
-    return `${formattedHours}:${formattedMinutes}`;
+  sumCallIns(callIns: boolean[]): number {
+    const total = callIns.reduce((sum, value) => sum + (value ? 1 : 0), 0);
+    return total;
   }
 
-  sumTimestamps(ms: number[]): string {
-    const totalMilliseconds = ms.reduce((sum, value) => sum + value, 0);
-    const totalSeconds = Math.floor(totalMilliseconds / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
+  addTimeValues(...timeValues: string[]): string {
+    let totalMinutes = 0;
 
-    function formatTime(x: number): string {
-      return String(x).padStart(2, '0');
+    // Convert each time value to minutes and sum them up
+    timeValues.forEach((timeValue) => {
+      const [hours, minutes] = timeValue.split('h:');
+      totalMinutes += parseInt(hours) * 60 + parseInt(minutes);
+    });
+
+    // Convert the total minutes back to hh:mm format
+    const totalHours = Math.floor(totalMinutes / 60);
+    const remainingMinutes = totalMinutes % 60;
+
+    function padZero(num: number): string {
+      return num.toString().padStart(2, '0');
     }
 
-    const formattedHours = formatTime(hours);
-    const formattedMinutes = formatTime(minutes);
-
-    return `${formattedHours}h:${formattedMinutes}m`;
-  }
-
-  sumCallIns(callIns: boolean[]): string {
-    const total = callIns.reduce((sum, value) => sum + (value ? 1 : 0), 0);
-    return total.toString();
+    return `${padZero(totalHours)}h:${padZero(remainingMinutes)}m`;
   }
 }
 

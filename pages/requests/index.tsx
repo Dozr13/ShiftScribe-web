@@ -1,107 +1,73 @@
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import Checkbox from '../../components/checkbox/Checkbox';
 import SubmitButton from '../../components/form-components/SubmitButton';
+import { useAuth } from '../../context/AuthContext';
+import { useFirebase } from '../../context/FirebaseContext';
 import { DASHBOARD } from '../../utils/constants/routes.constants';
 
-const requests = [
-  {
-    id: 1,
-    employeeName: 'Juan',
-    dateRequest: new Date(),
-    inRequest: '5am',
-    outRequest: '6pm',
-  },
-  {
-    id: 2,
-    employeeName: 'Ceasar',
-    dateRequest: new Date(),
-    inRequest: '5am',
-    outRequest: '6pm',
-  },
-  {
-    id: 3,
-    employeeName: 'Alfred',
-    dateRequest: new Date(),
-    inRequest: '5am',
-    outRequest: '6pm',
-  },
-  {
-    id: 4,
-    employeeName: 'Bobby',
-    dateRequest: new Date(),
-    inRequest: '5am',
-    outRequest: '6pm',
-  },
-  {
-    id: 5,
-    employeeName: 'Lou',
-    dateRequest: new Date(),
-    inRequest: '5am',
-    outRequest: '6pm',
-  },
-  {
-    id: 6,
-    employeeName: 'Pan',
-    dateRequest: new Date(),
-    inRequest: '5am',
-    outRequest: '6pm',
-  },
-  {
-    id: 7,
-    employeeName: 'Bobby',
-    dateRequest: new Date(),
-    inRequest: '5am',
-    outRequest: '6pm',
-  },
-  {
-    id: 8,
-    employeeName: 'Lou',
-    dateRequest: new Date(),
-    inRequest: '5am',
-    outRequest: '6pm',
-  },
-  {
-    id: 10,
-    employeeName: 'Pan',
-    dateRequest: new Date(),
-    inRequest: '5am',
-    outRequest: '6pm',
-  },
-  {
-    id: 11,
-    employeeName: 'Bobby',
-    dateRequest: new Date(),
-    inRequest: '5am',
-    outRequest: '6pm',
-  },
-  {
-    id: 8,
-    employeeName: 'Lou',
-    dateRequest: new Date(),
-    inRequest: '5am',
-    outRequest: '6pm',
-  },
-  {
-    id: 12,
-    employeeName: 'Pan',
-    dateRequest: new Date(),
-    inRequest: '5am',
-    outRequest: '6pm',
-  },
-];
-
 const ViewRequestsPage = () => {
+  const auth = useAuth();
+  const db = useFirebase();
   const router = useRouter();
 
-  const [isChecked, setIsChecked] = useState<boolean[]>(
-    Array(requests.length).fill(false),
-  );
+  const [isChecked, setIsChecked] = useState<boolean[]>([]);
   const [selectedItemsData, setSelectedItemsData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [requests, setRequests] = useState<any[]>([]);
 
-  const handleCheckboxChange = () => {
+  const fetchRequests = async () => {
+    setLoading(true);
+
+    try {
+      const snapshot = await db.query(`orgs/${auth.orgId}/adjustmentRequests`);
+      const data = snapshot.val();
+
+      const requestArray = Object.entries(data).map(([id, request]) => {
+        const { submitter, dateAdjustment, timeIn, timeOut } = (request as any)
+          .events[Object.keys((request as any).events)[0]];
+
+        return {
+          id,
+          employeeName: submitter,
+          dateRequest: new Date(dateAdjustment),
+          inRequest: new Date(timeIn).toLocaleTimeString(),
+          outRequest: new Date(timeOut).toLocaleTimeString(),
+        };
+      });
+
+      setRequests(requestArray);
+      setIsChecked(Array(requestArray.length).fill(false));
+    } catch (error) {
+      console.error('Error fetching requests:', error);
+      toast.error('Error fetching requests.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRequests();
+  });
+
+  const handleCheckboxChange = async () => {
     const newSelectedItemsData = requests.filter((_, i) => isChecked[i]);
     setSelectedItemsData(newSelectedItemsData);
+
+    const updatedRequests = requests.filter((_, i) => !isChecked[i]);
+    setRequests(updatedRequests);
+
+    for (const item of newSelectedItemsData) {
+      const { id } = item;
+
+      try {
+        await db.exists(`orgs/${auth.orgId}/adjustmentRequests/${id}`);
+      } catch (error) {
+        console.error('Error removing request:', error);
+        toast.error('Error removing request.');
+      }
+    }
   };
 
   const onClickDashboard = () => {

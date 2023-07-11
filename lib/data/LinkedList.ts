@@ -11,7 +11,7 @@ class Node<T> {
 /**
  * Doubly-Linked List Data Structure
  *
- * O(1) for Preappend
+ * O(1) for Prepend
  * O(n) for Iteration (Append, Delete, etc.)
  *
  * Written by Ryan

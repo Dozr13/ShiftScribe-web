@@ -210,8 +210,6 @@ export const ViewRecordsPage = () => {
 
       resCSV += '\n';
       resCSV += `,${userSummary.employeeName},${userSummary.employeeEmail},${totalRegularTime},${totalOvertime},${userSummary.totalBreakTime},${totalPaidTime},${userSummary.totalCallIns}`;
-
-      resCSV += `,${userSummary.employeeName},${userSummary.employeeEmail},${totalRegularTime},${totalOvertime},${userSummary.totalBreakTime},${userSummary.totalPaidTime},${userSummary.totalCallIns}`;
     }
 
     setCsv(resCSV);

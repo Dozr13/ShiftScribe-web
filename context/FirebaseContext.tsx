@@ -11,6 +11,7 @@ import {
   onValue,
   query,
   ref,
+  remove,
   set,
   update,
 } from 'firebase/database';
@@ -106,7 +107,7 @@ const Context = {
   },
 
   /**
-   * Deturmine if the current path contains data.
+   * Determine if the current path contains data.
    *
    * Useful if you don't need the data at a path, but instead want to know if it exists.
    *
@@ -133,11 +134,20 @@ const Context = {
   },
 
   /**
-   * Get the current time since unix epoch (millis)
+   * Get the current time since unix epoch (milliseconds)
    * @returns number
    */
   now: (): number => {
     return Date.now();
+  },
+
+  /**
+   * Delete data at a given path.
+   * @param Path
+   * @returns Promise<void>
+   */
+  delete: (Path: string) => {
+    return remove(ref(getDatabase(), Path));
   },
 };
 

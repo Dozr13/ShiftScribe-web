@@ -32,12 +32,14 @@ class StringUtils {
     } else return `${s} Second${plural(s)}`;
   }
 
-  timestampHM(ms: number) {
-    // TODO: Look into implementing this instead of Math.max() unsure of best route.
-    // if (ms < 0) {
-    //   return '00h:00m check';
-    // }
+  timestampToMilliseconds(timeString: string): number {
+    const [hours, minutes] = timeString.split(':');
+    const hoursInMs = parseInt(hours) * 60 * 60 * 1000;
+    const minutesInMs = parseInt(minutes) * 60 * 1000;
+    return hoursInMs + minutesInMs;
+  }
 
+  timestampHM(ms: number) {
     const seconds = Math.round(ms / 1000);
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
@@ -109,6 +111,29 @@ class StringUtils {
     }
 
     return `${padZero(totalHours)}h:${padZero(remainingMinutes)}m`;
+  }
+
+  subtractTimeValues(...timeValues: string[]): string {
+    let totalMinutes = 0;
+
+    // Convert each time value to minutes and sum them up
+    timeValues.forEach((timeValue) => {
+      const [hours, minutes] = timeValue.split('h:');
+      totalMinutes += parseInt(hours) * 60 + parseInt(minutes);
+    });
+
+    // Convert the total minutes back to hh:mm format
+    const totalHours = Math.floor(totalMinutes / 60);
+    const remainingMinutes = Math.abs(totalMinutes) % 60;
+
+    function padZero(num: number): string {
+      return num.toString().padStart(2, '0');
+    }
+
+    const sign = totalMinutes < 0 ? '-' : '';
+    return `${sign}${padZero(Math.abs(totalHours))}h:${padZero(
+      remainingMinutes,
+    )}m`;
   }
 }
 

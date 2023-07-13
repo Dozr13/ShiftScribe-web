@@ -1,6 +1,7 @@
 interface ButtonProps {
   message: string;
   onClick?: () => void;
+  onSubmit?: (index: number, checked: boolean) => Promise<void>;
   disabled?: boolean;
   width?: string;
 }

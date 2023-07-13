@@ -27,7 +27,8 @@ export type RecordEventType =
   | 'clockout'
   | 'break'
   | 'endbreak'
-  | 'calledin';
+  | 'calledin'
+  | 'adjustmentRequest';
 
 export interface EventObject {
   job: string;

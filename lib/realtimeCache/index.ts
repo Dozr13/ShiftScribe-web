@@ -24,7 +24,10 @@ export class RealtimeCache<T> {
   }
 
   private invalidated() {
-    if (Date.now() - this.lastAccessed > this.lifetime || this.state === undefined) {
+    if (
+      Date.now() - this.lastAccessed > this.lifetime ||
+      this.state === undefined
+    ) {
       this.lastAccessed = Date.now();
       return true;
     }

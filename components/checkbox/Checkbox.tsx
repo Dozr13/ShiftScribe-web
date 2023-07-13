@@ -3,7 +3,7 @@ import { ChangeEvent } from 'react';
 interface CheckboxProps {
   label: string;
   checked: boolean;
-  dateRequest: Date;
+  dateRequest: string;
   inRequest: string;
   outRequest: string;
   onChange: (checked: boolean) => void;
@@ -37,9 +37,7 @@ const Checkbox = ({
           <span className='m-2 text-gray-800'>{label}</span>
         </div>
         <div className='col-span-2 flex flex-col justify-center'>
-          <div className='text-gray-600'>
-            Date: {dateRequest.toLocaleDateString()}
-          </div>
+          <div className='text-gray-600'>Date: {dateRequest}</div>
         </div>
         <div className='col-span-1 flex flex-col w-40'>
           <div className='text-gray-600'>In: {inRequest}</div>

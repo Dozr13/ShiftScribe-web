@@ -31,7 +31,6 @@ export const ViewRecordsPage = () => {
     setLoading(true);
     const res = await db.query(`orgs/${auth.orgId}/timeRecords`, ...query);
     setLoading(false);
-
     if (!res.exists()) {
       let errorMessage = 'No records match this request.';
       toast.error(errorMessage);
@@ -100,7 +99,8 @@ export const ViewRecordsPage = () => {
     const summaryHeaders = [
       'Employee',
       'E-Mail',
-      'Total Time Worked',
+      'Total Regular Time',
+      'Total Overtime',
       'Total Time On Break',
       'Total Combined Time',
       'Total Call Ins',
@@ -117,20 +117,30 @@ export const ViewRecordsPage = () => {
       const userData = await db.read(`/users/${record.submitter}`);
       const userInfo = userData.toJSON() as UserData;
 
-      const end = Number(key);
       const { origin, timeWorked, breakTime, job, calledIn, meta } =
         TimeParser.parseCurrentRecord(record.events);
 
       const timestamp = new Date(origin);
-      const outTimestamp = new Date(end);
+      const outTimestamp = new Date(origin + timeWorked);
       const daysWorkTime = StringUtils.timestampHM(timeWorked);
       const daysBreakTime = StringUtils.timestampHM(breakTime);
       const paidTime = Math.max(timeWorked - breakTime, 0);
       const daysPaidTime = StringUtils.timestampHM(paidTime);
 
+      const inTime = new Date(timestamp).toLocaleTimeString(undefined, {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+      const outTime = new Date(outTimestamp).toLocaleTimeString(undefined, {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+
       resCSV += `${userInfo.displayName},${userInfo.email},${
         calledIn ? '' : job
-      },${timestamp.toLocaleDateString()},${timestamp.toLocaleTimeString()},${outTimestamp.toLocaleTimeString()},${daysWorkTime},${daysBreakTime},${daysPaidTime},${
+      },${timestamp.toLocaleDateString()},${inTime},${outTime},${daysWorkTime},${daysBreakTime},${daysPaidTime},${
         calledIn ? 'Out Today' : ''
       },${calledIn ? meta : ''}`;
 
@@ -169,8 +179,39 @@ export const ViewRecordsPage = () => {
     resCSV += `\nSummary,\n,${summaryHeaders.join(',')}\n`;
 
     for (const userSummary of summary) {
+      // Calculate regular time and overtime
+      const totalWorkTimeMs = StringUtils.timestampToMilliseconds(
+        userSummary.totalWorkTime,
+      );
+      const breakTimeMs = StringUtils.timestampToMilliseconds(
+        userSummary.totalBreakTime,
+      );
+      const regularTimeMs = 40 * 60 * 60 * 1000; // 40 hours in milliseconds
+
+      // Calculate paid time by subtracting break time from total work time
+      const paidTimeMs = Math.max(totalWorkTimeMs - breakTimeMs, 0);
+
+      // Format regular time, overtime, and paid time
+      const totalRegularTime = StringUtils.timestampHM(
+        Math.min(totalWorkTimeMs, regularTimeMs),
+      );
+      const overtimeMs = Math.max(totalWorkTimeMs - regularTimeMs, 0);
+      const totalOvertime = StringUtils.timestampHM(overtimeMs);
+      const totalPaidTime = StringUtils.timestampHM(paidTimeMs);
+      // Subtract break time from combined time
+      let totalCombinedTime = StringUtils.addTimeValues(
+        totalRegularTime,
+        totalOvertime,
+      );
+      totalCombinedTime = StringUtils.subtractTimeValues(
+        totalCombinedTime,
+        userSummary.totalBreakTime,
+      );
+
       resCSV += '\n';
-      resCSV += `,${userSummary.employeeName},${userSummary.employeeEmail},${userSummary.totalWorkTime},${userSummary.totalBreakTime},${userSummary.totalPaidTime},${userSummary.totalCallIns},`;
+      resCSV += `,${userSummary.employeeName},${userSummary.employeeEmail},${totalRegularTime},${totalOvertime},${userSummary.totalBreakTime},${totalPaidTime},${userSummary.totalCallIns}`;
+
+      resCSV += `,${userSummary.employeeName},${userSummary.employeeEmail},${totalRegularTime},${totalOvertime},${userSummary.totalBreakTime},${userSummary.totalPaidTime},${userSummary.totalCallIns}`;
     }
 
     setCsv(resCSV);

@@ -4,6 +4,7 @@ import ProtectedRoute from '../../components/protected-route';
 import { useAuth } from '../../context/AuthContext';
 import { PermissionLevel } from '../../lib';
 import {
+  JOB_LIST,
   LOGIN,
   RECORDS,
   REQUESTS,
@@ -22,6 +23,10 @@ const DashboardPage = () => {
     router.push(REQUESTS);
   };
 
+  const onClickJobInformation = () => {
+    router.push(JOB_LIST);
+  };
+
   const handleLogout = async () => {
     showToast('Logging out...');
     try {
@@ -37,19 +42,29 @@ const DashboardPage = () => {
     <ProtectedRoute>
       <div className='flex py-2 container mx-auto'>
         <div className='text-gray-600 flex flex-col justify-center items-center px-12 py-24 mx-auto'>
-          <p className='text-2xl text-white font-semibold'>{`Welcome ${auth.user?.displayName}`}</p>
+          <p className='text-5xl h-20 absolute top-[30vh] text-white font-semibold border-double border-b-4 bor'>{`Welcome ${auth.user?.displayName}`}</p>
 
           {auth.permissionLevel >= PermissionLevel.MANAGER ? (
-            <>
-              <SubmitButton
-                message={'Click Here To Manage Records'}
-                onClick={onClickManageRecords}
-              />
-              <SubmitButton
-                message={'Click Here To View Requests'}
-                onClick={onClickViewRequests}
-              />
-            </>
+            <div className='grid grid-cols-3 gap-10'>
+              <div className='mb-4'>
+                <SubmitButton
+                  message={'Click Here To Manage Records'}
+                  onClick={onClickManageRecords}
+                />
+              </div>
+              <div className='mb-4'>
+                <SubmitButton
+                  message={'Click Here To View Requests'}
+                  onClick={onClickViewRequests}
+                />
+              </div>
+              <div className='mb-4'>
+                <SubmitButton
+                  message={'Click Here To Edit Jobs'}
+                  onClick={onClickJobInformation}
+                />
+              </div>
+            </div>
           ) : (
             <>
               <p className='text-2xl text-white font-semibold'>

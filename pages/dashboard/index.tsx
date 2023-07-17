@@ -3,11 +3,7 @@ import SubmitButton from '../../components/form-components/SubmitButton';
 import ProtectedRoute from '../../components/protected-route';
 import { useAuth } from '../../context/AuthContext';
 import { PermissionLevel } from '../../lib';
-import {
-  LOGIN,
-  RECORDS,
-  REQUESTS,
-} from '../../utils/constants/routes.constants';
+import { routes } from '../../utils/constants/routes.constants';
 import { showToast } from '../../utils/toast';
 
 const DashboardPage = () => {
@@ -15,11 +11,15 @@ const DashboardPage = () => {
   const router = useRouter();
 
   const onClickManageRecords = () => {
-    router.push(RECORDS);
+    router.push(routes.RECORDS);
   };
 
   const onClickViewRequests = () => {
-    router.push(REQUESTS);
+    router.push(routes.REQUESTS);
+  };
+
+  const onClickImageUploader = () => {
+    router.push(routes.IMAGE_UPLOADER);
   };
 
   const handleLogout = async () => {
@@ -27,7 +27,7 @@ const DashboardPage = () => {
     try {
       await auth.signOut();
       showToast('You are now logged out');
-      router.push(LOGIN);
+      router.push(routes.LOGIN);
     } catch (error: any) {
       showToast(error.message, false);
     }
@@ -48,6 +48,10 @@ const DashboardPage = () => {
               <SubmitButton
                 message={'Click Here To View Requests'}
                 onClick={onClickViewRequests}
+              />
+              <SubmitButton
+                message={'Click Here To Upload Image'}
+                onClick={onClickImageUploader}
               />
             </>
           ) : (

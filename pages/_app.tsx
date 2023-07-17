@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import toast, { Toaster, useToasterStore } from 'react-hot-toast';
 import Header from '../components/header';
 import { AuthContextProvider } from '../context/AuthContext';
+import StorageContextProvider from '../context/StorageContext';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -16,19 +17,21 @@ function MyApp({ Component, pageProps }: AppProps) {
   }, [toasts]);
 
   return (
-    <AuthContextProvider>
-      <div className='h-screen overflow-y-hidden flex flex-col justify-center align-middle items-center'>
-        <Toaster position='bottom-right' reverseOrder={false} />
-        <Header>
-          <div
-            className='h-full w-full flex justify-center items-center overflow-hidden'
-            style={{ backgroundColor: '#262626' }}
-          >
-            <Component {...pageProps} />
-          </div>
-        </Header>
-      </div>
-    </AuthContextProvider>
+    <StorageContextProvider>
+      <AuthContextProvider>
+        <div className='h-screen overflow-y-hidden flex flex-col justify-center align-middle items-center'>
+          <Toaster position='bottom-right' reverseOrder={false} />
+          <Header>
+            <div
+              className='h-full w-full flex justify-center items-center overflow-hidden'
+              style={{ backgroundColor: '#262626' }}
+            >
+              <Component {...pageProps} />
+            </div>
+          </Header>
+        </div>
+      </AuthContextProvider>
+    </StorageContextProvider>
   );
 }
 

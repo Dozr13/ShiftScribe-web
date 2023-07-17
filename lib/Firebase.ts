@@ -2,7 +2,7 @@ import { initializeApp } from 'firebase/app';
 import 'firebase/auth';
 import { browserLocalPersistence, initializeAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-
+import { getStorage } from 'firebase/storage';
 /**
  * Due to firebase's rule system, our API key is okay to commit.
  */
@@ -18,7 +18,10 @@ const FirebaseConfig = {
 };
 
 const FIREBASE_APP = initializeApp(FirebaseConfig);
-export const FIREBASE_AUTH = initializeAuth(FIREBASE_APP, {
+const FIREBASE_STORAGE = getStorage(FIREBASE_APP);
+const FIREBASE_AUTH = initializeAuth(FIREBASE_APP, {
   persistence: browserLocalPersistence,
 });
-export const FIREBASE_DATABASE = getFirestore(FIREBASE_APP);
+const FIREBASE_DATABASE = getFirestore(FIREBASE_APP);
+
+export { FIREBASE_AUTH, FIREBASE_DATABASE, FIREBASE_STORAGE };

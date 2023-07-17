@@ -227,8 +227,6 @@ export const ViewRecordsPage = () => {
     <ProtectedRoute>
       <div className='admin-panel flex flex-col justify-center items-center'>
         <div className='p-10 container flex flex-col justify-center items-center mx-auto w-96 border-2 bg-gray-400 border-gray-400 rounded-md'>
-          <div className='flex py-2 container mx-auto'></div>
-
           <div
             className='text-3xl text-white'
             style={{ fontFamily: 'monospace' }}

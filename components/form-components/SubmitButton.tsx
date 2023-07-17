@@ -8,7 +8,7 @@ interface ButtonProps {
 
 const SubmitButton = ({ disabled, message, onClick, width }: ButtonProps) => {
   return (
-    <div className='flex justify-center pt-8'>
+    <div className='flex justify-center'>
       <button
         type='submit'
         onClick={onClick}

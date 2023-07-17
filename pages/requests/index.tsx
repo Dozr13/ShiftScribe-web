@@ -194,7 +194,7 @@ const ViewRequestsPage = () => {
 
   return (
     <div className='admin-panel flex flex-col justify-center items-center'>
-      <div className='text-2xl text-gray-300 font-extrabold p-10'>
+      <div className='text-3xl text-gray-300 font-extrabold p-10'>
         Time Adjustment Requests
       </div>
       {requests.length > 0 ? (

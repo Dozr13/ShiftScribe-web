@@ -16,8 +16,9 @@ export interface OrgData {
 }
 
 export interface OrgJob {
-  jobNumber: number;
   jobName: string;
+  jobNumber: string;
+  jobAddress: string;
 }
 
 export type OrgJobs = Record<string, OrgJob>;

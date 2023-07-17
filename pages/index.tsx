@@ -2,7 +2,7 @@ import type { NextPage } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
-import { LOGIN, RECORDS } from '../utils/constants/routes.constants';
+import { DASHBOARD, LOGIN } from '../utils/constants/routes.constants';
 
 const Home: NextPage = () => {
   const auth = useAuth();
@@ -14,12 +14,12 @@ const Home: NextPage = () => {
         src={require('../assets/images/Logo-Official.png')}
         alt='Example'
       />
-      <Link href={auth.user ? RECORDS : LOGIN}>
+      <Link href={auth.user ? DASHBOARD : LOGIN}>
         <button
           type='button'
           className='bg-blue-800 hover:bg-blue-700 hover:shadow-lg transition h-fit text-white  px-8 py-4 rounded-md mt-20'
         >
-          {auth.user ? 'Go to view records' : 'Go to Login'}
+          {auth.user ? 'Go to Dashboard' : 'Go to Login'}
         </button>
       </Link>
     </div>

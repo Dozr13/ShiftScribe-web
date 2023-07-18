@@ -70,54 +70,51 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onDelete }) => {
   }
 
   return (
-    <div className='job-list-item w-[100%] flex'>
+    <div className='job-list-item w-[90vw] flex'>
       {editing ? (
-        <div className='flex items-center justify-evenly flex-wrap'>
+        <div className='flex items-center justify-center flex-wrap'>
           <StyledInput
-            label='Job Name: '
             type='text'
             value={jobName}
             onChange={setJobName}
-            className='w-[18vw] text-gray-800'
+            className='w-[20vw] text-gray-800'
           />
           <StyledInput
-            label='Job Number: '
             type='text'
             value={jobNumber}
             onChange={setJobNumber}
-            className='w-[18vw] text-gray-800'
+            className='w-[20vw] text-gray-800'
           />
           <StyledInput
-            label='Job Address: '
             type='text'
             value={jobAddress}
             onChange={setJobAddress}
-            className='w-[18vw] text-gray-800'
+            className='w-[20vw] text-gray-800'
           />
         </div>
       ) : (
         <div className='flex items-center justify-evenly flex-wrap'>
           <span
-            className='w-[18vw] text-gray-800'
+            className='w-[20vw] text-gray-800'
             style={{ wordWrap: 'break-word' }}
           >
             {jobName}
           </span>
           <span
-            className='w-[18vw] text-gray-800'
+            className='w-[20vw] text-gray-800'
             style={{ wordWrap: 'break-word' }}
           >
             {jobAddress}
           </span>
           <span
-            className='w-[18vw] text-gray-800'
+            className='w-[20vw] text-gray-800'
             style={{ wordWrap: 'break-word' }}
           >
             {jobNumber}
           </span>
         </div>
       )}
-      <div className='w-[8vw] flex justify-between text-gray-800'>
+      <div className='w-[10vw] flex justify-between text-gray-800'>
         <StyledIconButton
           onClick={!editing ? handleEdit : handleSave}
           label={!editing ? 'Edit' : 'Save'}

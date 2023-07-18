@@ -86,14 +86,20 @@ const JobInformationPage = () => {
           <div className='text-3xl text-gray-300 font-extrabold p-10'>
             Job Information
           </div>
-          <div className='p-12 container border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[70vw]'>
+          <div className='p-5 container border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[70vw]'>
             {/* <div className='flex flex-col' style={{ height: '100%' }}> */}
             {/* <div className='p-8 container border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[70vw]'> */}
-            <div className='flex justify-evenly mb-5'>
-              <div className='w-[15%] text-gray-800 font-bold'>Job Name</div>
-              <div className='w-[15%] text-gray-800 font-bold'>Job Number</div>
-              <div className='w-[15%] text-gray-800 font-bold'>Job Address</div>
-              <div className='w-[15%]'></div>
+            <div className='flex justify-evenly mb-2'>
+              <div className='w-[25%] text-gray-800 font-bold text-xl p-5'>
+                Job Name
+              </div>
+              <div className='w-[25%] text-gray-800 font-bold text-xl p-5'>
+                Job Number
+              </div>
+              <div className='w-[25%] text-gray-800 font-bold text-xl p-5'>
+                Job Address
+              </div>
+              <div className='w-[25%]'></div>
             </div>
             {jobs.map((job) => (
               <JobListItem key={job.id} job={job} onDelete={handleDelete} />

@@ -79,44 +79,44 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onDelete }) => {
               type='text'
               value={jobName}
               onChange={setJobName}
-              className='text-gray-800 w-[15%]'
+              className='text-gray-800 w-[25%]'
             />
             <StyledInput
               type='text'
               value={jobNumber}
               onChange={setJobNumber}
-              className='text-gray-800 w-[15%]'
+              className='text-gray-800 w-[25%]'
             />
             <StyledInput
               type='text'
               value={jobAddress}
               onChange={setJobAddress}
-              className='text-gray-800 w-[15%]'
+              className='text-gray-800 w-[25%]'
             />
           </>
         ) : (
           <>
             <span
-              className='text-gray-800 w-[15%]'
+              className='text-gray-800 w-[25%] p-5'
               style={{ wordWrap: 'break-word' }}
             >
               {jobName}
             </span>
             <span
-              className='text-gray-800 w-[15%]'
+              className='text-gray-800 w-[25%] p-5'
               style={{ wordWrap: 'break-word' }}
             >
               {jobAddress}
             </span>
             <span
-              className='text-gray-800 w-[15%]'
+              className='text-gray-800 w-[25%] p-5'
               style={{ wordWrap: 'break-word' }}
             >
               {jobNumber}
             </span>
           </>
         )}
-        <div className='flex justify-around text-gray-800 w-[15%]'>
+        <div className='flex justify-around text-gray-800 w-[25%] p-5'>
           <StyledIconButton
             onClick={!editing ? handleEdit : handleSave}
             label={!editing ? 'Edit' : 'Save'}

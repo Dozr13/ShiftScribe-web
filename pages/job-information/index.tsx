@@ -86,56 +86,45 @@ const JobInformationPage = () => {
           <div className='text-3xl text-gray-300 font-extrabold p-10'>
             Job Information
           </div>
-          <div className='p-8 container border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[70vw]'>
-            <div className='flex flex-col' style={{ height: '100%' }}>
-              <div className='p-8 container border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[70vw]'>
-                <div className='flex justify-evenly mb-5 ml-10'>
-                  <div className='w-[25vw] text-gray-800 font-bold'>
-                    Job Name
-                  </div>
-                  <div className='w-[25vw] text-gray-800 font-bold'>
-                    Job Address
-                  </div>
-                  <div className='w-[25vw] text-gray-800 font-bold'>
-                    Job Number
-                  </div>
-                  <div className='w-[20vw]'></div>
-                </div>
-                {jobs.map((job) => (
-                  <div
-                    key={job.id}
-                    className='border-t-2 flex items-center h-20'
-                  >
-                    <JobListItem
-                      key={job.id}
-                      job={job}
-                      onDelete={handleDelete}
-                    />
-                  </div>
-                ))}
-              </div>
+          <div className='p-12 container border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[70vw]'>
+            {/* <div className='flex flex-col' style={{ height: '100%' }}> */}
+            {/* <div className='p-8 container border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[70vw]'> */}
+            <div className='flex justify-evenly mb-5'>
+              <div className='w-[15%] text-gray-800 font-bold'>Job Name</div>
+              <div className='w-[15%] text-gray-800 font-bold'>Job Number</div>
+              <div className='w-[15%] text-gray-800 font-bold'>Job Address</div>
+              <div className='w-[15%]'></div>
             </div>
-            <div className='p-8 container border-2 bg-gray-400 border-gray-400 rounded-md mt-4'>
-              <div className='flex justify-around items-start'>
-                <StyledInput
-                  label='Job Name: '
-                  type='text'
-                  value={jobNameValue}
-                  onChange={setJobNameValue}
-                />
-                <StyledInput
-                  label='Job Number: '
-                  type='text'
-                  value={jobNumberValue}
-                  onChange={setJobNumberValue}
-                />
-                <StyledInput
-                  label='Job Address: '
-                  type='text'
-                  value={jobAddressValue}
-                  onChange={setJobAddressValue}
-                />
-              </div>
+            {jobs.map((job) => (
+              <JobListItem key={job.id} job={job} onDelete={handleDelete} />
+            ))}
+            {/* </div> */}
+          </div>
+          {/* </div> */}
+          <div className='p-8 container border-2 bg-gray-400 border-gray-400 rounded-md mt-4'>
+            <div className='flex justify-around items-start'>
+              {/* THESE ARE NOT SHOWING */}
+              <StyledInput
+                label='Job Name: '
+                type='text'
+                value={jobNameValue}
+                onChange={setJobNameValue}
+                flex
+              />
+              <StyledInput
+                label='Job Number: '
+                type='text'
+                value={jobNumberValue}
+                onChange={setJobNumberValue}
+                flex
+              />
+              <StyledInput
+                label='Job Address: '
+                type='text'
+                value={jobAddressValue}
+                onChange={setJobAddressValue}
+                flex
+              />
             </div>
           </div>
           <SubmitButton message={'Add to List'} onClick={handleSubmit} />

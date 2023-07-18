@@ -70,63 +70,66 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onDelete }) => {
   }
 
   return (
-    <div className='job-list-item w-[90vw] flex'>
-      {editing ? (
-        <div className='flex items-center justify-center flex-wrap'>
-          <StyledInput
-            type='text'
-            value={jobName}
-            onChange={setJobName}
-            className='w-[20vw] text-gray-800'
+    <div className='job-list-item border-t-2'>
+      <div className='flex items-center justify-evenly flex-wrap'>
+        {editing ? (
+          <>
+            {/* HOW CAN I SPACE THESE APART? */}
+            <StyledInput
+              type='text'
+              value={jobName}
+              onChange={setJobName}
+              className='text-gray-800 w-[15%]'
+            />
+            <StyledInput
+              type='text'
+              value={jobNumber}
+              onChange={setJobNumber}
+              className='text-gray-800 w-[15%]'
+            />
+            <StyledInput
+              type='text'
+              value={jobAddress}
+              onChange={setJobAddress}
+              className='text-gray-800 w-[15%]'
+            />
+          </>
+        ) : (
+          <>
+            <span
+              className='text-gray-800 w-[15%]'
+              style={{ wordWrap: 'break-word' }}
+            >
+              {jobName}
+            </span>
+            <span
+              className='text-gray-800 w-[15%]'
+              style={{ wordWrap: 'break-word' }}
+            >
+              {jobAddress}
+            </span>
+            <span
+              className='text-gray-800 w-[15%]'
+              style={{ wordWrap: 'break-word' }}
+            >
+              {jobNumber}
+            </span>
+          </>
+        )}
+        <div className='flex justify-around text-gray-800 w-[15%]'>
+          <StyledIconButton
+            onClick={!editing ? handleEdit : handleSave}
+            label={!editing ? 'Edit' : 'Save'}
+            icon={!editing ? faEdit : faSave}
+            color={!editing ? 'text-blue-700' : 'text-green-700'}
           />
-          <StyledInput
-            type='text'
-            value={jobNumber}
-            onChange={setJobNumber}
-            className='w-[20vw] text-gray-800'
-          />
-          <StyledInput
-            type='text'
-            value={jobAddress}
-            onChange={setJobAddress}
-            className='w-[20vw] text-gray-800'
+          <StyledIconButton
+            onClick={!editing ? handleDelete : handleCancel}
+            label={!editing ? 'Delete' : 'Cancel'}
+            icon={!editing ? faTrashAlt : faCancel}
+            color={!editing ? 'text-red-700' : 'text-yellow-300'}
           />
         </div>
-      ) : (
-        <div className='flex items-center justify-evenly flex-wrap'>
-          <span
-            className='w-[20vw] text-gray-800'
-            style={{ wordWrap: 'break-word' }}
-          >
-            {jobName}
-          </span>
-          <span
-            className='w-[20vw] text-gray-800'
-            style={{ wordWrap: 'break-word' }}
-          >
-            {jobAddress}
-          </span>
-          <span
-            className='w-[20vw] text-gray-800'
-            style={{ wordWrap: 'break-word' }}
-          >
-            {jobNumber}
-          </span>
-        </div>
-      )}
-      <div className='w-[10vw] flex justify-between text-gray-800'>
-        <StyledIconButton
-          onClick={!editing ? handleEdit : handleSave}
-          label={!editing ? 'Edit' : 'Save'}
-          icon={!editing ? faEdit : faSave}
-          color={!editing ? 'text-blue-700' : 'text-green-700'}
-        />
-        <StyledIconButton
-          onClick={!editing ? handleDelete : handleCancel}
-          label={!editing ? 'Delete' : 'Cancel'}
-          icon={!editing ? faTrashAlt : faCancel}
-          color={!editing ? 'text-red-700' : 'text-yellow-300'}
-        />
       </div>
     </div>
   );

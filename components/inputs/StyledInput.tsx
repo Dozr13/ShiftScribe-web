@@ -8,6 +8,7 @@ interface StyledInputProps {
   placeholder?: string;
   error?: string;
   className?: string;
+  flex?: boolean;
 }
 
 const StyledInput: React.FC<StyledInputProps> = ({
@@ -18,6 +19,7 @@ const StyledInput: React.FC<StyledInputProps> = ({
   placeholder,
   error,
   className,
+  flex = false,
 }) => {
   const [focused, setFocused] = useState(false);
 
@@ -35,7 +37,7 @@ const StyledInput: React.FC<StyledInputProps> = ({
 
   const containerClassName = `input-container ${focused ? 'focused' : ''} ${
     className || ''
-  }`;
+  }   ${flex ? 'flex flex-col' : ''}`;
   const inputClassName = `input-field ${
     error ? 'error' : ''
   } mb-4 p-1 rounded-md`;

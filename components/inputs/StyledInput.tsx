@@ -3,12 +3,13 @@ import React, { ChangeEvent, useState } from 'react';
 interface StyledInputProps {
   label?: string;
   type?: string;
-  value: string;
+  value: string | number;
   onChange: (value: string) => void;
   placeholder?: string;
   error?: string;
   className?: string;
   flex?: boolean;
+  disabled?: boolean;
 }
 
 const StyledInput: React.FC<StyledInputProps> = ({
@@ -20,6 +21,7 @@ const StyledInput: React.FC<StyledInputProps> = ({
   error,
   className,
   flex = false,
+  disabled,
 }) => {
   const [focused, setFocused] = useState(false);
 
@@ -53,6 +55,7 @@ const StyledInput: React.FC<StyledInputProps> = ({
         onFocus={handleFocus}
         onBlur={handleBlur}
         className={inputClassName}
+        disabled={disabled}
       />
       {error && <div className='error-message'>{error}</div>}
     </div>

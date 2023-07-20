@@ -10,24 +10,24 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
-} from "firebase/auth";
-import { child, get, getDatabase, ref, set, update } from "firebase/database";
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { PermissionLevel } from "../lib";
-import { OrgProfile, UserData } from "../types/data";
-import { ResponseBad, ResponseOk } from "../types/response";
-import { FIREBASE_AUTH } from "../lib/Firebase";
+} from 'firebase/auth';
+import { child, get, getDatabase, ref, set, update } from 'firebase/database';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { PermissionLevel } from '../lib';
+import { FIREBASE_AUTH } from '../lib/Firebase';
+import { OrgProfile, UserData } from '../types/data';
+import { ResponseBad, ResponseOk } from '../types/response';
 
 const ERROR_TYPE = {
-  UserExists: "auth/email-already-in-use",
-  WeakPassword: "auth/weak-password",
-  UserNotFound: "auth/user-not-found",
-  WrongPassword: "auth/wrong-password",
-  InvalidEmail: "auth/invalid-email",
-  EmailInUse: "auth/email-already-in-use",
-  TooManyRequests: "auth/too-many-requests",
-  OrgNotValid: "OrgNotValid",
-  Unknown: "Unknown",
+  UserExists: 'auth/email-already-in-use',
+  WeakPassword: 'auth/weak-password',
+  UserNotFound: 'auth/user-not-found',
+  WrongPassword: 'auth/wrong-password',
+  InvalidEmail: 'auth/invalid-email',
+  EmailInUse: 'auth/email-already-in-use',
+  TooManyRequests: 'auth/too-many-requests',
+  OrgNotValid: 'OrgNotValid',
+  Unknown: 'Unknown',
 } as const;
 
 /**
@@ -54,7 +54,7 @@ interface AuthContextValue {
   orgId: string | undefined;
   signIn: (
     email: string,
-    password: string
+    password: string,
   ) => Promise<SignupResponse<UserCredential>>;
   deleteAccount: () => Promise<void>;
   validateOrg: (Name: string) => Promise<boolean>;
@@ -62,7 +62,7 @@ interface AuthContextValue {
     username: string,
     email: string,
     password: string,
-    organization: string
+    organization: string,
   ) => Promise<SignupResponse<UserCredential>>;
   getUserData: (user: User) => Promise<UserData>;
   getUserByUID: (UID: string) => Promise<UserData>;
@@ -97,7 +97,7 @@ const getErrorResponse = (res: any): ResponseBad<keyof typeof ERROR_TYPE> => {
     }
   }
 
-  console.warn("Uncaught Error: " + res.code);
+  console.warn('Uncaught Error: ' + res.code);
 
   return {
     success: false,
@@ -130,7 +130,7 @@ const Context = {
    * @param Name Org Name
    */
   validateOrg: async (Name: string) => {
-    if (Name.trim() === "") return false;
+    if (Name.trim() === '') return false;
     return await isValidOrg(Name);
   },
 
@@ -146,7 +146,7 @@ const Context = {
     username: string,
     email: string,
     password: string,
-    organization: string
+    organization: string,
   ) => {
     return new Promise<SignupResponse<UserCredential>>((res) => {
       isValidOrg(organization).then((r) => {
@@ -161,7 +161,7 @@ const Context = {
                 res({
                   success: true,
                   data: authUser,
-                })
+                }),
               );
             })
             .catch((e) => {
@@ -182,6 +182,81 @@ const Context = {
       await get(child(ref(getDatabase()), `users/${UID}`))
     ).toJSON() as UserData;
   },
+
+  /**
+   * Create an account given a username and password from the admin portal.
+   *
+   * The password must be over 6 characters.
+   * @param email
+   * @param password
+   * @returns Promise<SignupResponse<UserCredential>>
+   */ // TODO: WORK ON FIGURING THIS OUT
+  // createuser: async (
+  //   username: string,
+  //   email: string,
+  //   password: string,
+  //   organization: string,
+  // ): Promise<SignupResponse<UserCredential>> => {
+  //   try {
+  //     const authUser = await createUserWithEmailAndPassword(
+  //       FIREBASE_AUTH,
+  //       email,
+  //       password,
+  //     );
+
+  //     // Update the user's profile with the given username
+  //     await updateProfile(authUser.user, {
+  //       displayName: username,
+  //     });
+
+  //     // Write user data to '/users/$localId'
+  //     await writeUser(authUser.user, organization);
+
+  //     console.log('User profile updated:', authUser.user);
+
+  //     // Get the current user's access level within the organization
+  //     const orgUserDoc = await get(
+  //       child(
+  //         ref(getDatabase()),
+  //         `orgs/${organization}/members/${authUser.user.uid}`,
+  //       ),
+  //     );
+  //     const orgProfile: OrgProfile | null = orgUserDoc.exists()
+  //       ? orgUserDoc.val()
+  //       : null;
+  //     const accessLevel = orgProfile?.accessLevel || 1;
+
+  //     // Only allow admin users (access level 4) to create new users directly
+  //     if (accessLevel === 4) {
+  //       // Update the access level in '/orgs/$orgId/members/$localId'
+  //       await update(
+  //         ref(
+  //           getDatabase(),
+  //           `orgs/${organization}/members/${authUser.user.uid}`,
+  //         ),
+  //         {
+  //           accessLevel: 1, // Set the appropriate access level for the new user
+  //         },
+  //       );
+  //       console.log('Access level updated in /orgs:', authUser.user);
+
+  //       return {
+  //         success: true,
+  //         data: authUser,
+  //       };
+  //     } else {
+  //       return {
+  //         success: false,
+  //         error: ERROR_TYPE.PermissionDenied, // Return the PermissionDenied error
+  //       };
+  //     }
+
+  //     // ...
+  //   } catch (error) {
+  //     console.error('Error occurred during account creation:', error);
+  //     return getErrorResponse(error);
+  //   }
+  // },
 
   /**
    * Sign out of the current account.
@@ -211,7 +286,7 @@ const Context = {
     return await fetchSignInMethodsForEmail(FIREBASE_AUTH, email).then(
       (result) => {
         return result.length > 0;
-      }
+      },
     );
   },
 
@@ -250,7 +325,7 @@ export const AuthContextProvider = ({
 
       if (authUser) {
         const userDoc = await get(
-          child(ref(getDatabase()), `users/${authUser.uid}`)
+          child(ref(getDatabase()), `users/${authUser.uid}`),
         );
         const res = userDoc.toJSON() as UserData;
 
@@ -260,8 +335,8 @@ export const AuthContextProvider = ({
           const orgUserDoc = await get(
             child(
               ref(getDatabase()),
-              `orgs/${res.organization}/members/${authUser.uid}`
-            )
+              `orgs/${res.organization}/members/${authUser.uid}`,
+            ),
           );
 
           if (orgUserDoc.exists()) {
@@ -269,7 +344,7 @@ export const AuthContextProvider = ({
 
             if (data) {
               const isSU = await get(
-                child(ref(getDatabase()), `orgs/${res.organization}/superuser`)
+                child(ref(getDatabase()), `orgs/${res.organization}/superuser`),
               );
               if (isSU.val() === authUser.uid) {
                 setPermissionLevel(4);
@@ -292,7 +367,13 @@ export const AuthContextProvider = ({
 
   return (
     <AuthContext.Provider
-      value={{ ...Context, user, permissionLevel, orgId, isReady }}
+      value={{
+        ...Context,
+        user,
+        permissionLevel,
+        orgId,
+        isReady,
+      }}
     >
       {isLoading ? null : children}
     </AuthContext.Provider>

@@ -48,8 +48,6 @@ const JobInformationPage = () => {
       return showToast('Job name must not be empty', false);
     if (jobNumberValue.trim() === '')
       return showToast('Job number must not be empty', false);
-    if (jobAddressValue.trim() === '')
-      return showToast('Job address must not be empty', false);
 
     const jobKey = jobNameValue.replace(SPACE_REPLACE_REGEX, '_').toLowerCase();
 
@@ -87,8 +85,6 @@ const JobInformationPage = () => {
             Job Information
           </div>
           <div className='p-5 container border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[70vw]'>
-            {/* <div className='flex flex-col' style={{ height: '100%' }}> */}
-            {/* <div className='p-8 container border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[70vw]'> */}
             <div className='flex justify-evenly mb-2'>
               <div className='w-[25%] text-gray-800 font-bold text-xl p-5'>
                 Job Name
@@ -104,12 +100,9 @@ const JobInformationPage = () => {
             {jobs.map((job) => (
               <JobListItem key={job.id} job={job} onDelete={handleDelete} />
             ))}
-            {/* </div> */}
           </div>
-          {/* </div> */}
           <div className='p-8 container border-2 bg-gray-400 border-gray-400 rounded-md mt-4'>
             <div className='flex justify-around items-start'>
-              {/* THESE ARE NOT SHOWING */}
               <StyledInput
                 label='Job Name: '
                 type='text'

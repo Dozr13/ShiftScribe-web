@@ -4,6 +4,7 @@ import ProtectedRoute from '../../components/protected-route';
 import { useAuth } from '../../context/AuthContext';
 import { PermissionLevel } from '../../lib';
 import {
+  EMPLOYEE_LIST,
   JOB_LIST,
   LOGIN,
   RECORDS,
@@ -27,6 +28,10 @@ const DashboardPage = () => {
     router.push(JOB_LIST);
   };
 
+  const onClickEmployeeInformation = () => {
+    router.push(EMPLOYEE_LIST);
+  };
+
   const handleLogout = async () => {
     showToast('Logging out...');
     try {
@@ -45,23 +50,29 @@ const DashboardPage = () => {
           <p className='text-5xl h-20 absolute top-[30vh] text-white font-semibold border-double border-b-4 bor'>{`Welcome ${auth.user?.displayName}`}</p>
 
           {auth.permissionLevel >= PermissionLevel.MANAGER ? (
-            <div className='grid grid-cols-3 gap-10'>
+            <div className='grid grid-cols-2 gap-y-4 gap-x-10'>
               <div className='mb-4'>
                 <SubmitButton
-                  message={'Click Here To Manage Records'}
+                  message={'Manage Records'}
                   onClick={onClickManageRecords}
                 />
               </div>
               <div className='mb-4'>
                 <SubmitButton
-                  message={'Click Here To View Requests'}
+                  message={'View Requests'}
                   onClick={onClickViewRequests}
                 />
               </div>
               <div className='mb-4'>
                 <SubmitButton
-                  message={'Click Here To Edit Jobs'}
+                  message={'Edit Jobs'}
                   onClick={onClickJobInformation}
+                />
+              </div>
+              <div className='mb-4'>
+                <SubmitButton
+                  message={'View Employees'}
+                  onClick={onClickEmployeeInformation}
                 />
               </div>
             </div>

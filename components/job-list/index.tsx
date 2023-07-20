@@ -42,8 +42,8 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onDelete }) => {
       return showToast('Job name cannot be empty', false);
     if (jobNumber.trim() === '')
       return showToast('Job number cannot be empty', false);
-    if (jobAddress.trim() === '')
-      return showToast('Job address cannot be empty', false);
+    // if (jobAddress.trim() === '')
+    //   return showToast('Job address cannot be empty', false);
 
     // const jobKey = jobName.replace(SPACE_REPLACE_REGEX, '_').toLowerCase();
 

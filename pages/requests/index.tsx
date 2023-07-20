@@ -1,6 +1,6 @@
 import { QueryConstraint, equalTo, orderByKey } from 'firebase/database';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import Checkbox from '../../components/checkbox/Checkbox';
 import SubmitButton from '../../components/form-components/SubmitButton';
@@ -31,21 +31,24 @@ const ViewRequestsPage = () => {
     }[]
   >([]);
 
-  const fetchData = async (...query: QueryConstraint[]) => {
-    setLoading(true);
-    const res = await db.query(
-      `orgs/${auth.orgId}/adjustmentRequests`,
-      ...query,
-    );
-    setLoading(false);
+  const fetchData = useCallback(
+    async (...query: QueryConstraint[]) => {
+      setLoading(true);
+      const res = await db.query(
+        `orgs/${auth.orgId}/adjustmentRequests`,
+        ...query,
+      );
+      setLoading(false);
 
-    if (!res.exists()) {
-      let errorMessage = 'No records match this request.';
-      toast.error(errorMessage);
-    }
+      if (!res.exists()) {
+        let errorMessage = 'No records match this request.';
+        toast.error(errorMessage);
+      }
 
-    return res.toJSON() as TimeRecords;
-  };
+      return res.toJSON() as TimeRecords;
+    },
+    [auth.orgId, db],
+  );
 
   useEffect(() => {
     if (auth.user && auth.permissionLevel < PermissionLevel.MANAGER) {
@@ -53,7 +56,7 @@ const ViewRequestsPage = () => {
     }
   }, [auth.permissionLevel, auth.user, router]);
 
-  const displayRequests = async () => {
+  const displayRequests = useCallback(async () => {
     if (!auth.orgId || !auth.user) return;
 
     setLoading(true);
@@ -112,7 +115,26 @@ const ViewRequestsPage = () => {
       setLoading(false);
       return [];
     }
-  };
+  }, [auth.orgId, auth.user, db, fetchData]);
+
+  useEffect(() => {
+    if (auth.permissionLevel >= PermissionLevel.MANAGER) {
+      const getRequests = async () => {
+        const requests = await displayRequests();
+        if (requests) {
+          setRequests(requests);
+        }
+      };
+
+      getRequests();
+    } else {
+      router.back();
+    }
+  }, [auth.permissionLevel, router, displayRequests]);
+
+  useEffect(() => {
+    setIsChecked(Array(requests.length).fill(false));
+  }, [requests]);
 
   const handleApprove = async () => {
     const newSelectedItemsData = requests.filter((_, i) => isChecked[i]);
@@ -175,22 +197,6 @@ const ViewRequestsPage = () => {
   const onClickDashboard = () => {
     router.push(DASHBOARD);
   };
-
-  useEffect(() => {
-    if (auth.permissionLevel >= PermissionLevel.MANAGER) {
-      const getRequests = async () => {
-        const requests = await displayRequests();
-        if (requests) {
-          setRequests(requests);
-          setIsChecked(Array(requests.length).fill(false));
-        }
-      };
-
-      getRequests();
-    } else {
-      router.back();
-    }
-  }, [auth.permissionLevel, router]);
 
   return (
     <div className='admin-panel flex flex-col justify-center items-center'>

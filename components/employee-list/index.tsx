@@ -48,7 +48,6 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
     setEditing(true);
   };
   const handleSave = async () => {
-    console.log(typeof employeeAccessLevel);
     if (employeeName.trim() === '')
       return showToast('Employee Name cannot be empty', false);
     if (employeeEmail.trim() === '')

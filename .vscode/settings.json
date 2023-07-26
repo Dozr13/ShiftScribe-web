@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
     "ABQF",
+    "adminsdk",
     "appspot",
     "calledin",
     "clockout",
@@ -9,11 +10,15 @@
     "ESQO",
     "firebaseapp",
     "Firestore",
+    "fontawesome",
+    "fortawesome",
     "glitchless",
     "hookform",
     "shiftscribe",
     "signup",
     "speedrun",
-    "transitionfont"
+    "tailwindcss",
+    "transitionfont",
+    "xwdo"
   ]
 }

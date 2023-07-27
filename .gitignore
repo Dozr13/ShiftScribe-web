@@ -28,7 +28,12 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+# And other private dirs
 .env*.local
+.env*
+process.yml
+
+/config
 
 # vercel
 .vercel

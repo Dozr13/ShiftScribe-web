@@ -18,19 +18,28 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<CheckOrganizationResponse | { error: string }>,
 ) {
-  console.log('Request method:', req.method);
-  console.log('Query parameters:', req.query);
+  // console.log('Request method:', req.method);
+  // console.log('Query parameters:', req.query);
+
+  const organizationName = req.query.organizationName;
+  if (
+    !organizationName ||
+    (Array.isArray(organizationName) && organizationName[0].trim() === '')
+  ) {
+    return res.status(400).json({ error: 'Organization name is required' });
+  }
+
   if (req.method === 'GET') {
     try {
       const { organizationName } = req.query;
-      console.log('Organization name from query:', organizationName);
+      // console.log('Organization name from query:', organizationName);
 
       // Check if the organization exists in the Realtime Database
-      const orgRef = ref(admin.database(), `orgs/${organizationName}`);
+      const orgRef = ref(admin.database() as any, `orgs/${organizationName}`);
 
       const snapshot = await get(orgRef);
       const organizationExists = snapshot.exists();
-      console.log('Organization exists:', organizationExists);
+      // console.log('Organization exists:', organizationExists);
 
       res.status(200).json({ exists: organizationExists });
     } catch (error) {
@@ -43,41 +52,44 @@ export default async function handler(
         req.body as CheckOrganizationRequest;
 
       // Check if the organization exists in the Realtime Database
-      const orgRef = ref(admin.database(), `orgs/${organizationName}`);
+      const orgRef = ref(admin.database() as any, `orgs/${organizationName}`);
       const snapshot = await get(orgRef);
       const organizationExists = snapshot.exists();
-      console.log('Organization exists:', organizationExists);
+      // console.log('Organization exists:', organizationExists);
 
       if (isPaidAdmin) {
         const orgID = organizationName;
 
         // Set the superuser property in the new organization
-        await set(ref(admin.database(), `orgs/${orgID}`), {
+        await set(ref(admin.database() as any, `orgs/${orgID}`), {
           superuser: userID,
         });
 
         // Add the user to /orgs/${orgID}/members/${userID} with accessLevel: 4
-        await set(ref(admin.database(), `orgs/${orgID}/members/${userID}`), {
-          accessLevel: 4,
-        });
+        await set(
+          ref(admin.database() as any, `orgs/${orgID}/members/${userID}`),
+          {
+            accessLevel: 4,
+          },
+        );
 
         // Update the organizationExists based on the current state after modifications
         const updatedSnapshot = await get(orgRef);
         const updatedOrganizationExists = updatedSnapshot.exists();
-        console.log('Updated organization exists:', updatedOrganizationExists);
+        // console.log('Updated organization exists:', updatedOrganizationExists);
 
         res.status(200).json({ exists: updatedOrganizationExists });
       } else if (!isPaidAdmin && organizationExists) {
         // If isPaidAdmin is false, add the user to /orgs/${orgID}/joinRequests with userID: true
         const orgID = organizationName;
         const orgJoinRequestsRef = ref(
-          admin.database(),
+          admin.database() as any,
           `orgs/${orgID}/joinRequests`,
         );
         const orgJoinRequestsSnapshot = await get(orgJoinRequestsRef);
         const orgJoinRequests = orgJoinRequestsSnapshot.val();
 
-        console.log('orgJoinRequests:', JSON.stringify(orgJoinRequests)); // Add this line for debugging
+        // console.log('orgJoinRequests:', JSON.stringify(orgJoinRequests));
 
         if (orgJoinRequests === null) {
           // If joinRequests doesn't exist, create it with the user as the first entry

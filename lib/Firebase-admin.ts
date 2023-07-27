@@ -1,12 +1,19 @@
-var admin = require('firebase-admin');
+import 'dotenv/config';
+import admin from 'firebase-admin';
 
-var serviceAccount = require('../secret/shiftscribe-db-firebase-adminsdk-4xwdo-3914fc2e55.json');
+const firebaseConfig = {
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+};
 
-if (!admin.apps.length) {
+try {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert(firebaseConfig),
     databaseURL: 'https://shiftscribe-db-default-rtdb.firebaseio.com',
   });
+} catch (error) {
+  console.error('Error initializing Firebase Admin SDK:', error);
 }
 
 export default admin;

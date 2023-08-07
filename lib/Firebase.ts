@@ -1,7 +1,7 @@
-import { getApp, getApps, initializeApp } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import 'firebase/auth';
 import { browserLocalPersistence, initializeAuth } from 'firebase/auth';
-import { getDatabase } from 'firebase/database';
+import { getFirestore } from 'firebase/firestore';
 
 const FirebaseConfig = {
   apiKey: 'AIzaSyABQFYo9_alESQOQnGdS03xWemNnq0amBE',
@@ -14,15 +14,17 @@ const FirebaseConfig = {
   measurementId: 'G-5QGQ8TNS3F',
 };
 
-let FIREBASE_APP;
+const FIREBASE_APP = initializeApp(FirebaseConfig);
 
-if (!getApps().length) {
-  FIREBASE_APP = initializeApp(FirebaseConfig, 'shiftscribe-web');
-} else {
-  FIREBASE_APP = getApp('shiftscribe-web');
-}
+// let FIREBASE_APP;
+
+// if (!getApps().length) {
+//   FIREBASE_APP = initializeApp(FirebaseConfig, 'shiftscribe-web');
+// } else {
+//   FIREBASE_APP = getApp('shiftscribe-web');
+// }
 
 export const FIREBASE_AUTH = initializeAuth(FIREBASE_APP, {
   persistence: browserLocalPersistence,
 });
-export const FIREBASE_DATABASE = getDatabase(FIREBASE_APP);
+export const FIREBASE_DATABASE = getFirestore(FIREBASE_APP);

@@ -47,8 +47,6 @@ export default async function handler(
 
     const clientSecret = paymentIntent.client_secret;
 
-    console.log(clientSecret);
-
     return res.status(200).json({ clientSecret });
   } catch (error) {
     return res.status(500).json((error as Error).message);

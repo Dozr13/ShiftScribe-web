@@ -9,6 +9,7 @@ interface StyledInputProps {
   error?: string;
   className?: string;
   flex?: boolean;
+  emailInputClassName?: string;
   disabled?: boolean;
 }
 
@@ -21,6 +22,7 @@ const StyledInput: React.FC<StyledInputProps> = ({
   error,
   className,
   flex = false,
+  emailInputClassName: emailInputClassName,
   disabled,
 }) => {
   const [focused, setFocused] = useState(false);
@@ -40,9 +42,9 @@ const StyledInput: React.FC<StyledInputProps> = ({
   const containerClassName = `input-container ${focused ? 'focused' : ''} ${
     className || ''
   }   ${flex ? 'flex flex-col' : ''}`;
-  const inputClassName = `input-field ${
+  const inputClassName = `box-border input-field focus:outline-none ${
     error ? 'error' : ''
-  } mb-4 p-1 rounded-md`;
+  } mb-4 p-1 rounded-md ${emailInputClassName || ''}`;
 
   return (
     <div className={containerClassName}>

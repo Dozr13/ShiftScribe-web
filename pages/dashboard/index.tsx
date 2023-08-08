@@ -49,7 +49,7 @@ const DashboardPage = () => {
         <div className='text-gray-600 flex flex-col justify-center items-center px-12 py-24 mx-auto'>
           <p className='text-5xl h-20 absolute top-[30vh] text-white font-semibold border-double border-b-4 bor'>{`Welcome ${auth.user?.displayName}`}</p>
 
-          {auth.permissionLevel >= PermissionLevel.MANAGER ? (
+          {auth.permissionLevel >= PermissionLevel.SUPERUSER ? (
             <div className='grid grid-cols-2 gap-y-4 gap-x-10'>
               <div className='mb-4'>
                 <SubmitButton
@@ -78,8 +78,8 @@ const DashboardPage = () => {
             </div>
           ) : (
             <>
-              <p className='text-2xl text-white font-semibold'>
-                Unable to access this page without proper permissions
+              <p className='text-3xl text-yellow-400 font-semibold mb-32'>
+                You are unable to access this page without proper permissions
               </p>
               <SubmitButton
                 message={'Click Here To Logout'}

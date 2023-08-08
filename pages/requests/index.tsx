@@ -50,12 +50,6 @@ const ViewRequestsPage = () => {
     [auth.orgId, db],
   );
 
-  useEffect(() => {
-    if (auth.user && auth.permissionLevel < PermissionLevel.MANAGER) {
-      router.back();
-    }
-  }, [auth.permissionLevel, auth.user, router]);
-
   const displayRequests = useCallback(async () => {
     if (!auth.orgId || !auth.user) return;
 

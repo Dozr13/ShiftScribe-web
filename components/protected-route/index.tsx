@@ -1,18 +1,21 @@
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useAuth } from '../../context/AuthContext';
+import usePermissionRedirect from '../../hooks/auth/usePermissionRedirect';
+import { PermissionLevel } from '../../lib';
 import { LOGIN } from '../../utils/constants/routes.constants';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-  const { user } = useAuth();
+  const auth = useAuth();
 
-  useEffect(() => {
-    if (!user) {
-      router.push(LOGIN);
-    }
-  }, [router, user]);
-  return <div>{user ? children : null}</div>;
+  usePermissionRedirect(
+    PermissionLevel.SUPERUSER,
+    () => router.push(LOGIN),
+    auth.accessLevel,
+  );
+
+  return <div>{auth ? children : null}</div>;
 };
 
 export default ProtectedRoute;

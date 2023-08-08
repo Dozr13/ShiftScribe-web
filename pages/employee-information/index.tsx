@@ -1,24 +1,42 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import EmployeeListItem, { Employee } from '../../components/employee-list';
+import AccessLevelKey from '../../components/information-keys/AccessLevelKey';
 import ProtectedRoute from '../../components/protected-route';
 import { useAuth } from '../../context/AuthContext';
 import { useFirebase } from '../../context/FirebaseContext';
 import { RequestThrottle } from '../../lib';
 
-const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}/g;
 const throttle = new RequestThrottle(3, 10);
 
 const EmployeeInformationPage = () => {
   const auth = useAuth();
   const db = useFirebase();
-  // const [isValidEmail, setIsValidEmail] = useState(false);
 
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
-  // const [employeeName, setEmployeeName] = useState('');
-  // const [employeeEmail, setEmployeeEmail] = useState('');
-  // const [employeeOrg, setEmployeeOrg] = useState(auth.orgId);
-  // const [employeeAccessLevel, setEmployeeAccessLevel] = useState<string>('1');
+  const [showAccessKey, setShowAccessKey] = useState(false);
+
+  const questionButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  const accessKeyRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        showAccessKey &&
+        accessKeyRef.current &&
+        !accessKeyRef.current.contains(event.target as Node) &&
+        questionButtonRef.current !== event.target
+      ) {
+        setShowAccessKey(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showAccessKey]);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -54,107 +72,6 @@ const EmployeeInformationPage = () => {
     fetchEmployees();
   }, [auth.orgId, db, employees]);
 
-  // useEffect(() => {
-  //   setIsValidEmail(
-  //     employeeEmail.trim() === ''
-  //       ? true
-  //       : employeeEmail.match(emailRegex) !== null,
-  //   );
-  // }, [employeeEmail]);
-
-  // useEffect(() => {
-  //   if (!/^[1-4]$/.test(employeeAccessLevel)) {
-  //     showToast(
-  //       'Invalid Access Level. Please enter a number between 1 and 4.',
-  //       false,
-  //     );
-  //   }
-  // }, [employeeAccessLevel]);
-
-  // TODO: Figure out if this is possible
-  // async function attemptSubmit() {
-  //   if (!auth.orgId) return;
-
-  //   const tempPass = '123456';
-
-  //   if (employeeName.trim() === '')
-  //     return showToast('Employee name must not be empty', false);
-  //   if (employeeEmail.trim() === '')
-  //     return showToast('Employee email must not be empty', false);
-
-  //   await throttle
-  //     .tryAsync(async () => {
-  //       setLoading(true);
-
-  //       const pack = [employeeOrg, employeeName, employeeEmail, tempPass];
-  //       const keys = ['Organization', 'Username', 'Email', 'Password'];
-
-  //       // Ensure that all fields are populated.
-  //       for (let i = 0; i < pack.length; i++) {
-  //         if (pack[i].trim() === '') {
-  //           showToast(`Issue ${keys[i]} Cannot be Empty.`);
-  //           return;
-  //         }
-  //       }
-
-  //       // Validate Email
-  //       if (employeeEmail.match(emailRegex) === null)
-  //         return showToast('Invalid Email, Please Enter a valid Email.', false);
-
-  //       // Attempt signup and provide helpful errors.
-  //       const res = await auth.createuser(
-  //         employeeName,
-  //         employeeEmail,
-  //         tempPass,
-  //         employeeOrg,
-  //       );
-
-  //       if (res.success) {
-  //         // User created successfully, show success toast or any additional actions needed.
-  //         showToast('User created successfully.', true);
-  //       } else {
-  //         // Error occurred during user creation, show appropriate error toast.
-  //         switch (res.error) {
-  //           case 'EmailInUse':
-  //           case 'UserExists':
-  //             showToast(
-  //               'User Already Exists, a user with this email already exists. Please log in instead.',
-  //               false,
-  //             );
-  //             break;
-
-  //           case 'OrgNotValid':
-  //             showToast(
-  //               'Invalid Organization, please enter a valid organization.',
-  //               false,
-  //             );
-  //             break;
-
-  //           case 'PermissionDenied':
-  //             showToast(
-  //               'Permission Denied, you do not have permission to create a user.',
-  //               false,
-  //             );
-  //             break;
-
-  //           default:
-  //             showToast(
-  //               'Internal Issue, an issue occurred when creating your account.',
-  //               false,
-  //             );
-  //         }
-  //       }
-  //     })
-  //     .then(() => setLoading(false))
-  //     .catch(console.warn);
-
-  //   setEmployeeName('');
-  //   setEmployeeEmail('');
-  //   setEmployeeOrg(auth.orgId);
-  //   setEmployeeAccessLevel('1');
-  //   setLoading(false);
-  // }
-
   const handleDelete = async (id: string) => {
     await db.update(`orgs/${auth.orgId}/members`, {
       [id]: null,
@@ -163,7 +80,7 @@ const EmployeeInformationPage = () => {
 
   return (
     <ProtectedRoute>
-      <div className='employee-information'>
+      <div className='employee-information relative'>
         <div className='flex flex-col items-center'>
           <div className='text-3xl text-gray-300 font-extrabold p-10'>
             Employee Information
@@ -179,8 +96,15 @@ const EmployeeInformationPage = () => {
               <div className='w-[20%] text-gray-800 font-bold text-xl p-5'>
                 Organization
               </div>
-              <div className='w-[20%] text-gray-800 font-bold text-xl p-5'>
+              <div className='relative flex flex-row w-[20%] text-gray-800 font-bold text-xl p-5'>
                 Access Level
+                <button
+                  className='ml-2 w-6 h-6 bg-gray-300 rounded-full text-gray-700 font-bold flex items-center justify-center'
+                  onClick={() => setShowAccessKey(!showAccessKey)}
+                  ref={questionButtonRef}
+                >
+                  ?
+                </button>
               </div>
               <div className='w-[20%]'></div>
             </div>
@@ -192,42 +116,17 @@ const EmployeeInformationPage = () => {
               />
             ))}
           </div>
-          {/* <div className='p-8 container border-2 bg-gray-400 border-gray-400 rounded-md mt-4'>
-            <div className='flex justify-around items-start'>
-              <StyledInput
-                label='Employee Name: '
-                type='text'
-                value={employeeName}
-                onChange={setEmployeeName}
-                flex
-              />
-              <StyledInput
-                label='Employee Email: '
-                type='text'
-                value={employeeEmail}
-                onChange={setEmployeeEmail}
-                flex
-              />
-              <StyledInput
-                label='Employee Organization: '
-                type='text'
-                value={employeeOrg}
-                onChange={setEmployeeOrg}
-                disabled={true}
-                flex
-              />
-              <StyledInput
-                label='Employee Access Level: '
-                type='text'
-                value={employeeAccessLevel}
-                onChange={setEmployeeAccessLevel}
-                flex
-              />
-            </div>
-          </div>
-          <SubmitButton message={'Add Employee'} onClick={attemptSubmit} /> */}
         </div>
       </div>
+      {showAccessKey && (
+        <div
+          className='absolute top-20 left-0 w-[100%]'
+          ref={accessKeyRef}
+          onClick={() => setShowAccessKey(false)}
+        >
+          <AccessLevelKey />
+        </div>
+      )}
     </ProtectedRoute>
   );
 };

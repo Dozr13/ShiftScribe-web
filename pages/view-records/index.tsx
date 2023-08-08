@@ -1,11 +1,11 @@
 import { QueryConstraint, endAt, orderByKey } from 'firebase/database';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import ProtectedRoute from '../../components/protected-route';
 import { useAuth } from '../../context/AuthContext';
 import { useFirebase } from '../../context/FirebaseContext';
-import { PermissionLevel, StringUtils, TimeParser } from '../../lib';
+import { StringUtils, TimeParser } from '../../lib';
 import { TimeRecords, UserData } from '../../types/data';
 
 type UserDataTotals = {
@@ -216,12 +216,6 @@ export const ViewRecordsPage = () => {
 
     setLoadingCSV(false);
   };
-
-  useEffect(() => {
-    if (auth.user && auth.permissionLevel < PermissionLevel.MANAGER) {
-      router.back();
-    }
-  }, [auth.permissionLevel, auth.user, router]);
 
   return (
     <ProtectedRoute>

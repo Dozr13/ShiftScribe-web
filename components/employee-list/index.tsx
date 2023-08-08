@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useFirebase } from '../../context/FirebaseContext';
 
@@ -8,6 +8,7 @@ import {
   faSave,
   faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
+import { EMAIL_REGEX } from '../../utils/constants/regex.constants';
 import { showToast } from '../../utils/toast';
 import StyledIconButton from '../buttons/StyledIconButton';
 import StyledInput from '../inputs/StyledInput';
@@ -36,22 +37,34 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
 
   const { id, accessLevel, userData } = employee;
   const { displayName, email, organization } = userData;
+  const isCurrentUser = !!auth.user && auth.user.uid === id;
 
   const [editing, setEditing] = useState(false);
+  const [isValidEmail, setIsValidEmail] = useState(false);
   const [employeeName, setEmployeeName] = useState(displayName || '');
   const [employeeEmail, setEmployeeEmail] = useState(email);
   const [employeeOrg, setEmployeeOrg] = useState(organization);
   const [employeeAccessLevel, setEmployeeAccessLevel] =
     useState<number>(accessLevel);
 
+  useEffect(() => {
+    setIsValidEmail(
+      employeeEmail.trim() === ''
+        ? true
+        : employeeEmail.match(EMAIL_REGEX) !== null,
+    );
+  }, [employeeEmail]);
+
   const handleEdit = () => {
     setEditing(true);
   };
+
   const handleSave = async () => {
     if (employeeName.trim() === '')
       return showToast('Employee Name cannot be empty', false);
     if (employeeEmail.trim() === '')
       return showToast('Employee Email cannot be empty', false);
+    if (!isValidEmail) return showToast('Please enter a valid email', false);
 
     const accessLevelNumber = employeeAccessLevel;
 
@@ -85,8 +98,18 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
   }
 
   const handleEmployeeAccessLevelChange = (value: string) => {
+    if (value === '') {
+      setEmployeeAccessLevel(0);
+      return;
+    }
+
     const parsedValue = parseInt(value, 10);
-    setEmployeeAccessLevel(parsedValue);
+
+    if (!isNaN(parsedValue) && parsedValue >= 0 && parsedValue <= 4) {
+      setEmployeeAccessLevel(parsedValue);
+    } else {
+      showToast('Access level must be a number between 1 and 4', false);
+    }
   };
 
   return (
@@ -104,7 +127,12 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
               type='text'
               value={employeeEmail}
               onChange={setEmployeeEmail}
-              className='text-gray-800 w-[20%]'
+              className={`text-gray-800 w-[20%]`}
+              emailInputClassName={
+                !isValidEmail || employeeEmail.trim() === ''
+                  ? 'border-4 border-red-400'
+                  : 'border-4 border-transparent'
+              }
             />
             <StyledInput
               type='text'
@@ -118,6 +146,7 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
               value={employeeAccessLevel}
               onChange={handleEmployeeAccessLevelChange}
               className='text-gray-800 w-[20%]'
+              disabled={isCurrentUser}
             />
           </>
         ) : (

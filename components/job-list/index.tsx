@@ -42,13 +42,6 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onDelete }) => {
       return showToast('Job name cannot be empty', false);
     if (jobNumber.trim() === '')
       return showToast('Job number cannot be empty', false);
-    // if (jobAddress.trim() === '')
-    //   return showToast('Job address cannot be empty', false);
-
-    // const jobKey = jobName.replace(SPACE_REPLACE_REGEX, '_').toLowerCase();
-
-    // const exists = await db.exists(`orgs/${auth.orgId}/jobs/${jobKey}`);
-    // if (exists) return showToast('Job already exists with this name.', false);
 
     await db.update(`orgs/${auth.orgId}/jobs/${job.id}`, {
       jobName: jobName,
@@ -60,8 +53,6 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onDelete }) => {
   };
 
   const handleDelete = () => {
-    // Call the `onDelete` function passed from the parent component
-    // to remove the job from the database
     onDelete(job.id);
   };
 
@@ -74,7 +65,6 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onDelete }) => {
       <div className='flex items-center justify-evenly flex-wrap'>
         {editing ? (
           <>
-            {/* HOW CAN I SPACE THESE APART? */}
             <StyledInput
               type='text'
               value={jobName}
@@ -106,13 +96,13 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onDelete }) => {
               className='text-gray-800 w-[25%] p-5'
               style={{ wordWrap: 'break-word' }}
             >
-              {jobAddress}
+              {jobNumber}
             </span>
             <span
               className='text-gray-800 w-[25%] p-5'
               style={{ wordWrap: 'break-word' }}
             >
-              {jobNumber}
+              {jobAddress}
             </span>
           </>
         )}

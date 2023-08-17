@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import EmployeeListItem, { Employee } from '../../components/employee-list';
 import AccessLevelKey from '../../components/information-keys/AccessLevelKey';
 import ProtectedRoute from '../../components/protected-route';
 import { useAuth } from '../../context/AuthContext';
 import { useFirebase } from '../../context/FirebaseContext';
 import { RequestThrottle } from '../../lib';
+import LoadingScreen from '../loading';
 
 const throttle = new RequestThrottle(3, 10);
 
@@ -20,8 +21,8 @@ const EmployeeInformationPage = () => {
 
   const accessKeyRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+  const handleClickOutside = useCallback(
+    (event: MouseEvent) => {
       if (
         showAccessKey &&
         accessKeyRef.current &&
@@ -30,13 +31,19 @@ const EmployeeInformationPage = () => {
       ) {
         setShowAccessKey(false);
       }
-    };
+    },
+    [showAccessKey],
+  );
 
-    document.addEventListener('click', handleClickOutside);
+  useEffect(() => {
+    if (showAccessKey) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [showAccessKey]);
+  }, [showAccessKey, handleClickOutside]);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -45,6 +52,7 @@ const EmployeeInformationPage = () => {
       setLoading(true);
 
       const snapshot = await db.read(`orgs/${auth.orgId}/members`);
+      console.log('SNAPSHOT', snapshot);
       if (snapshot.exists()) {
         const membersData = snapshot.val();
         const memberIds = Object.keys(membersData);
@@ -70,7 +78,7 @@ const EmployeeInformationPage = () => {
     };
 
     fetchEmployees();
-  }, [auth.orgId, db, employees]);
+  }, [auth.orgId, db]);
 
   const handleDelete = async (id: string) => {
     await db.update(`orgs/${auth.orgId}/members`, {
@@ -80,6 +88,7 @@ const EmployeeInformationPage = () => {
 
   return (
     <ProtectedRoute>
+      {loading && <LoadingScreen />}
       <div className='employee-information relative'>
         <div className='flex flex-col items-center'>
           <div className='text-3xl text-gray-300 font-extrabold p-10'>

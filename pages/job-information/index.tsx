@@ -8,6 +8,7 @@ import { useFirebase } from '../../context/FirebaseContext';
 import { OrgJobs } from '../../types/data';
 import { SPACE_REPLACE_REGEX } from '../../utils/constants/regex.constants';
 import { showToast } from '../../utils/toast';
+import LoadingScreen from '../loading';
 
 const JobInformationPage = () => {
   const auth = useAuth();
@@ -39,7 +40,7 @@ const JobInformationPage = () => {
     };
 
     fetchJobs();
-  }, [auth.orgId, db, jobs]);
+  }, [auth.orgId, db]);
 
   const handleSubmit = async () => {
     if (!auth.orgId) return;
@@ -79,6 +80,7 @@ const JobInformationPage = () => {
 
   return (
     <ProtectedRoute>
+      {loading && <LoadingScreen />}
       <div className='job-information'>
         <div className='flex flex-col items-center'>
           <div className='text-3xl text-gray-300 font-extrabold p-10'>

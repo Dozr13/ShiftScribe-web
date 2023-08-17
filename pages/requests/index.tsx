@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import Checkbox from '../../components/checkbox/Checkbox';
 import SubmitButton from '../../components/form-components/SubmitButton';
+import ProtectedRoute from '../../components/protected-route';
 import { useAuth } from '../../context/AuthContext';
 import { useFirebase } from '../../context/FirebaseContext';
 import { PermissionLevel } from '../../lib';
@@ -11,6 +12,7 @@ import stringUtils from '../../lib/StringUtils';
 import timeParser from '../../lib/TimeParser';
 import { TimeRecords, UserData } from '../../types/data';
 import { DASHBOARD } from '../../utils/constants/routes.constants';
+import LoadingScreen from '../loading';
 
 const ViewRequestsPage = () => {
   const auth = useAuth();
@@ -193,57 +195,58 @@ const ViewRequestsPage = () => {
   };
 
   return (
-    <div className='admin-panel flex flex-col justify-center items-center'>
-      <div className='text-3xl text-gray-300 font-extrabold p-10'>
-        Time Adjustment Requests
-      </div>
-      {requests.length > 0 ? (
-        <>
-          <div className='p-8 container items-center mx-auto border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[40vw]'>
-            <div className='border-t-2'></div>
-            {requests.map((request, index) => (
-              <Checkbox
-                key={request.id}
-                label={request.submitter}
-                checked={isChecked[index]}
-                dateRequest={request.dateRequest}
-                inRequest={request.inRequest}
-                outRequest={request.outRequest}
-                onChange={(checked) => {
-                  const newCheckedItems = [...isChecked];
-                  newCheckedItems[index] = checked;
-                  setIsChecked(newCheckedItems);
-                }}
+    <ProtectedRoute>
+      {loading && <LoadingScreen />}
+      <div className='admin-panel flex flex-col justify-center items-center'>
+        <div className='text-3xl text-gray-300 font-extrabold p-10'>
+          Time Adjustment Requests
+        </div>
+        {requests.length > 0 ? (
+          <>
+            <div className='p-8 container items-center mx-auto border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[40vw]'>
+              <div className='border-t-2'></div>
+              {requests.map((request, index) => (
+                <Checkbox
+                  key={request.id}
+                  label={request.submitter}
+                  checked={isChecked[index]}
+                  dateRequest={request.dateRequest}
+                  inRequest={request.inRequest}
+                  outRequest={request.outRequest}
+                  onChange={(checked) => {
+                    const newCheckedItems = [...isChecked];
+                    newCheckedItems[index] = checked;
+                    setIsChecked(newCheckedItems);
+                  }}
+                />
+              ))}
+            </div>
+            <div className='flex flex-row w-full justify-around'>
+              <SubmitButton
+                message={'Approve'}
+                onClick={handleApprove}
+                width='100%'
               />
-            ))}
-          </div>
-          <div className='flex flex-row w-full justify-around'>
-            <SubmitButton
-              message={'Approve'}
-              onClick={handleApprove}
-              width='100%'
-            />
-            <SubmitButton
-              message={'Deny'}
-              onClick={handleCheckboxChange}
-              width='100%'
-            />
-          </div>
-        </>
-      ) : (
-        <>
+              <SubmitButton
+                message={'Deny'}
+                onClick={handleCheckboxChange}
+                width='100%'
+              />
+            </div>
+          </>
+        ) : (
           <div className='p-8 container items-center mx-auto border-2 bg-gray-400 border-gray-400 rounded-md h-fit w-[40vw]'>
             <p className='text-black text-3xl text-center'>
               No Requests at this time.
             </p>
+            <SubmitButton
+              message={'Back to Dashboard'}
+              onClick={onClickDashboard}
+            />
           </div>
-          <SubmitButton
-            message={'Back to Dashboard'}
-            onClick={onClickDashboard}
-          />
-        </>
-      )}
-    </div>
+        )}
+      </div>
+    </ProtectedRoute>
   );
 };
 

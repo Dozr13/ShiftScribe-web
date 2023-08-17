@@ -12,6 +12,9 @@ module.exports = {
       minWidth: {
         screen: '100vw',
       },
+      animation: {
+        'spin-slow': 'spin 1s linear infinite',
+      },
     },
   },
   plugins: [],

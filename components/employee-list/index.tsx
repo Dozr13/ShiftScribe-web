@@ -20,7 +20,7 @@ export interface Employee {
     displayName: string;
     email: string;
     organization: string;
-  };
+  } | null;
 }
 
 interface EmployeeListItemProps {
@@ -36,12 +36,14 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
   const db = useFirebase();
 
   const { id, accessLevel, userData } = employee;
-  const { displayName, email, organization } = userData;
+
+  const { displayName = '', email = '', organization = '' } = userData || {};
+
   const isCurrentUser = !!auth.user && auth.user.uid === id;
 
   const [editing, setEditing] = useState(false);
   const [isValidEmail, setIsValidEmail] = useState(false);
-  const [employeeName, setEmployeeName] = useState(displayName || '');
+  const [employeeName, setEmployeeName] = useState(displayName);
   const [employeeEmail, setEmployeeEmail] = useState(email);
   const [employeeOrg, setEmployeeOrg] = useState(organization);
   const [employeeAccessLevel, setEmployeeAccessLevel] =
@@ -49,11 +51,11 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
 
   useEffect(() => {
     setIsValidEmail(
-      employeeEmail.trim() === ''
+      (employeeEmail || '').trim() === ''
         ? true
-        : employeeEmail.match(EMAIL_REGEX) !== null,
+        : (employeeEmail || '').match(EMAIL_REGEX) !== null,
     );
-  }, [employeeEmail]);
+  }, [employeeEmail, editing]);
 
   const handleEdit = () => {
     setEditing(true);
@@ -127,7 +129,7 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
               type='text'
               value={employeeEmail}
               onChange={setEmployeeEmail}
-              className={`text-gray-800 w-[20%]`}
+              className='text-gray-800 w-[20%]'
               emailInputClassName={
                 !isValidEmail || employeeEmail.trim() === ''
                   ? 'border-4 border-red-400'

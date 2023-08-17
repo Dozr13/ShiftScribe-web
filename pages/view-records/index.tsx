@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useFirebase } from '../../context/FirebaseContext';
 import { StringUtils, TimeParser } from '../../lib';
 import { TimeRecords, UserData } from '../../types/data';
+import LoadingScreen from '../loading';
 
 type UserDataTotals = {
   id: string;
@@ -219,6 +220,7 @@ export const ViewRecordsPage = () => {
 
   return (
     <ProtectedRoute>
+      {loading && <LoadingScreen />}
       <div className='flex flex-col justify-center items-center'>
         <div className='p-10 container flex flex-col justify-center items-center mx-auto w-96 border-2 bg-gray-400 border-gray-400 rounded-md'>
           <div className='flex py-2 container mx-auto'></div>

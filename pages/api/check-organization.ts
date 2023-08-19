@@ -8,6 +8,7 @@ interface CheckOrganizationRequest {
   displayName: string;
   email: string;
   isPaidAdmin: boolean;
+  isApproved?: boolean;
 }
 
 interface CheckOrganizationResponse {

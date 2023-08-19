@@ -83,138 +83,171 @@ export const ViewRecordsPage = () => {
       return;
     }
 
-    const headers = [
-      'Employee',
-      'E-Mail',
-      'Job',
+    let resCSV = '';
+
+    const uniqueEmployees = Array.from(
+      new Set(Object.values(data).map((record) => record.submitter)),
+    ).filter(Boolean);
+
+    const employeeHeaders = [
       'Date',
-      'Clocked In',
-      'Clocked Out',
-      'Time Worked',
-      'Time On Break',
-      'Combined Time',
-      'Called In',
-      'Reason Missed',
+      'Time IN',
+      'Time OUT',
+      'Hours',
+      'Lunch/ Break',
+      'Job Number',
+      'Total',
     ];
 
-    const summaryHeaders = [
-      'Employee',
-      'E-Mail',
+    const footerValues = [
       'Total Regular Time',
       'Total Overtime',
       'Total Time On Break',
       'Total Combined Time',
       'Total Call Ins',
+      '',
+      'Total Hours',
     ];
 
-    let resCSV = `${headers.join(',')}\n`;
+    const jobIndex = employeeHeaders.indexOf('Job Number');
 
-    let summary: UserDataTotals[] = [];
+    const allUsersPromises = uniqueEmployees.map((employeeId) =>
+      db.read(`/users/${employeeId}`),
+    );
+    const allUsersResults = await Promise.all(allUsersPromises);
+    const allUsers: Record<string, UserData> = {};
+    allUsersResults.forEach((userData, index) => {
+      const currentEmployeeId = uniqueEmployees[index] as string;
+      allUsers[currentEmployeeId] = userData.toJSON() as UserData;
+    });
 
-    for (const key in data) {
-      const record = data[key];
-      if (!record.events) continue; // no bueno
+    // Iterate through each unique employee
+    for (const employeeId of uniqueEmployees as string[]) {
+      const headers = [
+        `Name: ${allUsers[employeeId].displayName}`,
+        '',
+        '',
+        '',
+        '',
+        `Week Ending: 08/19/2020`,
+      ];
+      resCSV += `${headers.join(',')}\n${employeeHeaders.join(',')}\n`;
 
-      const userData = await db.read(`/users/${record.submitter}`);
-      const userInfo = userData.toJSON() as UserData;
+      let summary: UserDataTotals[] = [];
 
-      const { origin, timeWorked, breakTime, job, calledIn, meta } =
-        TimeParser.parseCurrentRecord(record.events);
+      for (const key in data) {
+        const record = data[key];
+        if (!record.events || record.submitter !== employeeId) continue;
 
-      const timestamp = new Date(origin);
-      const outTimestamp = new Date(origin + timeWorked);
-      const daysWorkTime = StringUtils.timestampHM(timeWorked);
-      const daysBreakTime = StringUtils.timestampHM(breakTime);
-      const paidTime = Math.max(timeWorked - breakTime, 0);
-      const daysPaidTime = StringUtils.timestampHM(paidTime);
+        const userInfo = allUsers[record.submitter];
+        const { origin, timeWorked, breakTime, job, calledIn, meta } =
+          TimeParser.parseCurrentRecord(record.events);
 
-      const inTime = new Date(timestamp).toLocaleTimeString(undefined, {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
-      const outTime = new Date(outTimestamp).toLocaleTimeString(undefined, {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
-
-      resCSV += `${userInfo.displayName},${userInfo.email},${
-        calledIn ? '' : job
-      },${timestamp.toLocaleDateString()},${inTime},${outTime},${daysWorkTime},${daysBreakTime},${daysPaidTime},${
-        calledIn ? 'Out Today' : ''
-      },${calledIn ? meta : ''}`;
-
-      resCSV += '\n';
-
-      const userId = record.submitter as string;
-      const userSummary = summary.find((item) => item.id === userId);
-
-      if (userSummary) {
-        userSummary.totalWorkTime = StringUtils.addTimeValues(
-          userSummary.totalWorkTime,
-          StringUtils.timestampHM(timeWorked),
-        );
-        userSummary.totalBreakTime = StringUtils.addTimeValues(
-          userSummary.totalBreakTime,
-          StringUtils.timestampHM(breakTime),
-        );
-        userSummary.totalPaidTime = StringUtils.addTimeValues(
-          userSummary.totalPaidTime,
-          StringUtils.timestampHM(paidTime),
-        );
-        userSummary.totalCallIns += calledIn ? 1 : 0;
-      } else {
-        summary.push({
-          id: userId,
-          employeeName: userInfo.displayName,
-          employeeEmail: userInfo.email,
-          totalWorkTime: StringUtils.timestampHM(timeWorked),
-          totalBreakTime: StringUtils.timestampHM(breakTime),
-          totalPaidTime: StringUtils.timestampHM(timeWorked - breakTime),
-          totalCallIns: calledIn ? 1 : 0,
+        const timestamp = new Date(origin);
+        const outTimestamp = new Date(origin + timeWorked);
+        const daysWorkTime = StringUtils.timestampHM(timeWorked);
+        const daysBreakTime = StringUtils.timestampHM(breakTime);
+        const paidTime = Math.max(timeWorked - breakTime, 0);
+        const daysPaidTime = StringUtils.timestampHM(paidTime);
+        const inTime = timestamp.toLocaleTimeString(undefined, {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
         });
+        const outTime = outTimestamp.toLocaleTimeString(undefined, {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+        });
+
+        // CSV Record
+        resCSV += `${timestamp.toLocaleDateString()},${inTime},${outTime},${daysWorkTime},${daysBreakTime},${job},${daysPaidTime}\n`;
+
+        const userId = record.submitter as string;
+        const userSummary = summary.find((item) => item.id === userId);
+        if (userSummary) {
+          userSummary.totalWorkTime = StringUtils.addTimeValues(
+            userSummary.totalWorkTime,
+            daysWorkTime,
+          );
+          userSummary.totalBreakTime = StringUtils.addTimeValues(
+            userSummary.totalBreakTime,
+            daysBreakTime,
+          );
+          userSummary.totalPaidTime = StringUtils.addTimeValues(
+            userSummary.totalPaidTime,
+            daysPaidTime,
+          );
+          userSummary.totalCallIns += calledIn ? 1 : 0;
+        } else {
+          summary.push({
+            id: userId,
+            employeeName: userInfo.displayName,
+            employeeEmail: userInfo.email,
+            totalWorkTime: daysWorkTime,
+            totalBreakTime: daysBreakTime,
+            totalPaidTime: daysPaidTime,
+            totalCallIns: calledIn ? 1 : 0,
+          });
+        }
       }
-    }
 
-    resCSV += `\nSummary,\n,${summaryHeaders.join(',')}\n`;
+      for (const userSummary of summary) {
+        const totalWorkTimeMs = StringUtils.timestampToMilliseconds(
+          userSummary.totalWorkTime,
+        );
+        const breakTimeMs = StringUtils.timestampToMilliseconds(
+          userSummary.totalBreakTime,
+        );
+        const regularTimeMs = 40 * 60 * 60 * 1000;
+        const paidTimeMs = Math.max(totalWorkTimeMs - breakTimeMs, 0);
+        const totalRegularTime = StringUtils.timestampHM(
+          Math.min(totalWorkTimeMs, regularTimeMs),
+        );
+        const overtimeMs = Math.max(totalWorkTimeMs - regularTimeMs, 0);
+        const totalOvertime = StringUtils.timestampHM(overtimeMs);
+        const totalPaidTime = StringUtils.timestampHM(paidTimeMs);
+        let totalCombinedTime = StringUtils.addTimeValues(
+          totalRegularTime,
+          totalOvertime,
+        );
+        totalCombinedTime = StringUtils.subtractTimeValues(
+          totalCombinedTime,
+          userSummary.totalBreakTime,
+        );
 
-    for (const userSummary of summary) {
-      // Calculate regular time and overtime
-      const totalWorkTimeMs = StringUtils.timestampToMilliseconds(
-        userSummary.totalWorkTime,
-      );
-      const breakTimeMs = StringUtils.timestampToMilliseconds(
-        userSummary.totalBreakTime,
-      );
-      const regularTimeMs = 40 * 60 * 60 * 1000; // 40 hours in milliseconds
+        const footerData = [
+          totalRegularTime,
+          totalOvertime,
+          userSummary.totalBreakTime,
+          totalPaidTime,
+          userSummary.totalCallIns,
+          '',
+          totalCombinedTime,
+        ];
 
-      // Calculate paid time by subtracting break time from total work time
-      const paidTimeMs = Math.max(totalWorkTimeMs - breakTimeMs, 0);
+        console.log('footerData: ', footerData);
 
-      // Format regular time, overtime, and paid time
-      const totalRegularTime = StringUtils.timestampHM(
-        Math.min(totalWorkTimeMs, regularTimeMs),
-      );
-      const overtimeMs = Math.max(totalWorkTimeMs - regularTimeMs, 0);
-      const totalOvertime = StringUtils.timestampHM(overtimeMs);
-      const totalPaidTime = StringUtils.timestampHM(paidTimeMs);
-      // Subtract break time from combined time
-      let totalCombinedTime = StringUtils.addTimeValues(
-        totalRegularTime,
-        totalOvertime,
-      );
-      totalCombinedTime = StringUtils.subtractTimeValues(
-        totalCombinedTime,
-        userSummary.totalBreakTime,
-      );
+        for (let i = 0; i < footerValues.length; i++) {
+          if (footerValues[i] === '') {
+            resCSV += '\n';
+          } else {
+            resCSV += `\n${Array(jobIndex).fill('').join(',')},${
+              footerValues[i]
+            },${footerData[i]}`;
+          }
+        }
+      }
 
-      resCSV += '\n';
-      resCSV += `,${userSummary.employeeName},${userSummary.employeeEmail},${totalRegularTime},${totalOvertime},${userSummary.totalBreakTime},${totalPaidTime},${userSummary.totalCallIns}`;
+      const dividerWidth = 10;
+      const dividerRow = '='.repeat(dividerWidth);
+
+      resCSV += `\n\n\n${dividerRow}`;
+      resCSV += `\n--- ${allUsers[employeeId].displayName} Data Ends Here ---\n`;
+      resCSV += `${dividerRow}\n\n\n`;
     }
 
     setCsv(resCSV);
-
     setLoadingCSV(false);
   };
 
@@ -241,7 +274,10 @@ export const ViewRecordsPage = () => {
           {csv ? (
             <>
               <a
-                href={'data:text/csv;charset=utf-8,' + encodeURI(csv)}
+                href={`data:text/csv;charset=utf-8,${encodeURI(csv)}`}
+                download={`EmployeesHours-${StringUtils.getHumanReadableDate(
+                  new Date(),
+                )}.csv`}
                 onClick={() => {
                   setCsv(undefined);
                 }}

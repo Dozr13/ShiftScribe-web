@@ -13,11 +13,17 @@ class TimeParser {
 
   constructor() {}
 
+  // Private static method to parse the event ID and return the timestamp part
+  private static parseEventId(eventId: string): number {
+    return Number(eventId.match(/^\d+/)?.[0] ?? '0');
+  }
+
   parseCurrentRecord(profile: Events) {
     const events: number[] = [];
 
     for (const object in profile) {
-      events.push(Number(object));
+      const timestamp = TimeParser.parseEventId(object);
+      events.push(timestamp);
     }
 
     // Sort the event keys
@@ -38,8 +44,14 @@ class TimeParser {
 
     core: for (const key of events) {
       const packet = profile[key];
-      //console.log(`\t- ${packet.type} @ ${key / 1000}s`);
-      job = packet.job;
+      // console.log(`\t- ${packet.type} @ ${key / 1000}s`);
+
+      if (!packet) {
+        console.error(`No packet for event key: ${key}`);
+        continue;
+      }
+
+      job = packet.job; // ! Type 'string' is not assignable to type 'string[]'.ts(2322)
 
       switch (packet.type) {
         case 'calledin':

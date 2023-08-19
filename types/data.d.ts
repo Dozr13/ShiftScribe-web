@@ -29,7 +29,8 @@ export type RecordEventType =
   | 'break'
   | 'endbreak'
   | 'calledin'
-  | 'adjustmentRequest';
+  | 'adjustmentRequest'
+  | 'location';
 
 export interface EventObject {
   job: string;

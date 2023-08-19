@@ -52,7 +52,7 @@ const EmployeeInformationPage = () => {
       setLoading(true);
 
       const snapshot = await db.read(`orgs/${auth.orgId}/members`);
-      console.log('SNAPSHOT', snapshot);
+      // console.log('SNAPSHOT', snapshot);
       if (snapshot.exists()) {
         const membersData = snapshot.val();
         const memberIds = Object.keys(membersData);

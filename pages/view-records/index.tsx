@@ -226,7 +226,7 @@ export const ViewRecordsPage = () => {
           totalCombinedTime,
         ];
 
-        console.log('footerData: ', footerData);
+        // console.log('footerData: ', footerData);
 
         for (let i = 0; i < footerValues.length; i++) {
           if (footerValues[i] === '') {

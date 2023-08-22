@@ -2,15 +2,17 @@ import { QueryConstraint, equalTo, orderByKey } from 'firebase/database';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import Checkbox from '../../components/checkbox/Checkbox';
 import SubmitButton from '../../components/form-components/SubmitButton';
 import ProtectedRoute from '../../components/protected-route';
+import RequestListItem, {
+  UserProfileData,
+} from '../../components/requests-list';
 import { useAuth } from '../../context/AuthContext';
 import { useFirebase } from '../../context/FirebaseContext';
 import { PermissionLevel } from '../../lib';
 import stringUtils from '../../lib/StringUtils';
 import timeParser from '../../lib/TimeParser';
-import { TimeRecords, UserData } from '../../types/data';
+import { EventObject, TimeRecords, UserData } from '../../types/data';
 import { DASHBOARD } from '../../utils/constants/routes.constants';
 import LoadingScreen from '../loading';
 
@@ -22,16 +24,7 @@ const ViewRequestsPage = () => {
   const [isChecked, setIsChecked] = useState<boolean[]>([]);
   const [selectedItemsData, setSelectedItemsData] = useState<TimeRecords[]>([]);
   const [loading, setLoading] = useState(false);
-  const [requests, setRequests] = useState<
-    {
-      id: string;
-      submitter: string;
-      dateRequest: string;
-      inRequest: string;
-      outRequest: string;
-      totalTimeRequested: string;
-    }[]
-  >([]);
+  const [requests, setRequests] = useState<UserProfileData[]>([]);
 
   const fetchData = useCallback(
     async (...query: QueryConstraint[]) => {
@@ -40,6 +33,7 @@ const ViewRequestsPage = () => {
         `orgs/${auth.orgId}/adjustmentRequests`,
         ...query,
       );
+      // console.log('res: ', res);
       setLoading(false);
 
       if (!res.exists()) {
@@ -89,14 +83,27 @@ const ViewRequestsPage = () => {
           minute: '2-digit',
         });
 
-        const daysWorkTime = stringUtils.timestampHM(timeWorked);
+        const allJobs: EventObject[] = Object.values(record.events);
 
+        const uniqueJobs = [...new Set(allJobs)];
+
+        if (uniqueJobs.length === 1) {
+          console.log(`Job: ${uniqueJobs[0]}`);
+        } else if (uniqueJobs.length > 1) {
+          console.log(`Jobs: ${uniqueJobs.join(', ')}`);
+        } else {
+          console.log('No jobs found');
+        }
+
+        const daysWorkTime = stringUtils.timestampHM(timeWorked);
+        console.log('recEVENTS', record.events);
         const request = {
           id: key,
           submitter: userInfo.displayName,
           dateRequest: timestamp.toLocaleDateString(),
           inRequest: inRequestTime,
           outRequest: outRequestTime,
+          jobs: allJobs,
           totalTimeRequested: daysWorkTime,
         };
 
@@ -132,16 +139,53 @@ const ViewRequestsPage = () => {
     setIsChecked(Array(requests.length).fill(false));
   }, [requests]);
 
+  // const handleApprove = async () => {
+  //   const newSelectedItemsData = requests.filter((_, i) => isChecked[i]);
+
+  //   for (const item of newSelectedItemsData) {
+  //     const index = requests.findIndex((request) => request.id === item.id);
+  //     const isCheckedItem = isChecked[index];
+
+  //     const originalData = await fetchData(orderByKey(), equalTo(item.id));
+
+  //     console.log('isCheckedItem: ', isCheckedItem);
+
+  //     if (isCheckedItem) {
+  //       try {
+  //         const { events, submitter } = Object.values(originalData)[0];
+
+  //         await db.update(`orgs/${auth.orgId}/timeRecords`, {
+  //           [Date.now()]: {
+  //             events,
+  //             submitter,
+  //           },
+  //         });
+
+  //         await db.delete(`orgs/${auth.orgId}/adjustmentRequests/${item.id}`);
+  //       } catch (error) {
+  //         console.error('Error approving request:', error);
+  //         toast.error('Error approving request.');
+  //       }
+  //     } else {
+  //       try {
+  //         await db.delete(`orgs/${auth.orgId}/adjustmentRequests/${item.id}`);
+  //       } catch (error) {
+  //         console.error('Error denying request:', error);
+  //         toast.error('Error denying request.');
+  //       }
+  //     }
+  //   }
+
+  //   const updatedRequests = requests.filter((_, i) => !isChecked[i]);
+  //   setRequests(updatedRequests);
+  // };
   const handleApprove = async () => {
-    const newSelectedItemsData = requests.filter((_, i) => isChecked[i]);
+    const approvedRequests = requests.filter((_, i) => isChecked[i]);
 
-    for (const item of newSelectedItemsData) {
-      const index = requests.findIndex((request) => request.id === item.id);
-      const isCheckedItem = isChecked[index];
+    for (const request of approvedRequests) {
+      const originalData = await fetchData(orderByKey(), equalTo(request.id));
 
-      const originalData = await fetchData(orderByKey(), equalTo(item.id));
-
-      if (isCheckedItem) {
+      if (originalData) {
         try {
           const { events, submitter } = Object.values(originalData)[0];
 
@@ -152,47 +196,50 @@ const ViewRequestsPage = () => {
             },
           });
 
-          await db.delete(`orgs/${auth.orgId}/adjustmentRequests/${item.id}`);
+          await db.delete(
+            `orgs/${auth.orgId}/adjustmentRequests/${request.id}`,
+          );
         } catch (error) {
           console.error('Error approving request:', error);
           toast.error('Error approving request.');
         }
-      } else {
-        try {
-          await db.delete(`orgs/${auth.orgId}/adjustmentRequests/${item.id}`);
-        } catch (error) {
-          console.error('Error denying request:', error);
-          toast.error('Error denying request.');
-        }
       }
     }
 
-    const updatedRequests = requests.filter((_, i) => !isChecked[i]);
-    setRequests(updatedRequests);
+    // Update the requests list
+    const remainingRequests = requests.filter((_, i) => !isChecked[i]);
+    setRequests(remainingRequests);
+    setIsChecked(Array(remainingRequests.length).fill(false)); // Reset checkboxes
   };
 
-  const handleCheckboxChange = async () => {
-    const newSelectedItemsData = requests.filter((_, i) => isChecked[i]);
-    setSelectedItemsData(newSelectedItemsData);
+  // const handleCheckboxChange = async () => {
+  //   const newSelectedItemsData = requests.filter((_, i) => isChecked[i]);
+  //   setSelectedItemsData(newSelectedItemsData);
 
-    const updatedRequests = requests.filter((_, i) => !isChecked[i]);
-    setRequests(updatedRequests);
+  //   const updatedRequests = requests.filter((_, i) => !isChecked[i]);
+  //   setRequests(updatedRequests);
 
-    for (const item of newSelectedItemsData) {
-      const { id } = item;
+  //   for (const item of newSelectedItemsData) {
+  //     const { id } = item;
 
-      try {
-        await db.exists(`orgs/${auth.orgId}/adjustmentRequests/${id}`);
-      } catch (error) {
-        console.error('Error removing request:', error);
-        toast.error('Error removing request.');
-      }
-    }
+  //     try {
+  //       await db.exists(`orgs/${auth.orgId}/adjustmentRequests/${id}`);
+  //     } catch (error) {
+  //       console.error('Error removing request:', error);
+  //       toast.error('Error removing request.');
+  //     }
+  //   }
+  // };
+
+  const handleDeny = async (id: string) => {
+    await db.delete(`orgs/${auth.orgId}/adjustmentRequests/${id}`);
   };
 
   const onClickDashboard = () => {
     router.push(DASHBOARD);
   };
+
+  // console.log(requests);
 
   return (
     <ProtectedRoute>
@@ -202,38 +249,13 @@ const ViewRequestsPage = () => {
           Time Adjustment Requests
         </div>
         {requests.length > 0 ? (
-          <>
-            <div className='p-8 container items-center mx-auto border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[40vw]'>
-              <div className='border-t-2'></div>
-              {requests.map((request, index) => (
-                <Checkbox
-                  key={request.id}
-                  label={request.submitter}
-                  checked={isChecked[index]}
-                  dateRequest={request.dateRequest}
-                  inRequest={request.inRequest}
-                  outRequest={request.outRequest}
-                  onChange={(checked) => {
-                    const newCheckedItems = [...isChecked];
-                    newCheckedItems[index] = checked;
-                    setIsChecked(newCheckedItems);
-                  }}
-                />
-              ))}
-            </div>
-            <div className='flex flex-row w-full justify-around'>
-              <SubmitButton
-                message={'Approve'}
-                onClick={handleApprove}
-                width='100%'
-              />
-              <SubmitButton
-                message={'Deny'}
-                onClick={handleCheckboxChange}
-                width='100%'
-              />
-            </div>
-          </>
+          <RequestListItem
+            requests={requests}
+            isChecked={isChecked}
+            setIsChecked={setIsChecked}
+            onApprove={handleApprove}
+            onDeny={handleDeny}
+          />
         ) : (
           <div className='p-8 container items-center mx-auto border-2 bg-gray-400 border-gray-400 rounded-md h-fit w-[40vw]'>
             <p className='text-black text-3xl text-center'>

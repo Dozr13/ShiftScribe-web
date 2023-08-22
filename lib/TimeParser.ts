@@ -35,7 +35,7 @@ class TimeParser {
     let breakStart;
     let breakEnd;
     let origin = events[0];
-    let job = '';
+    let job = [''];
     let calledIn = false;
 
     const lastRecord = profile[events[events.length - 1]];
@@ -51,7 +51,7 @@ class TimeParser {
         continue;
       }
 
-      job = packet.job; // ! Type 'string' is not assignable to type 'string[]'.ts(2322)
+      job = packet.job;
 
       switch (packet.type) {
         case 'calledin':

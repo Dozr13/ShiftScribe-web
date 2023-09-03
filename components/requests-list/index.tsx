@@ -37,8 +37,6 @@ const RequestListItem = ({
 
   return (
     <>
-      {requests &&
-        console.log('REQUESTS in RequestList  BEFORE CHECKBOX', requests)}
       <div className='p-8 container items-center mx-auto border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[40vw]'>
         <div className='border-t-2'></div>
         {requests.map((request, index) => (

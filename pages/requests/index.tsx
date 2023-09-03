@@ -77,16 +77,6 @@ const ViewRequestsPage = () => {
 
         const allJobs: EventObject[] = Object.values(record.events);
 
-        const uniqueJobs = [...new Set(allJobs)];
-
-        // if (uniqueJobs.length === 1) {
-        //   console.log(`Job: ${uniqueJobs[0]}`);
-        // } else if (uniqueJobs.length > 1) {
-        //   console.log(`Jobs: ${uniqueJobs.join(', ')}`);
-        // } else {
-        //   console.log('No jobs found');
-        // }
-
         const daysWorkTime = stringUtils.timestampHM(timeWorked);
         const request: RequestData = {
           id: Number(key),
@@ -144,9 +134,8 @@ const ViewRequestsPage = () => {
         const { events, submitter } = Object.values(originalData)[0];
 
         try {
-          const newKey = `${Date.now()}-${Math.random()
-            .toString(36)
-            .substr(2, 9)}`;
+          // TODO: Figure out an acceptable way to work with the key values being different on multiple accepts
+          const newKey = Date.now();
 
           await db.update(`orgs/${auth.orgId}/timeRecords`, {
             [newKey]: {

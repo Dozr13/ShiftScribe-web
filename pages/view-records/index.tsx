@@ -142,12 +142,8 @@ export const ViewRecordsPage = () => {
         const { origin, timeWorked, breakTime, job, calledIn, meta } =
           TimeParser.parseCurrentRecord(record.events);
 
-        // const timestamp = new Date(origin);
         const outTimestamp = origin + timeWorked;
-        // const daysWorkTime = timeWorked;
-        // const daysBreakTime = breakTime;
         const paidTime = Math.max(timeWorked - breakTime, 0);
-        // const daysPaidTime = paidTime;
 
         // CSV Record
         resCSV += `${StringUtils.timestampToMMDDYYYY(
@@ -189,10 +185,6 @@ export const ViewRecordsPage = () => {
 
         const totalCombinedTime =
           totalRegularTime + totalOvertime - totalBreakTime;
-
-        // console.log('TOTAL COMBINED', totalCombinedTime);
-
-        // console.log('TOTAL COMBINED', totalCombinedTime);
 
         const footerData = [
           StringUtils.timestampHM(totalRegularTime),

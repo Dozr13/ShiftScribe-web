@@ -4,15 +4,18 @@ import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import SubmitButton from '../../components/form-components/SubmitButton';
 import ProtectedRoute from '../../components/protected-route';
-import RequestListItem, {
-  UserProfileData,
-} from '../../components/requests-list';
+import RequestListItem from '../../components/requests-list';
 import { useAuth } from '../../context/AuthContext';
 import { useFirebase } from '../../context/FirebaseContext';
 import { PermissionLevel } from '../../lib';
 import stringUtils from '../../lib/StringUtils';
 import timeParser from '../../lib/TimeParser';
-import { EventObject, TimeRecords, UserData } from '../../types/data';
+import {
+  EventObject,
+  RequestData,
+  TimeRecords,
+  UserData,
+} from '../../types/data';
 import { DASHBOARD } from '../../utils/constants/routes.constants';
 import LoadingScreen from '../loading';
 
@@ -24,7 +27,7 @@ const ViewRequestsPage = () => {
   const [isChecked, setIsChecked] = useState<boolean[]>([]);
   const [selectedItemsData, setSelectedItemsData] = useState<TimeRecords[]>([]);
   const [loading, setLoading] = useState(false);
-  const [requests, setRequests] = useState<UserProfileData[]>([]);
+  const [requests, setRequests] = useState<Array<RequestData>>([]);
 
   const fetchData = useCallback(
     async (...query: QueryConstraint[]) => {
@@ -33,7 +36,6 @@ const ViewRequestsPage = () => {
         `orgs/${auth.orgId}/adjustmentRequests`,
         ...query,
       );
-      // console.log('res: ', res);
       setLoading(false);
 
       if (!res.exists()) {
@@ -46,13 +48,14 @@ const ViewRequestsPage = () => {
     [auth.orgId, db],
   );
 
-  const displayRequests = useCallback(async () => {
-    if (!auth.orgId || !auth.user) return;
+  const displayRequests = useCallback(async (): Promise<RequestData[]> => {
+    if (!auth.orgId || !auth.user) return [];
 
     setLoading(true);
 
     try {
       const data = await fetchData();
+
       if (!data) {
         setLoading(false);
         return [];
@@ -62,6 +65,7 @@ const ViewRequestsPage = () => {
 
       for (const key in data) {
         const record = data[key];
+
         if (!record.events) continue;
 
         const userData = await db.read(`/users/${record.submitter}`);
@@ -71,40 +75,27 @@ const ViewRequestsPage = () => {
           record.events,
         );
 
-        const timestamp = new Date(origin);
-        const outTimestamp = new Date(origin + timeWorked);
-
-        const inRequestTime = timestamp.toLocaleTimeString(undefined, {
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-        const outRequestTime = outTimestamp.toLocaleTimeString(undefined, {
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-
         const allJobs: EventObject[] = Object.values(record.events);
 
         const uniqueJobs = [...new Set(allJobs)];
 
-        if (uniqueJobs.length === 1) {
-          console.log(`Job: ${uniqueJobs[0]}`);
-        } else if (uniqueJobs.length > 1) {
-          console.log(`Jobs: ${uniqueJobs.join(', ')}`);
-        } else {
-          console.log('No jobs found');
-        }
+        // if (uniqueJobs.length === 1) {
+        //   console.log(`Job: ${uniqueJobs[0]}`);
+        // } else if (uniqueJobs.length > 1) {
+        //   console.log(`Jobs: ${uniqueJobs.join(', ')}`);
+        // } else {
+        //   console.log('No jobs found');
+        // }
 
         const daysWorkTime = stringUtils.timestampHM(timeWorked);
-        console.log('recEVENTS', record.events);
-        const request = {
-          id: key,
+        const request: RequestData = {
+          id: Number(key),
           submitter: userInfo.displayName,
-          dateRequest: timestamp.toLocaleDateString(),
-          inRequest: inRequestTime,
-          outRequest: outRequestTime,
+          dateRequest: origin,
+          inRequest: origin,
+          outRequest: origin + timeWorked,
           jobs: allJobs,
-          totalTimeRequested: daysWorkTime,
+          totalTimeRequested: Number(daysWorkTime),
         };
 
         requestsArray.push(request);
@@ -124,7 +115,7 @@ const ViewRequestsPage = () => {
     if (auth.permissionLevel >= PermissionLevel.MANAGER) {
       const getRequests = async () => {
         const requests = await displayRequests();
-        if (requests) {
+        if (Array.isArray(requests)) {
           setRequests(requests);
         }
       };
@@ -139,58 +130,26 @@ const ViewRequestsPage = () => {
     setIsChecked(Array(requests.length).fill(false));
   }, [requests]);
 
-  // const handleApprove = async () => {
-  //   const newSelectedItemsData = requests.filter((_, i) => isChecked[i]);
-
-  //   for (const item of newSelectedItemsData) {
-  //     const index = requests.findIndex((request) => request.id === item.id);
-  //     const isCheckedItem = isChecked[index];
-
-  //     const originalData = await fetchData(orderByKey(), equalTo(item.id));
-
-  //     console.log('isCheckedItem: ', isCheckedItem);
-
-  //     if (isCheckedItem) {
-  //       try {
-  //         const { events, submitter } = Object.values(originalData)[0];
-
-  //         await db.update(`orgs/${auth.orgId}/timeRecords`, {
-  //           [Date.now()]: {
-  //             events,
-  //             submitter,
-  //           },
-  //         });
-
-  //         await db.delete(`orgs/${auth.orgId}/adjustmentRequests/${item.id}`);
-  //       } catch (error) {
-  //         console.error('Error approving request:', error);
-  //         toast.error('Error approving request.');
-  //       }
-  //     } else {
-  //       try {
-  //         await db.delete(`orgs/${auth.orgId}/adjustmentRequests/${item.id}`);
-  //       } catch (error) {
-  //         console.error('Error denying request:', error);
-  //         toast.error('Error denying request.');
-  //       }
-  //     }
-  //   }
-
-  //   const updatedRequests = requests.filter((_, i) => !isChecked[i]);
-  //   setRequests(updatedRequests);
-  // };
   const handleApprove = async () => {
-    const approvedRequests = requests.filter((_, i) => isChecked[i]);
+    const allPromises = requests
+      .filter((_, i) => isChecked[i])
+      .map(async (request) => {
+        const originalData = await fetchData(
+          orderByKey(),
+          equalTo(request.id.toString()),
+        );
 
-    for (const request of approvedRequests) {
-      const originalData = await fetchData(orderByKey(), equalTo(request.id));
+        if (!originalData) return;
 
-      if (originalData) {
+        const { events, submitter } = Object.values(originalData)[0];
+
         try {
-          const { events, submitter } = Object.values(originalData)[0];
+          const newKey = `${Date.now()}-${Math.random()
+            .toString(36)
+            .substr(2, 9)}`;
 
           await db.update(`orgs/${auth.orgId}/timeRecords`, {
-            [Date.now()]: {
+            [newKey]: {
               events,
               submitter,
             },
@@ -199,47 +158,30 @@ const ViewRequestsPage = () => {
           await db.delete(
             `orgs/${auth.orgId}/adjustmentRequests/${request.id}`,
           );
+
+          const remainingRequests = requests.filter((_, i) => !isChecked[i]);
+          setRequests(remainingRequests);
+          setIsChecked(Array(remainingRequests.length).fill(false));
         } catch (error) {
           console.error('Error approving request:', error);
           toast.error('Error approving request.');
         }
-      }
-    }
+      });
 
-    // Update the requests list
-    const remainingRequests = requests.filter((_, i) => !isChecked[i]);
-    setRequests(remainingRequests);
-    setIsChecked(Array(remainingRequests.length).fill(false)); // Reset checkboxes
+    await Promise.all(allPromises);
   };
 
-  // const handleCheckboxChange = async () => {
-  //   const newSelectedItemsData = requests.filter((_, i) => isChecked[i]);
-  //   setSelectedItemsData(newSelectedItemsData);
-
-  //   const updatedRequests = requests.filter((_, i) => !isChecked[i]);
-  //   setRequests(updatedRequests);
-
-  //   for (const item of newSelectedItemsData) {
-  //     const { id } = item;
-
-  //     try {
-  //       await db.exists(`orgs/${auth.orgId}/adjustmentRequests/${id}`);
-  //     } catch (error) {
-  //       console.error('Error removing request:', error);
-  //       toast.error('Error removing request.');
-  //     }
-  //   }
-  // };
-
-  const handleDeny = async (id: string) => {
+  const handleDeny = async (id: number) => {
     await db.delete(`orgs/${auth.orgId}/adjustmentRequests/${id}`);
+    const remainingRequests = requests.filter((request) => request.id !== id);
+    setRequests(remainingRequests);
+
+    setIsChecked(Array(remainingRequests.length).fill(false));
   };
 
   const onClickDashboard = () => {
     router.push(DASHBOARD);
   };
-
-  // console.log(requests);
 
   return (
     <ProtectedRoute>

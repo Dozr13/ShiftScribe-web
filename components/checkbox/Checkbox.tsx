@@ -1,13 +1,14 @@
 import { ChangeEvent } from 'react';
+import { StringUtils } from '../../lib';
 import { EventObject } from '../../types/data';
 
 interface CheckboxProps {
   label: string;
   checked: boolean;
   jobs?: EventObject[];
-  dateRequest: string;
-  inRequest: string;
-  outRequest: string;
+  dateRequest: number;
+  inRequest: number;
+  outRequest: number;
   onChange: (checked: boolean) => void;
 }
 
@@ -27,8 +28,6 @@ const Checkbox = ({
 
   const uniqueJobs = new Set(jobs?.map((j) => j.job));
 
-  console.log(jobs);
-
   return (
     <div className='border-b-2'>
       <div className='grid grid-cols-5 my-4'>
@@ -44,7 +43,9 @@ const Checkbox = ({
           <span className='m-2 text-gray-800'>{label}</span>
         </div>
         <div className='col-span-2 flex flex-col justify-center'>
-          <div className='text-gray-600'>Date: {dateRequest}</div>
+          <div className='text-gray-600'>
+            Date: {StringUtils.timestampToMMDDYYYY(dateRequest)}
+          </div>
           {jobs && jobs.length > 0 && (
             <div className='col-span-2 flex flex-col justify-center group relative'>
               <div className='text-gray-600'>
@@ -65,8 +66,12 @@ const Checkbox = ({
           )}
         </div>
         <div className='col-span-1 flex flex-col w-40'>
-          <div className='text-gray-600'>In: {inRequest}</div>
-          <div className='text-gray-600'>Out: {outRequest}</div>
+          <div className='text-gray-600'>
+            In: {StringUtils.timestampToHHMM(inRequest)}
+          </div>
+          <div className='text-gray-600'>
+            Out: {StringUtils.timestampToHHMM(outRequest)}
+          </div>
         </div>
       </div>
     </div>

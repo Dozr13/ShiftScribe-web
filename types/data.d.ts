@@ -67,3 +67,44 @@ type CSVRowData = {
   calledIn: boolean;
   reasonMissed?: string;
 };
+
+export type UserProfileData = {
+  id: number;
+  userId: string;
+  date: Date;
+  timeWorkedInDay: number;
+  clockedIn: Date;
+  clockedOut: Date;
+  breaks: number;
+  job: string;
+  submitter?: string;
+  dateRequest?: string;
+  inRequest?: string;
+  outRequest?: string;
+  jobs?: EventObject[];
+  totalTimeRequested?: string;
+};
+
+type UserProfileDataGeneric<T> = {
+  [K in keyof UserProfileData]: T extends 'toDate'
+    ? UserProfileData[K]
+    : UserProfileData[K] extends Date
+    ? number
+    : UserProfileData[K];
+};
+
+export type UserProfileDataTimestamps = DateOrNumber<UserProfileData>;
+
+type RequestData = {
+  id: number;
+  submitter: string;
+  dateRequest: number;
+  inRequest: number;
+  outRequest: number;
+  jobs: EventObject[];
+  totalTimeRequested: number;
+};
+
+type FullProfileData = UserProfileData & RequestData;
+
+export type EitherProfileData = UserProfileData | RequestData;

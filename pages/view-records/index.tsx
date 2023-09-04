@@ -10,12 +10,12 @@ import { TimeRecords, UserData } from '../../types/data';
 import LoadingScreen from '../loading';
 
 type UserDataTotals = {
-  id: string;
+  id: number;
   employeeName: string;
   employeeEmail: string;
-  totalWorkTime: string;
-  totalBreakTime: string;
-  totalPaidTime: string;
+  totalWorkTime: number;
+  totalBreakTime: number;
+  totalPaidTime: number;
   totalCallIns: number;
 };
 
@@ -96,13 +96,13 @@ export const ViewRecordsPage = () => {
       'Hours',
       'Lunch/ Break',
       'Job Number',
-      'Total',
+      'Total Payable Hours',
     ];
 
     const footerValues = [
-      'Total Regular Time',
-      'Total Overtime',
-      'Total Time On Break',
+      'Regular Hours',
+      'Overtime',
+      'Break / Travel',
       'Total Combined Time',
       'Total Call Ins',
       '',
@@ -121,7 +121,6 @@ export const ViewRecordsPage = () => {
       allUsers[currentEmployeeId] = userData.toJSON() as UserData;
     });
 
-    // Iterate through each unique employee
     for (const employeeId of uniqueEmployees as string[]) {
       const headers = [
         `Name: ${allUsers[employeeId].displayName}`,
@@ -135,98 +134,80 @@ export const ViewRecordsPage = () => {
 
       let summary: UserDataTotals[] = [];
 
-      for (const key in data) {
-        const record = data[key];
+      for (const [parentTimestamp, record] of Object.entries(data)) {
         if (!record.events || record.submitter !== employeeId) continue;
 
         const userInfo = allUsers[record.submitter];
         const { origin, timeWorked, breakTime, job, calledIn, meta } =
           TimeParser.parseCurrentRecord(record.events);
 
-        const timestamp = new Date(origin);
-        const outTimestamp = new Date(origin + timeWorked);
-        const daysWorkTime = StringUtils.timestampHM(timeWorked);
-        const daysBreakTime = StringUtils.timestampHM(breakTime);
+        const outTimestamp = origin + timeWorked;
         const paidTime = Math.max(timeWorked - breakTime, 0);
-        const daysPaidTime = StringUtils.timestampHM(paidTime);
-        const inTime = timestamp.toLocaleTimeString(undefined, {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
-        });
-        const outTime = outTimestamp.toLocaleTimeString(undefined, {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
-        });
 
-        // CSV Record
-        resCSV += `${timestamp.toLocaleDateString()},${inTime},${outTime},${daysWorkTime},${daysBreakTime},${job},${daysPaidTime}\n`;
+        resCSV += `${StringUtils.timestampToMMDDYYYY(
+          Number(parentTimestamp),
+        )},${StringUtils.timestampToHHMM(origin)},${StringUtils.timestampToHHMM(
+          outTimestamp,
+        )},${StringUtils.timestampHM(timeWorked)},${StringUtils.timestampHM(
+          breakTime,
+        )},${job},${StringUtils.timestampHM(paidTime)}\n`;
 
         const userId = record.submitter as string;
-        const userSummary = summary.find((item) => item.id === userId);
+        const userSummary = summary.find((item) => item.id === Number(userId));
         if (userSummary) {
-          userSummary.totalWorkTime = StringUtils.addTimeValues(
-            userSummary.totalWorkTime,
-            daysWorkTime,
-          );
-          userSummary.totalBreakTime = StringUtils.addTimeValues(
-            userSummary.totalBreakTime,
-            daysBreakTime,
-          );
-          userSummary.totalPaidTime = StringUtils.addTimeValues(
-            userSummary.totalPaidTime,
-            daysPaidTime,
-          );
-          userSummary.totalCallIns += calledIn ? 1 : 0;
+          (userSummary.totalWorkTime = userSummary.totalWorkTime + timeWorked),
+            (userSummary.totalBreakTime =
+              userSummary.totalBreakTime + breakTime),
+            (userSummary.totalPaidTime = userSummary.totalPaidTime + paidTime),
+            (userSummary.totalCallIns += calledIn ? 1 : 0);
         } else {
           summary.push({
-            id: userId,
+            id: Number(userId),
             employeeName: userInfo.displayName,
             employeeEmail: userInfo.email,
-            totalWorkTime: daysWorkTime,
-            totalBreakTime: daysBreakTime,
-            totalPaidTime: daysPaidTime,
+            totalWorkTime: timeWorked,
+            totalBreakTime: breakTime,
+            totalPaidTime: paidTime,
             totalCallIns: calledIn ? 1 : 0,
           });
         }
       }
 
-      for (const userSummary of summary) {
-        const totalWorkTimeMs = StringUtils.timestampToMilliseconds(
-          userSummary.totalWorkTime,
+      if (summary.length > 0) {
+        const aggregatedSummary = {
+          totalWorkTime: 0,
+          totalBreakTime: 0,
+          totalPaidTime: 0,
+          totalCallIns: 0,
+        };
+
+        for (const userSummary of summary) {
+          aggregatedSummary.totalWorkTime += userSummary.totalWorkTime;
+          aggregatedSummary.totalBreakTime += userSummary.totalBreakTime;
+          aggregatedSummary.totalPaidTime += userSummary.totalPaidTime;
+          aggregatedSummary.totalCallIns += userSummary.totalCallIns;
+        }
+
+        const totalRegularTime = Math.min(
+          aggregatedSummary.totalWorkTime,
+          40 * 60 * 60 * 1000,
         );
-        const breakTimeMs = StringUtils.timestampToMilliseconds(
-          userSummary.totalBreakTime,
+        const totalOvertime = Math.max(
+          0,
+          aggregatedSummary.totalWorkTime - 40 * 60 * 60 * 1000,
         );
-        const regularTimeMs = 40 * 60 * 60 * 1000;
-        const paidTimeMs = Math.max(totalWorkTimeMs - breakTimeMs, 0);
-        const totalRegularTime = StringUtils.timestampHM(
-          Math.min(totalWorkTimeMs, regularTimeMs),
-        );
-        const overtimeMs = Math.max(totalWorkTimeMs - regularTimeMs, 0);
-        const totalOvertime = StringUtils.timestampHM(overtimeMs);
-        const totalPaidTime = StringUtils.timestampHM(paidTimeMs);
-        let totalCombinedTime = StringUtils.addTimeValues(
-          totalRegularTime,
-          totalOvertime,
-        );
-        totalCombinedTime = StringUtils.subtractTimeValues(
-          totalCombinedTime,
-          userSummary.totalBreakTime,
-        );
+        const totalCombinedTime =
+          totalRegularTime + totalOvertime - aggregatedSummary.totalBreakTime;
 
         const footerData = [
-          totalRegularTime,
-          totalOvertime,
-          userSummary.totalBreakTime,
-          totalPaidTime,
-          userSummary.totalCallIns,
+          StringUtils.timestampHM(totalRegularTime),
+          StringUtils.timestampHM(totalOvertime),
+          StringUtils.timestampHM(aggregatedSummary.totalBreakTime),
+          StringUtils.timestampHM(aggregatedSummary.totalPaidTime),
+          aggregatedSummary.totalCallIns,
           '',
-          totalCombinedTime,
+          StringUtils.timestampHM(totalCombinedTime),
         ];
-
-        // console.log('footerData: ', footerData);
 
         for (let i = 0; i < footerValues.length; i++) {
           if (footerValues[i] === '') {
@@ -241,9 +222,8 @@ export const ViewRecordsPage = () => {
 
       const dividerWidth = 10;
       const dividerRow = '='.repeat(dividerWidth);
-
       resCSV += `\n\n\n${dividerRow}`;
-      resCSV += `\n--- ${allUsers[employeeId].displayName} Data Ends Here ---\n`;
+      resCSV += `\n--- ${allUsers[employeeId].displayName}'s Logs Ends Here ---\n`;
       resCSV += `${dividerRow}\n\n\n`;
     }
 

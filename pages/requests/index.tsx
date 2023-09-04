@@ -25,9 +25,9 @@ const ViewRequestsPage = () => {
   const router = useRouter();
 
   const [isChecked, setIsChecked] = useState<boolean[]>([]);
-  const [selectedItemsData, setSelectedItemsData] = useState<TimeRecords[]>([]);
   const [loading, setLoading] = useState(false);
   const [requests, setRequests] = useState<Array<RequestData>>([]);
+  const [isEditedRecord, setIsEditedRecord] = useState<boolean>(false);
 
   const fetchData = useCallback(
     async (...query: QueryConstraint[]) => {
@@ -131,30 +131,38 @@ const ViewRequestsPage = () => {
 
         if (!originalData) return;
 
-        const { events, submitter } = Object.values(originalData)[0];
+        // console.log('ORIGINAL DATA: ', originalData);
 
-        try {
-          // TODO: Figure out an acceptable way to work with the key values being different on multiple accepts
-          const newKey = Date.now();
+        for (const [originalKey, record] of Object.entries(originalData)) {
+          if (!record.events) continue;
 
-          await db.update(`orgs/${auth.orgId}/timeRecords`, {
-            [newKey]: {
-              events,
-              submitter,
-            },
-          });
+          const { events, submitter } = record;
 
-          await db.delete(
-            `orgs/${auth.orgId}/adjustmentRequests/${request.id}`,
-          );
+          try {
+            const existingRecord = await db.read(
+              `orgs/${auth.orgId}/timeRecords/${originalKey}`,
+            );
 
-          const remainingRequests = requests.filter((_, i) => !isChecked[i]);
-          setRequests(remainingRequests);
-          setIsChecked(Array(remainingRequests.length).fill(false));
-        } catch (error) {
-          console.error('Error approving request:', error);
-          toast.error('Error approving request.');
+            if (existingRecord.exists()) {
+              setIsEditedRecord(true);
+            }
+
+            await db.update(`orgs/${auth.orgId}/timeRecords`, {
+              [originalKey]: {
+                events,
+                submitter,
+              },
+            });
+          } catch (error) {
+            console.error('Error approving request:', error);
+            toast.error('Error approving request.');
+          }
         }
+
+        await db.delete(`orgs/${auth.orgId}/adjustmentRequests/${request.id}`);
+        const remainingRequests = requests.filter((_, i) => !isChecked[i]);
+        setRequests(remainingRequests);
+        setIsChecked(Array(remainingRequests.length).fill(false));
       });
 
     await Promise.all(allPromises);

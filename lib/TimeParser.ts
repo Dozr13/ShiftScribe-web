@@ -51,7 +51,7 @@ class TimeParser {
         continue;
       }
 
-      job = packet.job;
+      job = [packet.job];
 
       switch (packet.type) {
         case 'calledin':

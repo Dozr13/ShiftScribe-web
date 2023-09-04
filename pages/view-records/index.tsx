@@ -100,9 +100,9 @@ export const ViewRecordsPage = () => {
     ];
 
     const footerValues = [
-      'Total Regular Time',
-      'Total Overtime',
-      'Total Time On Break',
+      'Regular Hours',
+      'Overtime',
+      'Break / Travel',
       'Total Combined Time',
       'Total Call Ins',
       '',
@@ -134,8 +134,7 @@ export const ViewRecordsPage = () => {
 
       let summary: UserDataTotals[] = [];
 
-      for (const key in data) {
-        const record = data[key];
+      for (const [parentTimestamp, record] of Object.entries(data)) {
         if (!record.events || record.submitter !== employeeId) continue;
 
         const userInfo = allUsers[record.submitter];
@@ -145,9 +144,8 @@ export const ViewRecordsPage = () => {
         const outTimestamp = origin + timeWorked;
         const paidTime = Math.max(timeWorked - breakTime, 0);
 
-        // CSV Record
         resCSV += `${StringUtils.timestampToMMDDYYYY(
-          origin,
+          Number(parentTimestamp),
         )},${StringUtils.timestampToHHMM(origin)},${StringUtils.timestampToHHMM(
           outTimestamp,
         )},${StringUtils.timestampHM(timeWorked)},${StringUtils.timestampHM(
@@ -175,23 +173,38 @@ export const ViewRecordsPage = () => {
         }
       }
 
-      for (const userSummary of summary) {
-        const { totalWorkTime, totalBreakTime } = userSummary;
+      if (summary.length > 0) {
+        const aggregatedSummary = {
+          totalWorkTime: 0,
+          totalBreakTime: 0,
+          totalPaidTime: 0,
+          totalCallIns: 0,
+        };
 
-        const regularTimeMs = 40 * 60 * 60 * 1000;
-        const totalRegularTime = Math.min(totalWorkTime, regularTimeMs);
-        const totalOvertime = Math.max(0, totalWorkTime - regularTimeMs);
-        const totalPaidTime = totalRegularTime + totalOvertime;
+        for (const userSummary of summary) {
+          aggregatedSummary.totalWorkTime += userSummary.totalWorkTime;
+          aggregatedSummary.totalBreakTime += userSummary.totalBreakTime;
+          aggregatedSummary.totalPaidTime += userSummary.totalPaidTime;
+          aggregatedSummary.totalCallIns += userSummary.totalCallIns;
+        }
 
+        const totalRegularTime = Math.min(
+          aggregatedSummary.totalWorkTime,
+          40 * 60 * 60 * 1000,
+        );
+        const totalOvertime = Math.max(
+          0,
+          aggregatedSummary.totalWorkTime - 40 * 60 * 60 * 1000,
+        );
         const totalCombinedTime =
-          totalRegularTime + totalOvertime - totalBreakTime;
+          totalRegularTime + totalOvertime - aggregatedSummary.totalBreakTime;
 
         const footerData = [
           StringUtils.timestampHM(totalRegularTime),
           StringUtils.timestampHM(totalOvertime),
-          StringUtils.timestampHM(userSummary.totalBreakTime),
-          StringUtils.timestampHM(totalPaidTime),
-          userSummary.totalCallIns,
+          StringUtils.timestampHM(aggregatedSummary.totalBreakTime),
+          StringUtils.timestampHM(aggregatedSummary.totalPaidTime),
+          aggregatedSummary.totalCallIns,
           '',
           StringUtils.timestampHM(totalCombinedTime),
         ];
@@ -209,9 +222,8 @@ export const ViewRecordsPage = () => {
 
       const dividerWidth = 10;
       const dividerRow = '='.repeat(dividerWidth);
-
       resCSV += `\n\n\n${dividerRow}`;
-      resCSV += `\n--- ${allUsers[employeeId].displayName} Data Ends Here ---\n`;
+      resCSV += `\n--- ${allUsers[employeeId].displayName}'s Logs Ends Here ---\n`;
       resCSV += `${dividerRow}\n\n\n`;
     }
 

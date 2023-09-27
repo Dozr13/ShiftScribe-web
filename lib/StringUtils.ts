@@ -136,8 +136,15 @@ class StringUtils {
     )}m`;
   }
 
-  getHumanReadableDate(date = new Date()) {
+  getHumanReadableDate(date: Date | null) {
+    if (!(date instanceof Date)) {
+      return;
+    }
     return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+  }
+
+  formatDateForFirebase(date: Date | null): string {
+    return date ? date.getTime().toString() : '';
   }
 }
 

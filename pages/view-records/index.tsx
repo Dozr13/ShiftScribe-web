@@ -1,6 +1,8 @@
-import { QueryConstraint, endAt, orderByKey } from 'firebase/database';
-import { useRouter } from 'next/router';
+import { QueryConstraint, endAt, orderByKey, startAt } from 'firebase/database';
 import { useState } from 'react';
+import { DateRange } from 'react-date-range';
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
 import toast from 'react-hot-toast';
 import ProtectedRoute from '../../components/protected-route';
 import { useAuth } from '../../context/AuthContext';
@@ -20,7 +22,6 @@ type UserDataTotals = {
 };
 
 export const ViewRecordsPage = () => {
-  const router = useRouter();
   const auth = useAuth();
   const db = useFirebase();
 
@@ -28,16 +29,66 @@ export const ViewRecordsPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingCSV, setLoadingCSV] = useState<boolean>(false);
 
-  const fetchData = async (...query: QueryConstraint[]) => {
-    setLoading(true);
-    const res = await db.query(`orgs/${auth.orgId}/timeRecords`, ...query);
-    setLoading(false);
-    if (!res.exists()) {
-      let errorMessage = 'No records match this request.';
-      toast.error(errorMessage);
-    }
+  const [dateState, setDateState] = useState<
+    Array<{ startDate: Date; endDate: Date | undefined; key: string }>
+  >([
+    {
+      startDate: new Date(),
+      endDate: undefined,
+      key: 'selection',
+    },
+  ]);
 
-    return res.toJSON() as TimeRecords;
+  const { startDate, endDate } = dateState[0];
+
+  const [showDateRange, setShowDateRange] = useState(false);
+
+  const formatAndSetDates = (
+    date: Date | null,
+    hours: number,
+    minutes: number,
+    seconds: number,
+    milliseconds: number,
+  ) => {
+    if (!date) return null;
+
+    date.setHours(hours, minutes, seconds, milliseconds);
+
+    return StringUtils.formatDateForFirebase(date);
+  };
+
+  const fetchData = async (
+    ...query: QueryConstraint[]
+  ): Promise<TimeRecords | null> => {
+    setLoading(true);
+    try {
+      const formattedStartDate = startDate
+        ? formatAndSetDates(startDate, 0, 0, 0, 0)
+        : null;
+      const formattedEndDate = endDate
+        ? formatAndSetDates(endDate, 23, 59, 59, 999)
+        : null;
+      const queryConstraints: QueryConstraint[] = [orderByKey()];
+
+      if (formattedStartDate)
+        queryConstraints.push(startAt(formattedStartDate));
+      if (formattedEndDate) queryConstraints.push(endAt(formattedEndDate));
+
+      const res = await db.query(
+        `orgs/${auth.orgId}/timeRecords`,
+        ...queryConstraints,
+      );
+
+      if (!res.exists()) {
+        toast.error('No records match this request.');
+        return null;
+      }
+      return res.toJSON() as TimeRecords;
+    } catch (error: unknown) {
+    } finally {
+      setLoading(false);
+    }
+    return null;
   };
 
   const purgeOldRecords = async (timeInWeeks = 2) => {
@@ -103,7 +154,6 @@ export const ViewRecordsPage = () => {
       'Total Regular Time',
       'Total Overtime',
       'Total Time On Break',
-      'Total Combined Time',
       'Total Call Ins',
       '',
       'Total Hours',
@@ -121,15 +171,21 @@ export const ViewRecordsPage = () => {
       allUsers[currentEmployeeId] = userData.toJSON() as UserData;
     });
 
-    // Iterate through each unique employee
+    const startHumanReadable = startDate
+      ? StringUtils.getHumanReadableDate(startDate)
+      : 'N/A';
+    const endHumanReadable = endDate
+      ? StringUtils.getHumanReadableDate(endDate)
+      : 'N/A';
+
     for (const employeeId of uniqueEmployees as string[]) {
       const headers = [
         `Name: ${allUsers[employeeId].displayName}`,
         '',
         '',
         '',
-        '',
-        `Week Ending: 08/19/2020`,
+        `Week Start At: ${startHumanReadable}`,
+        `Week Ending: ${endHumanReadable}`,
       ];
       resCSV += `${headers.join(',')}\n${employeeHeaders.join(',')}\n`;
 
@@ -207,26 +263,23 @@ export const ViewRecordsPage = () => {
         const overtimeMs = Math.max(totalWorkTimeMs - regularTimeMs, 0);
         const totalOvertime = StringUtils.timestampHM(overtimeMs);
         const totalPaidTime = StringUtils.timestampHM(paidTimeMs);
-        let totalCombinedTime = StringUtils.addTimeValues(
-          totalRegularTime,
-          totalOvertime,
-        );
-        totalCombinedTime = StringUtils.subtractTimeValues(
-          totalCombinedTime,
-          userSummary.totalBreakTime,
-        );
+        // let totalCombinedTime = StringUtils.addTimeValues(
+        //   totalRegularTime,
+        //   totalOvertime,
+        // );
+        // totalCombinedTime = StringUtils.subtractTimeValues(
+        //   totalCombinedTime,
+        //   userSummary.totalBreakTime,
+        // );
 
         const footerData = [
           totalRegularTime,
           totalOvertime,
           userSummary.totalBreakTime,
-          totalPaidTime,
           userSummary.totalCallIns,
           '',
-          totalCombinedTime,
+          totalPaidTime,
         ];
-
-        // console.log('footerData: ', footerData);
 
         for (let i = 0; i < footerValues.length; i++) {
           if (footerValues[i] === '') {
@@ -251,6 +304,12 @@ export const ViewRecordsPage = () => {
     setLoadingCSV(false);
   };
 
+  const handleSelect = (ranges: any) => {
+    const { startDate, endDate } = ranges.selection;
+
+    setDateState([{ startDate, endDate, key: 'selection' }]);
+  };
+
   return (
     <ProtectedRoute>
       {loading && <LoadingScreen />}
@@ -262,7 +321,7 @@ export const ViewRecordsPage = () => {
             className='text-3xl text-white'
             style={{ fontFamily: 'monospace' }}
           >
-            ADMIN PANEL v0
+            ADMIN PANEL v1.0
           </div>
 
           <div
@@ -271,11 +330,12 @@ export const ViewRecordsPage = () => {
           >
             {`ORG ID: ${auth.orgId?.toUpperCase()}`}
           </div>
+
           {csv ? (
             <>
               <a
                 href={`data:text/csv;charset=utf-8,${encodeURI(csv)}`}
-                download={`EmployeesHours-${StringUtils.getHumanReadableDate(
+                download={`Employees-Hours-${StringUtils.getHumanReadableDate(
                   new Date(),
                 )}.csv`}
                 onClick={() => {
@@ -289,6 +349,31 @@ export const ViewRecordsPage = () => {
             </>
           ) : (
             <>
+              {showDateRange && (
+                <DateRange
+                  editableDateInputs={true}
+                  onChange={handleSelect}
+                  moveRangeOnFirstSelection={false}
+                  ranges={dateState}
+                />
+              )}
+
+              {!showDateRange && (
+                <button
+                  className='w-full mt-8 p-4 bg-blue-600 rounded-md'
+                  onClick={() => setShowDateRange(!showDateRange)}
+                >
+                  <p className='text-md font-semibold'>Select Dates</p>
+                </button>
+              )}
+              {showDateRange && (
+                <button
+                  className='w-full mt-8 p-4 bg-blue-600 rounded-md'
+                  onClick={() => setShowDateRange(!showDateRange)}
+                >
+                  <p className='text-md font-semibold'>Close Range Picker</p>
+                </button>
+              )}
               <button
                 className='w-full mt-10 p-4 bg-green-500 rounded-md'
                 onClick={async () => {

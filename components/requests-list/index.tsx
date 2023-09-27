@@ -1,24 +1,14 @@
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import Checkbox from '../../components/checkbox/Checkbox';
-import { EventObject } from '../../types/data';
+import { RequestData } from '../../types/data';
 import SubmitButton from '../form-components/SubmitButton';
 
-export type UserProfileData = {
-  id: string;
-  submitter: string;
-  dateRequest: string;
-  inRequest: string;
-  outRequest: string;
-  jobs: EventObject[];
-  totalTimeRequested: string;
-};
-
 interface IRequestListItem {
-  requests: UserProfileData[];
+  requests: RequestData[];
   isChecked: boolean[];
   setIsChecked: Dispatch<SetStateAction<boolean[]>>;
   onApprove: () => Promise<void>;
-  onDeny: (id: string) => Promise<void>;
+  onDeny: (id: number) => Promise<void>;
 }
 
 const RequestListItem = ({
@@ -45,8 +35,6 @@ const RequestListItem = ({
     }
   };
 
-  console.log(requests);
-
   return (
     <>
       <div className='p-8 container items-center mx-auto border-2 bg-gray-400 border-gray-400 rounded-md overflow-y-scroll overflow-x-hidden h-[50vh] w-[40vw]'>
@@ -54,10 +42,10 @@ const RequestListItem = ({
         {requests.map((request, index) => (
           <Checkbox
             key={request.id}
-            label={request.submitter}
+            label={request.submitter ?? 'Err'}
             checked={isChecked[index]}
             jobs={request.jobs}
-            dateRequest={request.dateRequest}
+            dateRequest={request.id}
             inRequest={request.inRequest}
             outRequest={request.outRequest}
             onChange={(checked) => {

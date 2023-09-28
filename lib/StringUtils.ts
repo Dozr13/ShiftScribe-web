@@ -267,6 +267,16 @@ class StringUtils {
     )}m`;
   }
 
+  getHumanReadableDate(date: Date | null) {
+    if (!(date instanceof Date)) {
+      return;
+    }
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+  }
+
+  formatDateForFirebase(date: Date | null): string {
+    return date ? date.getTime().toString() : '';
+  }
   timestampToMilliseconds(timeString: string): number {
     const [hours, minutes] = timeString.split(':');
     const hoursInMs = parseInt(hours) * 60 * 60 * 1000;
@@ -282,10 +292,6 @@ class StringUtils {
   convertTimestampToDate = (timestamp: number): Date => {
     return new Date(timestamp * 1000);
   };
-
-  getHumanReadableDate(date = new Date()) {
-    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-  }
 
   // ! HELPER FUNCTIONS
   logTimestampToHHMM(timestamp: number, stringPassed: string): string {
@@ -316,6 +322,16 @@ class StringUtils {
 
     return timeString;
   }
+
+  convertTimestampToDateString = (timestampStr: string): string => {
+    const timestamp = Number(timestampStr); // Convert string to number
+    const date = new Date(timestamp);
+    const mm = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const dd = String(date.getDate()).padStart(2, '0');
+    const yyyy = date.getFullYear();
+
+    return `${mm}-${dd}-${yyyy}`;
+  };
 
   logDateToHHMM(time: Date): string {
     const actualTime = time instanceof Date ? time : new Date(time);

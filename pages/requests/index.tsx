@@ -94,7 +94,7 @@ const ViewRequestsPage = () => {
       setLoading(false);
       return requestsArray;
     } catch (error) {
-      console.error('Error fetching requests:', error);
+      // console.error('Error fetching requests:', error);
       toast.error('Error fetching requests.');
       setLoading(false);
       return [];
@@ -120,6 +120,14 @@ const ViewRequestsPage = () => {
     setIsChecked(Array(requests.length).fill(false));
   }, [requests]);
 
+  function convertUnixToMMDDYYYY(unixTimestamp: string | number) {
+    const date = new Date(unixTimestamp);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
+  }
+
   const handleApprove = async () => {
     const allPromises = requests
       .filter((_, i) => isChecked[i])
@@ -128,6 +136,16 @@ const ViewRequestsPage = () => {
           orderByKey(),
           equalTo(request.id.toString()),
         );
+        // console.log('Fetched original data:', originalData);
+
+        if (originalData && Object.keys(originalData).length > 0) {
+          const firstTimestamp = Object.keys(originalData)[0]; // Get the first timestamp
+          const firstTimestampMMDDYYYY = convertUnixToMMDDYYYY(
+            Number(firstTimestamp),
+          );
+
+          // console.log('First Timestamp (MM/DD/YYYY):', firstTimestampMMDDYYYY);
+        }
 
         if (!originalData) return;
 
@@ -143,6 +161,7 @@ const ViewRequestsPage = () => {
               `orgs/${auth.orgId}/timeRecords/${originalKey}`,
             );
 
+            // console.log('existingRecord with dateRequest:', existingRecord);
             if (existingRecord.exists()) {
               setIsEditedRecord(true);
             }
@@ -153,8 +172,12 @@ const ViewRequestsPage = () => {
                 submitter,
               },
             });
+            // console.log(
+            //   'Updated record with dateRequest:',
+            //   stringUtils.convertTimestampToDateString(originalKey),
+            // );
           } catch (error) {
-            console.error('Error approving request:', error);
+            // console.error('Error approving request:', error);
             toast.error('Error approving request.');
           }
         }

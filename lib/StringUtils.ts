@@ -323,6 +323,16 @@ class StringUtils {
     return timeString;
   }
 
+  convertTimestampToDateString = (timestampStr: string): string => {
+    const timestamp = Number(timestampStr); // Convert string to number
+    const date = new Date(timestamp);
+    const mm = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const dd = String(date.getDate()).padStart(2, '0');
+    const yyyy = date.getFullYear();
+
+    return `${mm}-${dd}-${yyyy}`;
+  };
+
   logDateToHHMM(time: Date): string {
     const actualTime = time instanceof Date ? time : new Date(time);
     let hours = actualTime.getHours();

@@ -34,7 +34,7 @@ const Checkbox = ({
         <div className='flex items-center'>
           <input
             type='checkbox'
-            checked={checked}
+            checked={checked ?? false}
             onChange={handleChange}
             className='form-checkbox h-6 w-6 text-red-600 rounded-full focus:ring-0 focus:outline-none mx-auto my-auto'
           />

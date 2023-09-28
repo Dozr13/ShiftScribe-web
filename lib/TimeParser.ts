@@ -59,8 +59,7 @@ class TimeParser {
           meta = packet.meta;
           break core;
         case 'clockin':
-          origin = key;
-          time = origin - key;
+          time = key - origin;
           time -= breakTime;
           break;
         case 'break':

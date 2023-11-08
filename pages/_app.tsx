@@ -22,7 +22,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <Header>
           <div
             className="h-full w-full flex justify-center items-center overflow-hidden"
-            style={{ backgroundColor: "#CCC" }}
+            style={{ backgroundColor: "#262626" }}
           >
             <Component {...pageProps} />
           </div>

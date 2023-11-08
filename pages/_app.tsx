@@ -1,9 +1,9 @@
-import type { AppProps } from 'next/app';
-import { useEffect } from 'react';
-import toast, { Toaster, useToasterStore } from 'react-hot-toast';
-import Header from '../components/header';
-import { AuthContextProvider } from '../context/AuthContext';
-import '../styles/globals.css';
+import type { AppProps } from "next/app";
+import { useEffect } from "react";
+import toast, { Toaster, useToasterStore } from "react-hot-toast";
+import Header from "../components/header";
+import { AuthContextProvider } from "../context/AuthContext";
+import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const { toasts } = useToasterStore();
@@ -17,12 +17,12 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <AuthContextProvider>
-      <div className='h-screen overflow-y-hidden flex flex-col justify-center align-middle items-center'>
-        <Toaster position='bottom-right' reverseOrder={false} />
+      <div className="h-screen overflow-y-hidden flex flex-col justify-center align-middle items-center">
+        <Toaster position="bottom-right" reverseOrder={false} />
         <Header>
           <div
-            className='h-full w-full flex justify-center items-center overflow-hidden'
-            style={{ backgroundColor: '#262626' }}
+            className="h-full w-full flex justify-center items-center overflow-hidden"
+            style={{ backgroundColor: "#CCC" }}
           >
             <Component {...pageProps} />
           </div>

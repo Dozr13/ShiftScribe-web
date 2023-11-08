@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { useFirebase } from '../../context/FirebaseContext';
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { useFirebase } from "../../context/FirebaseContext";
 
 import {
   faCancel,
   faEdit,
   faSave,
   faTrashAlt,
-} from '@fortawesome/free-solid-svg-icons';
-import { EMAIL_REGEX } from '../../utils/constants/regex.constants';
-import { showToast } from '../../utils/toast';
-import StyledIconButton from '../buttons/StyledIconButton';
-import StyledInput from '../inputs/StyledInput';
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Grid, IconButton, TextField, Typography } from "@mui/material";
+import * as theme from "../../constants/theme";
+import { EMAIL_REGEX } from "../../utils/constants/regex.constants";
+import { showToast } from "../../utils/toast";
 
 export interface Employee {
   id: string;
@@ -37,7 +38,7 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
 
   const { id, accessLevel, userData } = employee;
 
-  const { displayName = '', email = '', organization = '' } = userData || {};
+  const { displayName = "", email = "", organization = "" } = userData || {};
 
   const isCurrentUser = !!auth.user && auth.user.uid === id;
 
@@ -51,9 +52,9 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
 
   useEffect(() => {
     setIsValidEmail(
-      (employeeEmail || '').trim() === ''
+      (employeeEmail || "").trim() === ""
         ? true
-        : (employeeEmail || '').match(EMAIL_REGEX) !== null,
+        : (employeeEmail || "").match(EMAIL_REGEX) !== null,
     );
   }, [employeeEmail, editing]);
 
@@ -62,11 +63,11 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
   };
 
   const handleSave = async () => {
-    if (employeeName.trim() === '')
-      return showToast('Employee Name cannot be empty', false);
-    if (employeeEmail.trim() === '')
-      return showToast('Employee Email cannot be empty', false);
-    if (!isValidEmail) return showToast('Please enter a valid email', false);
+    if (employeeName.trim() === "")
+      return showToast("Employee Name cannot be empty", false);
+    if (employeeEmail.trim() === "")
+      return showToast("Employee Email cannot be empty", false);
+    if (!isValidEmail) return showToast("Please enter a valid email", false);
 
     const accessLevelNumber = employeeAccessLevel;
 
@@ -75,7 +76,7 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
       accessLevelNumber < 1 ||
       accessLevelNumber > 4
     ) {
-      return showToast('Access level must be a number between 1 and 4', false);
+      return showToast("Access level must be a number between 1 and 4", false);
     }
 
     await db.update(`orgs/${auth.orgId}/members/${employee.id}`, {
@@ -100,7 +101,7 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
   }
 
   const handleEmployeeAccessLevelChange = (value: string) => {
-    if (value === '') {
+    if (value === "") {
       setEmployeeAccessLevel(0);
       return;
     }
@@ -110,91 +111,97 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
     if (!isNaN(parsedValue) && parsedValue >= 0 && parsedValue <= 4) {
       setEmployeeAccessLevel(parsedValue);
     } else {
-      showToast('Access level must be a number between 1 and 4', false);
+      showToast("Access level must be a number between 1 and 4", false);
     }
   };
 
   return (
-    <div className='employee-list-item border-t-2'>
-      <div className='flex items-center justify-evenly flex-wrap'>
-        {editing ? (
-          <>
-            <StyledInput
-              type='text'
+    <Grid
+      container
+      alignItems="center"
+      spacing={2}
+      sx={{ borderBottom: 2, borderColor: theme.BORDER_COLOR, py: 2 }}
+    >
+      {editing ? (
+        <>
+          <Grid item xs={2.5}>
+            <TextField
+              fullWidth
+              type="text"
               value={employeeName}
-              onChange={setEmployeeName}
-              className='text-gray-800 w-[20%]'
+              onChange={(e) => setEmployeeName(e.target.value)}
+              variant="outlined"
+              size="small"
             />
-            <StyledInput
-              type='text'
+          </Grid>
+          <Grid item xs={2.5}>
+            <TextField
+              fullWidth
+              type="email"
               value={employeeEmail}
-              onChange={setEmployeeEmail}
-              className='text-gray-800 w-[20%]'
-              emailInputClassName={
-                !isValidEmail || employeeEmail.trim() === ''
-                  ? 'border-4 border-red-400'
-                  : 'border-4 border-transparent'
-              }
+              onChange={(e) => setEmployeeEmail(e.target.value)}
+              variant="outlined"
+              size="small"
+              error={!isValidEmail || employeeEmail.trim() === ""}
             />
-            <StyledInput
-              type='text'
+          </Grid>
+          <Grid item xs={2.5}>
+            <TextField
+              fullWidth
+              type="text"
               value={employeeOrg}
-              onChange={setEmployeeOrg}
-              className='text-gray-800 w-[20%]'
+              onChange={(e) => setEmployeeOrg(e.target.value)}
+              variant="outlined"
+              size="small"
               disabled
             />
-            <StyledInput
-              type='text'
-              value={employeeAccessLevel}
-              onChange={handleEmployeeAccessLevelChange}
-              className='text-gray-800 w-[20%]'
+          </Grid>
+          <Grid item xs={1}>
+            <TextField
+              fullWidth
+              type="number"
+              value={employeeAccessLevel.toString()}
+              onChange={(e) => handleEmployeeAccessLevelChange(e.target.value)}
+              variant="outlined"
+              size="small"
               disabled={isCurrentUser}
+              InputProps={{ inputProps: { min: 1, max: 4 } }}
             />
-          </>
-        ) : (
-          <>
-            <span
-              className='text-gray-800 w-[20%] p-5'
-              style={{ wordWrap: 'break-word' }}
-            >
-              {employeeName}
-            </span>
-            <span
-              className='text-gray-800 w-[20%] p-5'
-              style={{ wordWrap: 'break-word' }}
-            >
-              {employeeEmail}
-            </span>
-            <span
-              className='text-gray-800 w-[20%] p-5'
-              style={{ wordWrap: 'break-word' }}
-            >
-              {employeeOrg}
-            </span>
-            <span
-              className='text-gray-800 w-[20%] p-5'
-              style={{ wordWrap: 'break-word' }}
-            >
-              {employeeAccessLevel}
-            </span>
-          </>
-        )}
-        <div className='flex justify-around text-gray-800 w-[20%] p-5'>
-          <StyledIconButton
-            onClick={!editing ? handleEdit : handleSave}
-            label={!editing ? 'Edit' : 'Save'}
-            icon={!editing ? faEdit : faSave}
-            color={!editing ? 'text-blue-700' : 'text-green-700'}
-          />
-          <StyledIconButton
-            onClick={!editing ? handleDelete : handleCancel}
-            label={!editing ? 'Delete' : 'Cancel'}
-            icon={!editing ? faTrashAlt : faCancel}
-            color={!editing ? 'text-red-700' : 'text-yellow-300'}
-          />
-        </div>
-      </div>
-    </div>
+          </Grid>
+        </>
+      ) : (
+        <>
+          <Grid item xs={2.5}>
+            <Typography>{employeeName}</Typography>
+          </Grid>
+          <Grid item xs={2.5}>
+            <Typography>{employeeEmail}</Typography>
+          </Grid>
+          <Grid item xs={2.5}>
+            <Typography>{employeeOrg}</Typography>
+          </Grid>
+          <Grid item xs={1}>
+            <Typography>{employeeAccessLevel}</Typography>
+          </Grid>
+        </>
+      )}
+      <Grid item xs={2} sx={{ display: "flex", justifyContent: "flex-start" }}>
+        <IconButton
+          onClick={!editing ? handleEdit : handleSave}
+          sx={{
+            color: !editing ? theme.ACCENT_COLOR : theme.BUTTON_COLOR_PRIMARY,
+          }}
+        >
+          <FontAwesomeIcon icon={!editing ? faEdit : faSave} />
+        </IconButton>
+        <IconButton
+          onClick={!editing ? handleDelete : handleCancel}
+          sx={{ color: !editing ? "error.main" : "warning.main" }}
+        >
+          <FontAwesomeIcon icon={!editing ? faTrashAlt : faCancel} />
+        </IconButton>
+      </Grid>
+    </Grid>
   );
 };
 

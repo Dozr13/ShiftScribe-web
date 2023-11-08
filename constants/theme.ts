@@ -1,0 +1,10 @@
+export const BACKGROUND_COLOR = "#f5f5f5";
+export const TEXT_COLOR = "#333333";
+export const BUTTON_COLOR_PRIMARY = "#5E6AD2";
+export const BUTTON_PRIMARY_HOVER_COLOR = "#4E5BB2";
+export const BUTTON_COLOR_SECONDARY = "#A8A8A8";
+export const BUTTON_SECONDARY_HOVER_COLOR = "#949494";
+export const BUTTON_COLOR_TEXT = "#FFFFFF";
+export const HEADER_BACKGROUND_COLOR = "#e0e0e0";
+export const ACCENT_COLOR = "#87AEDF";
+export const BORDER_COLOR = "#DADADA";

@@ -1,18 +1,20 @@
-import { faCalendar, faClose } from '@fortawesome/free-solid-svg-icons';
-import { QueryConstraint, endAt, orderByKey, startAt } from 'firebase/database';
-import { useEffect, useState } from 'react';
-import { DateRange } from 'react-date-range';
-import 'react-date-range/dist/styles.css';
-import 'react-date-range/dist/theme/default.css';
-import toast from 'react-hot-toast';
-import StyledIconButton from '../../components/buttons/StyledIconButton';
-import ProtectedRoute from '../../components/protected-route';
-import { useAuth } from '../../context/AuthContext';
-import { useFirebase } from '../../context/FirebaseContext';
-import { StringUtils } from '../../lib';
-import timeParser from '../../lib/TimeParser';
-import { TimeRecords, UserData } from '../../types/data';
-import LoadingScreen from '../loading';
+import { faCalendar, faClose } from "@fortawesome/free-solid-svg-icons";
+import { Box, Button, Typography } from "@mui/material";
+import { QueryConstraint, endAt, orderByKey, startAt } from "firebase/database";
+import { useEffect, useState } from "react";
+import { DateRange } from "react-date-range";
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
+import toast from "react-hot-toast";
+import StyledIconButton from "../../components/buttons/StyledIconButton";
+import ProtectedRoute from "../../components/protected-route";
+import * as theme from "../../constants/theme";
+import { useAuth } from "../../context/AuthContext";
+import { useFirebase } from "../../context/FirebaseContext";
+import { StringUtils } from "../../lib";
+import timeParser from "../../lib/TimeParser";
+import { TimeRecords, UserData } from "../../types/data";
+import LoadingScreen from "../loading";
 
 type UserDataTotals = {
   id: string;
@@ -42,7 +44,7 @@ export const ViewRecordsPage = () => {
     {
       startDate: undefined,
       endDate: undefined,
-      key: 'selection',
+      key: "selection",
     },
   ]);
 
@@ -129,13 +131,13 @@ export const ViewRecordsPage = () => {
       // console.log('DB Query Result value:', res?.val());
 
       if (!res?.exists()) {
-        toast.error('No records match this request.');
+        toast.error("No records match this request.");
         return null;
       }
 
       return res.toJSON() as TimeRecords;
     } catch (error: unknown) {
-      toast.error('An error occurred while fetching data.');
+      toast.error("An error occurred while fetching data.");
       return null;
     } finally {
       setLoading(false);
@@ -166,7 +168,7 @@ export const ViewRecordsPage = () => {
     endDate: Date | null,
   ) => {
     if (!startDate || !endDate) {
-      toast.error('Both start date and end date are required.');
+      toast.error("Both start date and end date are required.");
       return;
     }
 
@@ -223,32 +225,32 @@ export const ViewRecordsPage = () => {
       return;
     }
 
-    let resCSV = '';
+    let resCSV = "";
 
     const uniqueEmployees = Array.from(
       new Set(Object.values(data).map((record) => record.submitter)),
     ).filter(Boolean);
 
     const employeeHeaders = [
-      'Date',
-      'Time IN',
-      'Time OUT',
-      'Hours',
-      'Lunch/ Break',
-      'Job Number',
-      'Total',
+      "Date",
+      "Time IN",
+      "Time OUT",
+      "Hours",
+      "Lunch/ Break",
+      "Job Number",
+      "Total",
     ];
 
     const footerValues = [
-      'Total Regular Time',
-      'Total Overtime',
-      'Total Time On Break',
-      'Total Call Ins',
-      '',
-      'Total Hours',
+      "Total Regular Time",
+      "Total Overtime",
+      "Total Time On Break",
+      "Total Call Ins",
+      "",
+      "Total Hours",
     ];
 
-    const jobIndex = employeeHeaders.indexOf('Job Number');
+    const jobIndex = employeeHeaders.indexOf("Job Number");
 
     const allUsersPromises = uniqueEmployees.map((employeeId) =>
       db.read(`/users/${employeeId}`),
@@ -262,21 +264,21 @@ export const ViewRecordsPage = () => {
 
     const startHumanReadable = startDate
       ? StringUtils.getHumanReadableDate(startDate)
-      : 'N/A';
+      : "N/A";
     const endHumanReadable = endDate
       ? StringUtils.getHumanReadableDate(endDate)
-      : 'N/A';
+      : "N/A";
 
     for (const employeeId of uniqueEmployees as string[]) {
       const headers = [
         `Name: ${allUsers[employeeId].displayName}`,
-        '',
-        '',
-        '',
+        "",
+        "",
+        "",
         `Week Start At: ${startHumanReadable}`,
         `Week Ending: ${endHumanReadable}`,
       ];
-      resCSV += `${headers.join(',')}\n${employeeHeaders.join(',')}\n`;
+      resCSV += `${headers.join(",")}\n${employeeHeaders.join(",")}\n`;
 
       let summary: UserDataTotals[] = [];
 
@@ -303,9 +305,9 @@ export const ViewRecordsPage = () => {
           const event = record.events[eventKey];
 
           switch (event.type) {
-            case 'clockin':
+            case "clockin":
               break;
-            case 'clockout':
+            case "clockout":
               time += Number(eventKey) - origin;
               break;
           }
@@ -325,13 +327,13 @@ export const ViewRecordsPage = () => {
         const paidTime = Math.max(timeWorked - breakTime, 0);
         const daysPaidTime = StringUtils.timestampHM(paidTime);
         const inTime = timestamp.toLocaleTimeString(undefined, {
-          hour: 'numeric',
-          minute: '2-digit',
+          hour: "numeric",
+          minute: "2-digit",
           hour12: true,
         });
         const outTime = outTimestamp.toLocaleTimeString(undefined, {
-          hour: 'numeric',
-          minute: '2-digit',
+          hour: "numeric",
+          minute: "2-digit",
           hour12: true,
         });
 
@@ -391,15 +393,15 @@ export const ViewRecordsPage = () => {
           totalOvertime,
           userSummary.totalBreakTime,
           userSummary.totalCallIns,
-          '',
+          "",
           totalPaidTime,
         ];
 
         for (let i = 0; i < footerValues.length; i++) {
-          if (footerValues[i] === '') {
-            resCSV += '\n';
+          if (footerValues[i] === "") {
+            resCSV += "\n";
           } else {
-            resCSV += `\n${Array(jobIndex).fill('').join(',')},${
+            resCSV += `\n${Array(jobIndex).fill("").join(",")},${
               footerValues[i]
             },${footerData[i]}`;
           }
@@ -407,7 +409,7 @@ export const ViewRecordsPage = () => {
       }
 
       const dividerWidth = 10;
-      const dividerRow = '='.repeat(dividerWidth);
+      const dividerRow = "=".repeat(dividerWidth);
       resCSV += `\n\n\n${dividerRow}`;
       resCSV += `\n--- ${allUsers[employeeId].displayName}'s Data Ends Here ---\n`;
       resCSV += `${dividerRow}\n\n\n`;
@@ -419,7 +421,7 @@ export const ViewRecordsPage = () => {
   const handleSelect = (ranges: any) => {
     const { startDate, endDate } = ranges.selection;
 
-    setDateState([{ startDate, endDate, key: 'selection' }]);
+    setDateState([{ startDate, endDate, key: "selection" }]);
   };
 
   const handleShowDateRange = () => {
@@ -429,106 +431,128 @@ export const ViewRecordsPage = () => {
   return (
     <ProtectedRoute>
       {loading && <LoadingScreen />}
-      <div className='flex flex-col justify-center items-center'>
-        <div className='p-10 container flex flex-col justify-center items-center mx-auto w-96 border-2 bg-gray-400 border-gray-400 rounded-md'>
-          <div className='flex py-2 container mx-auto'></div>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          p: 5,
+          m: 2,
+          width: 384, // equivalent to w-96
+          border: 2,
+          borderColor: theme.BORDER_COLOR,
+          bgcolor: theme.HEADER_BACKGROUND_COLOR,
+          borderRadius: 2,
+        }}
+      >
+        <Typography
+          variant="h3"
+          sx={{
+            color: theme.TEXT_COLOR,
+            fontFamily: "monospace",
+            mb: 2,
+          }}
+        >
+          ADMIN PANEL v1.0
+        </Typography>
 
-          <div
-            className='text-3xl text-white'
-            style={{ fontFamily: 'monospace' }}
+        <Typography
+          variant="h6"
+          sx={{
+            color: theme.TEXT_COLOR,
+            fontFamily: "monospace",
+            mb: 2,
+          }}
+        >
+          {`ORG ID: ${auth.orgId?.toUpperCase()}`}
+        </Typography>
+
+        {csv ? (
+          <Button
+            component="a"
+            href={`data:text/csv;charset=utf-8,${encodeURI(csv)}`}
+            download={`Employees-Hours-${StringUtils.getHumanReadableDate(
+              dateState[0].startDate ?? new Date(),
+            )}-${StringUtils.getHumanReadableDate(
+              dateState[0].endDate ?? new Date(),
+            )}.csv`}
+            onClick={() => setCsv(undefined)}
+            variant="contained"
+            sx={{
+              mt: 4,
+              bgcolor: theme.BUTTON_COLOR_PRIMARY,
+              "&:hover": {
+                bgcolor: theme.BUTTON_PRIMARY_HOVER_COLOR,
+              },
+            }}
           >
-            ADMIN PANEL v1.0
-          </div>
-
-          <div
-            className='text-xl text-white'
-            style={{ fontFamily: 'monospace' }}
-          >
-            {`ORG ID: ${auth.orgId?.toUpperCase()}`}
-          </div>
-
-          {csv ? (
-            <>
-              <a
-                href={`data:text/csv;charset=utf-8,${encodeURI(csv)}`}
-                download={`Employees-Hours-${StringUtils.getHumanReadableDate(
-                  dateState[0].startDate ?? new Date(),
-                )}-${StringUtils.getHumanReadableDate(
-                  dateState[0].endDate ?? new Date(),
-                )}.csv`}
-                onClick={() => {
-                  setCsv(undefined);
-                }}
+            Click to Download CSV
+          </Button>
+        ) : (
+          <>
+            {showDateRange && (
+              <Box
+                className={`date-picker-wrapper ${
+                  showDateRange ? "slide-in-fade-in" : "slide-out-fade-out"
+                }`}
               >
-                <button className='w-full mt-10 p-4 bg-blue-500 rounded-md'>
-                  <p className='text-md font-semibold'>Click to Download CSV</p>
-                </button>
-              </a>
-            </>
-          ) : (
-            <>
-              {showDateRange && (
-                <div
-                  className={`date-picker-wrapper ${
-                    showDateRange ? 'slide-in-fade-in' : 'slide-out-fade-out'
-                  }`}
-                >
-                  <DateRange
-                    editableDateInputs={true}
-                    onChange={handleSelect}
-                    moveRangeOnFirstSelection={false}
-                    ranges={dateState}
-                  />
-                </div>
-              )}
-
-              <button
-                className='w-full mt-10 p-4 bg-green-500 rounded-md'
-                onClick={async () => {
-                  await toast.promise(
-                    generateCSV(),
-                    {
-                      loading: 'Generating CSV...',
-
-                      success: 'CSV generated successfully!',
-                      error: 'Error generating CSV.',
-                    },
-                    {
-                      duration: 3000,
-                    },
-                  );
-                }}
-                disabled={loadingCSV}
-              >
-                <p className='text-md font-semibold'>
-                  Generate CSV of ALL work Records
-                </p>
-              </button>
-              <button
-                className='w-full mt-8 p-4 bg-red-600 rounded-md'
-                onClick={() =>
-                  purgeOldRecords(startDate, endDate || new Date())
-                }
-                disabled={loadingCSV}
-              >
-                <p className='text-md font-semibold'>
-                  Purge records older than 2 weeks
-                </p>
-              </button>
-              <div className='mt-6'>
-                <StyledIconButton
-                  onClick={handleShowDateRange}
-                  label={
-                    showDateRange ? 'Close Date Range' : 'Toggle Date Range '
-                  }
-                  icon={!showDateRange ? faCalendar : faClose}
-                  color={'text-blue-700'}
+                <DateRange
+                  editableDateInputs={true}
+                  onChange={handleSelect}
+                  moveRangeOnFirstSelection={false}
+                  ranges={dateState}
                 />
-              </div>
-            </>
-          )}
-        </div>
-      </div>
+              </Box>
+            )}
+
+            <Button
+              variant="contained"
+              onClick={async () => {
+                await toast.promise(
+                  generateCSV(),
+                  {
+                    loading: "Generating CSV...",
+
+                    success: "CSV generated successfully!",
+                    error: "Error generating CSV.",
+                  },
+                  {
+                    duration: 3000,
+                  },
+                );
+              }}
+              disabled={loadingCSV}
+            >
+              Generate CSV of ALL work Records
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => purgeOldRecords(startDate, endDate || new Date())}
+              disabled={loadingCSV}
+              sx={{
+                mt: 3,
+                bgcolor: "error.main",
+                "&:hover": {
+                  bgcolor: "error.dark",
+                },
+              }}
+            >
+              Purge records older than 2 weeks
+            </Button>
+            <Box mt={3}>
+              <StyledIconButton
+                onClick={handleShowDateRange}
+                label={
+                  showDateRange ? "Close Date Range" : "Toggle Date Range "
+                }
+                icon={!showDateRange ? faCalendar : faClose}
+                color={"primary"}
+              />
+            </Box>
+          </>
+        )}
+      </Box>
     </ProtectedRoute>
   );
 };

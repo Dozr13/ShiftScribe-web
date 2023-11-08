@@ -1,16 +1,18 @@
-import { useRouter } from 'next/router';
-import SubmitButton from '../../components/form-components/SubmitButton';
-import ProtectedRoute from '../../components/protected-route';
-import { useAuth } from '../../context/AuthContext';
-import { PermissionLevel } from '../../lib';
+import { Box, Typography } from "@mui/material";
+import { useRouter } from "next/router";
+import SubmitButton from "../../components/form-components/SubmitButton";
+import ProtectedRoute from "../../components/protected-route";
+import * as theme from "../../constants/theme";
+import { useAuth } from "../../context/AuthContext";
+import { PermissionLevel } from "../../lib";
 import {
   EMPLOYEE_LIST,
   JOB_LIST,
   LOGIN,
   RECORDS,
   REQUESTS,
-} from '../../utils/constants/routes.constants';
-import { showToast } from '../../utils/toast';
+} from "../../utils/constants/routes.constants";
+import { showToast } from "../../utils/toast";
 
 const DashboardPage = () => {
   const auth = useAuth();
@@ -33,10 +35,10 @@ const DashboardPage = () => {
   };
 
   const handleLogout = async () => {
-    showToast('Logging out...');
+    showToast("Logging out...");
     try {
       await auth.signOut();
-      showToast('You are now logged out');
+      showToast("You are now logged out");
       router.push(LOGIN);
     } catch (error: any) {
       showToast(error.message, false);
@@ -45,50 +47,71 @@ const DashboardPage = () => {
 
   return (
     <ProtectedRoute>
-      <div className='flex py-2 container mx-auto'>
-        <div className='text-gray-600 flex flex-col justify-center items-center px-12 py-24 mx-auto'>
-          <p className='text-5xl h-20 absolute top-[30vh] text-white font-semibold border-double border-b-4 bor'>{`Welcome ${auth.user?.displayName}`}</p>
+      <Box
+        sx={{
+          display: "flex",
+          py: 2,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: theme.BACKGROUND_COLOR,
+        }}
+      >
+        <Box
+          sx={{
+            color: theme.TEXT_COLOR,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            p: 4,
+          }}
+        >
+          <Typography variant="h4" sx={{ mb: 4, color: theme.ACCENT_COLOR }}>
+            {" "}
+            {`Welcome ${auth.user?.displayName}`}
+          </Typography>
 
           {auth.permissionLevel >= PermissionLevel.SUPERUSER ? (
-            <div className='grid grid-cols-2 gap-y-4 gap-x-10'>
-              <div className='mb-4'>
-                <SubmitButton
-                  message={'Manage Records'}
-                  onClick={onClickManageRecords}
-                />
-              </div>
-              <div className='mb-4'>
-                <SubmitButton
-                  message={'View Requests'}
-                  onClick={onClickViewRequests}
-                />
-              </div>
-              <div className='mb-4'>
-                <SubmitButton
-                  message={'Edit Jobs'}
-                  onClick={onClickJobInformation}
-                />
-              </div>
-              <div className='mb-4'>
-                <SubmitButton
-                  message={'View Employees'}
-                  onClick={onClickEmployeeInformation}
-                />
-              </div>
-            </div>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: 4,
+              }}
+            >
+              <SubmitButton
+                message={"Manage Records"}
+                onClick={onClickManageRecords}
+              />
+              <SubmitButton
+                message={"View Requests"}
+                onClick={onClickViewRequests}
+              />
+              <SubmitButton
+                message={"Edit Jobs"}
+                onClick={onClickJobInformation}
+              />
+              <SubmitButton
+                message={"View Employees"}
+                onClick={onClickEmployeeInformation}
+              />
+            </Box>
           ) : (
             <>
-              <p className='text-3xl text-yellow-400 font-semibold mb-32'>
+              <Typography
+                variant="h6"
+                sx={{ color: theme.ACCENT_COLOR, mb: 4 }}
+              >
                 You are unable to access this page without proper permissions
-              </p>
+              </Typography>
+
               <SubmitButton
-                message={'Click Here To Logout'}
+                message={"Click Here To Logout"}
                 onClick={handleLogout}
               />
             </>
           )}
-        </div>
-      </div>
+        </Box>
+      </Box>
     </ProtectedRoute>
   );
 };

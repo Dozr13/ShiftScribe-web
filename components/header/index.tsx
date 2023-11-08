@@ -1,40 +1,44 @@
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useAuth } from '../../context/AuthContext';
+"use client";
+import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import React from "react";
+import * as theme from "../../constants/theme";
+import { useAuth } from "../../context/AuthContext";
 import {
   DASHBOARD,
   HOME,
   LOGIN,
   SIGN_UP,
-} from '../../utils/constants/routes.constants';
-import { showToast } from '../../utils/toast';
+} from "../../utils/constants/routes.constants";
+import { showToast } from "../../utils/toast";
+
+// Directly using MUI's Box component to apply custom styles
+const headerStyles = {
+  backgroundColor: theme.HEADER_BACKGROUND_COLOR,
+  boxShadow: "none",
+  color: theme.TEXT_COLOR,
+};
+
+const linkStyles = {
+  color: theme.TEXT_COLOR,
+  "&:hover": {
+    color: theme.ACCENT_COLOR,
+    textDecoration: "none",
+  },
+  marginRight: 2, // MUI theme spacing
+  cursor: "pointer",
+};
 
 const Header = ({ children }: { children: React.ReactNode }) => {
   const { user, signOut } = useAuth();
   const router = useRouter();
-  const menuItems = [
-    {
-      id: 1,
-      name: 'Home',
-      link: HOME,
-    },
-    {
-      id: 2,
-      name: 'Login',
-      link: LOGIN,
-    },
-    {
-      id: 3,
-      name: 'Sign Up',
-      link: SIGN_UP,
-    },
-  ];
 
   const handleLogout = async () => {
-    showToast('Logging out...');
+    showToast("Logging out...");
     try {
       await signOut();
-      showToast('You are now logged out');
+      showToast("You are now logged out");
       router.push(LOGIN);
     } catch (error: any) {
       showToast(error.message, false);
@@ -43,63 +47,60 @@ const Header = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      <header className='bg-slate-950 flex flex-wrap container mx-auto max-w-full items-center p-6 justify-between shadow-md sticky top-0 z-50'>
-        <div className='flex items-center text-white hover:text-green-500 cursor-pointer transition duration-150 '>
-          <Link href={HOME} legacyBehavior>
-            <span className='transitionfont-semibold text-4xl font-sans ml-5'>
+      <AppBar
+        position="sticky"
+        sx={{
+          backgroundColor: theme.HEADER_BACKGROUND_COLOR,
+          boxShadow: "none",
+        }}
+      >
+        <Toolbar>
+          <Link href={HOME} passHref>
+            <Typography
+              variant="h6"
+              // component="a"
+              sx={{
+                flexGrow: 1,
+                color: theme.TEXT_COLOR,
+                textDecoration: "none",
+                "&:hover": { color: theme.ACCENT_COLOR },
+              }}
+            >
               ShiftScribe
-            </span>
+            </Typography>
           </Link>
-        </div>
-
-        <nav className={`md:flex md:items-center font-title w-full md:w-auto`}>
-          <ul className='text-lg inline-block'>
-            <>
-              {!user ? (
-                menuItems
-                  .filter((item) => item.link !== router.pathname)
-                  .map((item) => (
-                    <li
-                      key={item.id}
-                      className='my-3 md:my-0 items-center mr-8 md:inline-block block'
-                    >
-                      <Link href={item?.link} legacyBehavior>
-                        <a
-                          href=''
-                          className='text-white hover:text-green-500 transition'
-                        >
-                          {item?.name}
-                        </a>
-                      </Link>
-                    </li>
-                  ))
-              ) : (
-                <>
-                  <li className='my-3 md:my-0 items-center mr-4 md:inline-block block '>
-                    <Link href={DASHBOARD} legacyBehavior>
-                      <a
-                        href=''
-                        className='text-white hover:text-green-500 transition'
-                      >
-                        Dashboard
-                      </a>
-                    </Link>
-                  </li>
-                  <li className='my-3 md:my-0 items-center mr-4 md:inline-block block '>
-                    <a
-                      onClick={handleLogout}
-                      className='text-white hover:text-green-500 transition cursor-pointer'
-                    >
-                      Logout
-                    </a>
-                  </li>
-                </>
-              )}
-            </>
-          </ul>
-        </nav>
-      </header>
-      {children}
+          <Box sx={{ display: "flex" }}>
+            {!user ? (
+              <>
+                <Link href={LOGIN} passHref>
+                  <Button sx={linkStyles}>Login</Button>
+                </Link>
+                <Link href={SIGN_UP} passHref>
+                  <Button sx={linkStyles}>Sign Up</Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href={DASHBOARD} passHref>
+                  <Button sx={linkStyles}>Dashboard</Button>
+                </Link>
+                <Button color="inherit" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </>
+            )}
+          </Box>
+        </Toolbar>
+      </AppBar>
+      <div
+        style={{
+          backgroundColor: theme.BACKGROUND_COLOR,
+          height: "100vh",
+          width: "100vw",
+        }}
+      >
+        {children}
+      </div>
     </>
   );
 };

@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   ClickAwayListener,
   Grid,
   Paper,
@@ -8,7 +7,9 @@ import {
   Typography,
 } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
-import EmployeeListItem, { Employee } from "../../components/employee-list";
+import EmployeeListItem, {
+  Employee,
+} from "../../components/employee-list-item";
 import AccessLevelKey from "../../components/information-keys/AccessLevelKey";
 import ProtectedRoute from "../../components/protected-route";
 import * as theme from "../../constants/theme";
@@ -104,13 +105,10 @@ const EmployeeInformationPage = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          p: 10,
+          width: "100%",
         }}
       >
-        <Typography
-          variant="h3"
-          sx={{ color: theme.TEXT_COLOR, fontWeight: "bold", mb: 5 }}
-        >
+        <Typography variant="h3" color="textSecondary" sx={{ my: 4 }}>
           Employee Information
         </Typography>
         <Paper
@@ -121,12 +119,11 @@ const EmployeeInformationPage = () => {
             bgcolor: theme.HEADER_BACKGROUND_COLOR,
             borderRadius: 2,
             overflowY: "scroll",
-            maxHeight: "50vh",
+            maxHeight: "90%",
             width: "70vw",
             "&::-webkit-scrollbar": { display: "none" },
           }}
         >
-          {/* Grid container for headers */}
           <Grid container alignItems="center" spacing={2}>
             <Grid
               item
@@ -170,26 +167,8 @@ const EmployeeInformationPage = () => {
                 color: theme.TEXT_COLOR,
               }}
             >
-              Access Level
-              <Tooltip title="Access Level Key" placement="top" arrow>
-                <Button
-                  onClick={() => setShowAccessKey(!showAccessKey)}
-                  ref={questionButtonRef}
-                  sx={{
-                    ml: 1,
-                    borderRadius: "50%",
-                    minWidth: 0,
-                    p: "6px",
-                    bgcolor: "background.paper",
-                    color: "text.secondary",
-                    "&:hover": {
-                      bgcolor: "background.default",
-                      color: "text.primary",
-                    },
-                  }}
-                >
-                  ?
-                </Button>
+              <Tooltip title={<AccessLevelKey />} placement="top" arrow>
+                <Typography>Access Level</Typography>
               </Tooltip>
             </Grid>
             <Grid

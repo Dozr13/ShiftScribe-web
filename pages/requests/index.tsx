@@ -1,23 +1,22 @@
-import { QueryConstraint, equalTo, orderByKey } from 'firebase/database';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
-import SubmitButton from '../../components/form-components/SubmitButton';
-import ProtectedRoute from '../../components/protected-route';
-import RequestListItem from '../../components/requests-list';
-import { useAuth } from '../../context/AuthContext';
-import { useFirebase } from '../../context/FirebaseContext';
-import { PermissionLevel } from '../../lib';
-import stringUtils from '../../lib/StringUtils';
-import timeParser from '../../lib/TimeParser';
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
+import { QueryConstraint, equalTo, orderByKey } from "firebase/database";
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import ProtectedRoute from "../../components/protected-route";
+import RequestListItem from "../../components/requests-list-item";
+import { useAuth } from "../../context/AuthContext";
+import { useFirebase } from "../../context/FirebaseContext";
+import { PermissionLevel } from "../../lib";
+import stringUtils from "../../lib/StringUtils";
+import timeParser from "../../lib/TimeParser";
 import {
   EventObject,
   RequestData,
   TimeRecords,
   UserData,
-} from '../../types/data';
-import { DASHBOARD } from '../../utils/constants/routes.constants';
-import LoadingScreen from '../loading';
+} from "../../types/data";
+import { DASHBOARD } from "../../utils/constants/routes.constants";
 
 const ViewRequestsPage = () => {
   const auth = useAuth();
@@ -39,7 +38,7 @@ const ViewRequestsPage = () => {
       setLoading(false);
 
       if (!res.exists()) {
-        let errorMessage = 'No records match this request.';
+        let errorMessage = "No records match this request.";
         toast.error(errorMessage);
       }
 
@@ -94,8 +93,7 @@ const ViewRequestsPage = () => {
       setLoading(false);
       return requestsArray;
     } catch (error) {
-      // console.error('Error fetching requests:', error);
-      toast.error('Error fetching requests.');
+      toast.error("Error fetching requests.");
       setLoading(false);
       return [];
     }
@@ -122,8 +120,8 @@ const ViewRequestsPage = () => {
 
   function convertUnixToMMDDYYYY(unixTimestamp: string | number) {
     const date = new Date(unixTimestamp);
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
     const year = date.getFullYear();
     return `${month}/${day}/${year}`;
   }
@@ -136,20 +134,15 @@ const ViewRequestsPage = () => {
           orderByKey(),
           equalTo(request.id.toString()),
         );
-        // console.log('Fetched original data:', originalData);
 
         if (originalData && Object.keys(originalData).length > 0) {
-          const firstTimestamp = Object.keys(originalData)[0]; // Get the first timestamp
+          const firstTimestamp = Object.keys(originalData)[0];
           const firstTimestampMMDDYYYY = convertUnixToMMDDYYYY(
             Number(firstTimestamp),
           );
-
-          // console.log('First Timestamp (MM/DD/YYYY):', firstTimestampMMDDYYYY);
         }
 
         if (!originalData) return;
-
-        // console.log('ORIGINAL DATA: ', originalData);
 
         for (const [originalKey, record] of Object.entries(originalData)) {
           if (!record.events) continue;
@@ -161,7 +154,6 @@ const ViewRequestsPage = () => {
               `orgs/${auth.orgId}/timeRecords/${originalKey}`,
             );
 
-            // console.log('existingRecord with dateRequest:', existingRecord);
             if (existingRecord.exists()) {
               setIsEditedRecord(true);
             }
@@ -172,13 +164,8 @@ const ViewRequestsPage = () => {
                 submitter,
               },
             });
-            // console.log(
-            //   'Updated record with dateRequest:',
-            //   stringUtils.convertTimestampToDateString(originalKey),
-            // );
           } catch (error) {
-            // console.error('Error approving request:', error);
-            toast.error('Error approving request.');
+            toast.error("Error approving request.");
           }
         }
 
@@ -205,12 +192,22 @@ const ViewRequestsPage = () => {
 
   return (
     <ProtectedRoute>
-      {loading && <LoadingScreen />}
-      <div className='admin-panel flex flex-col justify-center items-center'>
-        <div className='text-3xl text-gray-300 font-extrabold p-10'>
+      <Box
+        sx={{
+          maxHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+        <Typography variant="h3" color="textSecondary" sx={{ my: 4 }}>
           Time Adjustment Requests
-        </div>
-        {requests.length > 0 ? (
+        </Typography>
+
+        {loading ? (
+          <CircularProgress />
+        ) : requests.length > 0 ? (
           <RequestListItem
             requests={requests}
             isChecked={isChecked}
@@ -219,17 +216,28 @@ const ViewRequestsPage = () => {
             onDeny={handleDeny}
           />
         ) : (
-          <div className='p-8 container items-center mx-auto border-2 bg-gray-400 border-gray-400 rounded-md h-fit w-[40vw]'>
-            <p className='text-black text-3xl text-center'>
-              No Requests at this time.
-            </p>
-            <SubmitButton
-              message={'Back to Dashboard'}
+          <Box
+            sx={{
+              border: 2,
+              bgcolor: "grey.400",
+              borderRadius: 2,
+              p: 4,
+              width: "40vw",
+              textAlign: "center",
+            }}
+          >
+            <Typography variant="h6">No Requests at this time.</Typography>
+            <Button
+              variant="contained"
+              color="primary"
               onClick={onClickDashboard}
-            />
-          </div>
+              sx={{ mt: 2 }}
+            >
+              Back to Dashboard
+            </Button>
+          </Box>
         )}
-      </div>
+      </Box>
     </ProtectedRoute>
   );
 };

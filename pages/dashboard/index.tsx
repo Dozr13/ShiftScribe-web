@@ -1,6 +1,5 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import SubmitButton from "../../components/form-components/SubmitButton";
 import ProtectedRoute from "../../components/protected-route";
 import * as theme from "../../constants/theme";
 import { useAuth } from "../../context/AuthContext";
@@ -13,25 +12,14 @@ import {
   REQUESTS,
 } from "../../utils/constants/routes.constants";
 import { showToast } from "../../utils/toast";
+import DashboardCard from "../../components/cards/DashboardCard";
 
 const DashboardPage = () => {
   const auth = useAuth();
   const router = useRouter();
 
-  const onClickManageRecords = () => {
-    router.push(RECORDS);
-  };
-
-  const onClickViewRequests = () => {
-    router.push(REQUESTS);
-  };
-
-  const onClickJobInformation = () => {
-    router.push(JOB_LIST);
-  };
-
-  const onClickEmployeeInformation = () => {
-    router.push(EMPLOYEE_LIST);
+  const handleNavigation = (route: string) => {
+    router.push(route);
   };
 
   const handleLogout = async () => {
@@ -40,77 +28,60 @@ const DashboardPage = () => {
       await auth.signOut();
       showToast("You are now logged out");
       router.push(LOGIN);
-    } catch (error: any) {
-      showToast(error.message, false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        showToast(error.message, false);
+      } else {
+        showToast("An unknown error occurred", false);
+      }
     }
   };
 
   return (
     <ProtectedRoute>
-      <Box
-        sx={{
-          display: "flex",
-          py: 2,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: theme.BACKGROUND_COLOR,
-        }}
-      >
-        <Box
-          sx={{
-            color: theme.TEXT_COLOR,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            p: 4,
-          }}
+      <Box sx={{ p: 3, backgroundColor: theme.BACKGROUND_COLOR }}>
+        <Typography
+          variant="h4"
+          gutterBottom
+          align="center"
+          color={theme.ACCENT_COLOR}
         >
-          <Typography variant="h4" sx={{ mb: 4, color: theme.ACCENT_COLOR }}>
-            {" "}
-            {`Welcome ${auth.user?.displayName}`}
-          </Typography>
+          {`Welcome ${auth.user?.displayName}`}
+        </Typography>
 
-          {auth.permissionLevel >= PermissionLevel.SUPERUSER ? (
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: 4,
-              }}
+        {auth.permissionLevel >= PermissionLevel.SUPERUSER ? (
+          <Grid container spacing={3}>
+            <DashboardCard
+              title="Manage Records"
+              onClick={() => handleNavigation(RECORDS)}
+            />
+            <DashboardCard
+              title="View Requests"
+              onClick={() => handleNavigation(REQUESTS)}
+            />
+            <DashboardCard
+              title="Edit Jobs"
+              onClick={() => handleNavigation(JOB_LIST)}
+            />
+            <DashboardCard
+              title="View Employees"
+              onClick={() => handleNavigation(EMPLOYEE_LIST)}
+            />
+          </Grid>
+        ) : (
+          <Box textAlign="center">
+            <Typography variant="h6" color={theme.ACCENT_COLOR} gutterBottom>
+              You are unable to access this page without proper permissions
+            </Typography>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleLogout}
             >
-              <SubmitButton
-                message={"Manage Records"}
-                onClick={onClickManageRecords}
-              />
-              <SubmitButton
-                message={"View Requests"}
-                onClick={onClickViewRequests}
-              />
-              <SubmitButton
-                message={"Edit Jobs"}
-                onClick={onClickJobInformation}
-              />
-              <SubmitButton
-                message={"View Employees"}
-                onClick={onClickEmployeeInformation}
-              />
-            </Box>
-          ) : (
-            <>
-              <Typography
-                variant="h6"
-                sx={{ color: theme.ACCENT_COLOR, mb: 4 }}
-              >
-                You are unable to access this page without proper permissions
-              </Typography>
-
-              <SubmitButton
-                message={"Click Here To Logout"}
-                onClick={handleLogout}
-              />
-            </>
-          )}
-        </Box>
+              Click Here To Logout
+            </Button>
+          </Box>
+        )}
       </Box>
     </ProtectedRoute>
   );

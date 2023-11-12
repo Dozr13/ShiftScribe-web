@@ -439,7 +439,7 @@ export const ViewRecordsPage = () => {
           alignItems: "center",
           p: 5,
           m: 2,
-          width: 384, // equivalent to w-96
+          width: 384,
           border: 2,
           borderColor: theme.BORDER_COLOR,
           bgcolor: theme.HEADER_BACKGROUND_COLOR,
@@ -544,7 +544,7 @@ export const ViewRecordsPage = () => {
               <StyledIconButton
                 onClick={handleShowDateRange}
                 label={
-                  showDateRange ? "Close Date Range" : "Toggle Date Range "
+                  showDateRange ? " Close Date Range" : " Toggle Date Range "
                 }
                 icon={!showDateRange ? faCalendar : faClose}
                 color={"primary"}

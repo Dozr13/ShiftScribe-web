@@ -9,7 +9,13 @@ import {
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Grid, IconButton, TextField, Typography } from "@mui/material";
+import {
+  Grid,
+  IconButton,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import * as theme from "../../constants/theme";
 import { EMAIL_REGEX } from "../../utils/constants/regex.constants";
 import { showToast } from "../../utils/toast";
@@ -124,9 +130,12 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
     >
       {editing ? (
         <>
-          <Grid item xs={2.5}>
+          <Grid
+            item
+            xs={2.4}
+            sx={{ display: "flex", justifyContent: "center" }}
+          >
             <TextField
-              fullWidth
               type="text"
               value={employeeName}
               onChange={(e) => setEmployeeName(e.target.value)}
@@ -134,9 +143,12 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
               size="small"
             />
           </Grid>
-          <Grid item xs={2.5}>
+          <Grid
+            item
+            xs={2.4}
+            sx={{ display: "flex", justifyContent: "center" }}
+          >
             <TextField
-              fullWidth
               type="email"
               value={employeeEmail}
               onChange={(e) => setEmployeeEmail(e.target.value)}
@@ -145,9 +157,12 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
               error={!isValidEmail || employeeEmail.trim() === ""}
             />
           </Grid>
-          <Grid item xs={2.5}>
+          <Grid
+            item
+            xs={2.4}
+            sx={{ display: "flex", justifyContent: "center" }}
+          >
             <TextField
-              fullWidth
               type="text"
               value={employeeOrg}
               onChange={(e) => setEmployeeOrg(e.target.value)}
@@ -156,9 +171,12 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
               disabled
             />
           </Grid>
-          <Grid item xs={1}>
+          <Grid
+            item
+            xs={2.4}
+            sx={{ display: "flex", justifyContent: "center" }}
+          >
             <TextField
-              fullWidth
               type="number"
               value={employeeAccessLevel.toString()}
               onChange={(e) => handleEmployeeAccessLevelChange(e.target.value)}
@@ -171,35 +189,63 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
         </>
       ) : (
         <>
-          <Grid item xs={2.5}>
-            <Typography>{employeeName}</Typography>
+          <Grid
+            item
+            xs={2.4}
+            sx={{ display: "flex", justifyContent: "center" }}
+          >
+            <Typography sx={{ color: theme.TEXT_COLOR }}>
+              {employeeName}
+            </Typography>
           </Grid>
-          <Grid item xs={2.5}>
-            <Typography>{employeeEmail}</Typography>
+          <Grid
+            item
+            xs={2.4}
+            sx={{ display: "flex", justifyContent: "center" }}
+          >
+            <Typography sx={{ color: theme.TEXT_COLOR }}>
+              {employeeEmail}
+            </Typography>
           </Grid>
-          <Grid item xs={2.5}>
-            <Typography>{employeeOrg}</Typography>
+          <Grid
+            item
+            xs={2.4}
+            sx={{ display: "flex", justifyContent: "center" }}
+          >
+            <Typography sx={{ color: theme.TEXT_COLOR }}>
+              {employeeOrg}
+            </Typography>
           </Grid>
-          <Grid item xs={1}>
-            <Typography>{employeeAccessLevel}</Typography>
+          <Grid
+            item
+            xs={2.4}
+            sx={{ display: "flex", justifyContent: "center" }}
+          >
+            <Typography sx={{ color: theme.TEXT_COLOR }}>
+              {employeeAccessLevel}
+            </Typography>
           </Grid>
         </>
       )}
-      <Grid item xs={2} sx={{ display: "flex", justifyContent: "flex-start" }}>
-        <IconButton
-          onClick={!editing ? handleEdit : handleSave}
-          sx={{
-            color: !editing ? theme.ACCENT_COLOR : theme.BUTTON_COLOR_PRIMARY,
-          }}
-        >
-          <FontAwesomeIcon icon={!editing ? faEdit : faSave} />
-        </IconButton>
-        <IconButton
-          onClick={!editing ? handleDelete : handleCancel}
-          sx={{ color: !editing ? "error.main" : "warning.main" }}
-        >
-          <FontAwesomeIcon icon={!editing ? faTrashAlt : faCancel} />
-        </IconButton>
+      <Grid item xs={2.4} sx={{ display: "flex", justifyContent: "center" }}>
+        <Tooltip title={!editing ? "Edit" : "Save"}>
+          <IconButton
+            onClick={!editing ? handleEdit : handleSave}
+            sx={{
+              color: !editing ? theme.ACCENT_COLOR : theme.BUTTON_COLOR_PRIMARY,
+            }}
+          >
+            <FontAwesomeIcon icon={!editing ? faEdit : faSave} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={!editing ? "Delete" : "Cancel"}>
+          <IconButton
+            onClick={!editing ? handleDelete : handleCancel}
+            sx={{ color: !editing ? "error.main" : "warning.main" }}
+          >
+            <FontAwesomeIcon icon={!editing ? faTrashAlt : faCancel} />
+          </IconButton>
+        </Tooltip>
       </Grid>
     </Grid>
   );

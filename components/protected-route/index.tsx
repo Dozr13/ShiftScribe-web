@@ -17,7 +17,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   );
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center" }}>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
       {auth ? children : null}
     </Box>
   );

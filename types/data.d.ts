@@ -24,13 +24,13 @@ export interface OrgJob {
 export type OrgJobs = Record<string, OrgJob>;
 
 export type RecordEventType =
-  | 'clockin'
-  | 'clockout'
-  | 'break'
-  | 'endbreak'
-  | 'calledin'
-  | 'adjustmentRequest'
-  | 'location';
+  | "clockin"
+  | "clockout"
+  | "break"
+  | "endbreak"
+  | "calledin"
+  | "adjustmentRequest"
+  | "location";
 
 export interface EventObject {
   job: string;
@@ -85,8 +85,18 @@ export type UserProfileData = {
   totalTimeRequested?: string;
 };
 
+export interface UserDataTotals {
+  id: string;
+  employeeName: string;
+  employeeEmail: string;
+  totalWorkTime: string;
+  totalBreakTime: string;
+  totalPaidTime: string;
+  totalCallIns: number;
+}
+
 type UserProfileDataGeneric<T> = {
-  [K in keyof UserProfileData]: T extends 'toDate'
+  [K in keyof UserProfileData]: T extends "toDate"
     ? UserProfileData[K]
     : UserProfileData[K] extends Date
     ? number

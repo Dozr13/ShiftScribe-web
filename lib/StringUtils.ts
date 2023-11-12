@@ -1,4 +1,4 @@
-import { Events } from '../types/data';
+import { Events } from "../types/data";
 
 interface ISubmit {
   clockedInTime: Date;
@@ -29,7 +29,7 @@ class StringUtils {
     const s = Math.floor(seconds % 60);
 
     function plural(v: number) {
-      return v > 1 ? 's' : '';
+      return v > 1 ? "s" : "";
     }
 
     if (d > 0) {
@@ -48,7 +48,7 @@ class StringUtils {
    */
   dateToTimestamp = (date?: Date): number | null => {
     if (!date) {
-      console.warn('Date object is null or undefined');
+      console.warn("Date object is null or undefined");
       return null;
     }
     return date.getTime();
@@ -64,10 +64,10 @@ class StringUtils {
   timestampToMMDDYYYY = (ms: number): string => {
     const date = new Date(ms);
     if (isNaN(date.getTime())) {
-      return 'Invalid Date';
+      return "Invalid Date";
     }
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
 
     return `${month}/${day}/${year}`;
@@ -79,35 +79,35 @@ class StringUtils {
     const m = Math.floor((seconds % 3600) / 60);
 
     function f(x: number) {
-      return String('0' + x).slice(-2);
+      return String("0" + x).slice(-2);
     }
 
     return `${h}h:${f(m)}m`;
   }
 
   dateToMMDDYYYY = (date: Date): string => {
-    if (!date) return '';
+    if (!date) return "";
 
     const month = date.getMonth() + 1;
     const day = date.getDate();
     const year = date.getFullYear();
 
-    return `${String('0' + month).slice(-2)}/${String('0' + day).slice(
+    return `${String("0" + month).slice(-2)}/${String("0" + day).slice(
       -2,
     )}/${year}`;
   };
 
   dateToHHMM = (date: Date): string => {
-    if (!date) return '';
+    if (!date) return "";
     let hours = date.getHours();
     const minutes = date.getMinutes();
 
-    const period = hours >= 12 ? 'PM' : 'AM';
+    const period = hours >= 12 ? "PM" : "AM";
 
     hours = hours % 12;
     hours = hours ? hours : 12;
 
-    return `${hours}:${String('0' + minutes).slice(-2)} ${period}`;
+    return `${hours}:${String("0" + minutes).slice(-2)} ${period}`;
   };
 
   /**
@@ -137,7 +137,7 @@ class StringUtils {
    * @returns number in bytes
    */
   byteSize(input: string | object) {
-    if (typeof input === 'object') {
+    if (typeof input === "object") {
       input = JSON.stringify(input);
     }
 
@@ -162,10 +162,10 @@ class StringUtils {
   timeStringToMinutes(str: string): number {
     if (!/^(\d+)h:(\d+)m$/.test(str)) {
       console.log(`Invalid input received: ${str}`);
-      throw new Error('Invalid format for input string');
+      throw new Error("Invalid format for input string");
     }
 
-    const parts = str.split('h:');
+    const parts = str.split("h:");
     const hours = parseInt(parts[0], 10);
     const minutes = parseInt(parts[1].slice(0, -1), 10);
 
@@ -184,7 +184,7 @@ class StringUtils {
       let minutes = date.getMinutes(); // Extract the minutes (0 - 59)
 
       // Determine whether it's AM or PM
-      const period = hours >= 12 ? 'PM' : 'AM';
+      const period = hours >= 12 ? "PM" : "AM";
 
       // Convert to 12-hour format
       hours = hours % 12;
@@ -192,24 +192,24 @@ class StringUtils {
       hours = hours ? hours : 12;
 
       // Make sure minutes are two digits
-      const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+      const minutesStr = minutes < 10 ? "0" + minutes : minutes;
 
       return `${hours}:${minutesStr} ${period}`;
     } catch (error) {
       console.error(`Couldn't convert timestamp to time: ${error}`);
-      return 'Invalid Timestamp';
+      return "Invalid Timestamp";
     }
   };
 
   getMS(timeString: string): number {
-    const [time, modifier] = timeString.split(' ');
-    const [hours, minutes] = time.split(':');
+    const [time, modifier] = timeString.split(" ");
+    const [hours, minutes] = time.split(":");
     const date = new Date();
 
     let hour = parseInt(hours);
-    if (modifier.toLowerCase() === 'pm' && hour < 12) {
+    if (modifier.toLowerCase() === "pm" && hour < 12) {
       hour += 12;
-    } else if (modifier.toLowerCase() === 'am' && hour === 12) {
+    } else if (modifier.toLowerCase() === "am" && hour === 12) {
       hour = 0;
     }
 
@@ -229,7 +229,7 @@ class StringUtils {
 
     // Convert each time value to minutes and sum them up
     timeValues.forEach((timeValue) => {
-      const [hours, minutes] = timeValue.split('h:');
+      const [hours, minutes] = timeValue.split("h:");
       totalMinutes += parseInt(hours) * 60 + parseInt(minutes);
     });
 
@@ -238,7 +238,7 @@ class StringUtils {
     const remainingMinutes = totalMinutes % 60;
 
     function padZero(num: number): string {
-      return num.toString().padStart(2, '0');
+      return num.toString().padStart(2, "0");
     }
 
     return `${padZero(totalHours)}h:${padZero(remainingMinutes)}m`;
@@ -249,7 +249,7 @@ class StringUtils {
 
     // Convert each time value to minutes and sum them up
     timeValues.forEach((timeValue) => {
-      const [hours, minutes] = timeValue.split('h:');
+      const [hours, minutes] = timeValue.split("h:");
       totalMinutes += parseInt(hours) * 60 + parseInt(minutes);
     });
 
@@ -258,10 +258,10 @@ class StringUtils {
     const remainingMinutes = Math.abs(totalMinutes) % 60;
 
     function padZero(num: number): string {
-      return num.toString().padStart(2, '0');
+      return num.toString().padStart(2, "0");
     }
 
-    const sign = totalMinutes < 0 ? '-' : '';
+    const sign = totalMinutes < 0 ? "-" : "";
     return `${sign}${padZero(Math.abs(totalHours))}h:${padZero(
       remainingMinutes,
     )}m`;
@@ -275,10 +275,10 @@ class StringUtils {
   }
 
   formatDateForFirebase(date: Date | null): string {
-    return date ? date.getTime().toString() : '';
+    return date ? date.getTime().toString() : "";
   }
   timestampToMilliseconds(timeString: string): number {
-    const [hours, minutes] = timeString.split(':');
+    const [hours, minutes] = timeString.split(":");
     const hoursInMs = parseInt(hours) * 60 * 60 * 1000;
     const minutesInMs = parseInt(minutes) * 60 * 1000;
     return hoursInMs + minutesInMs;
@@ -298,26 +298,26 @@ class StringUtils {
     const dateObj = new Date(timestamp);
 
     let hours = dateObj.getHours();
-    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+    const minutes = String(dateObj.getMinutes()).padStart(2, "0");
 
-    const amOrPm = hours >= 12 ? 'PM' : 'AM';
+    const amOrPm = hours >= 12 ? "PM" : "AM";
 
     hours = hours % 12;
     hours = hours ? hours : 12;
 
-    const hoursString = String(hours).padStart(2, '0');
+    const hoursString = String(hours).padStart(2, "0");
 
     const timeString = `${hoursString}:${minutes} ${amOrPm}`;
 
     console.group();
-    console.log('{{{{{{{{{{{{{{{{{');
-    console.log('StringUtils.logTimestampToHHMM in: ', stringPassed);
-    console.log('dateObj:', dateObj);
-    console.log('hours:', hours);
-    console.log('minutes:', minutes);
-    console.log('hoursString:', hoursString);
-    console.log('timeString:', timeString);
-    console.log('}}}}}}}}}}}}}}}}}');
+    console.log("{{{{{{{{{{{{{{{{{");
+    console.log("StringUtils.logTimestampToHHMM in: ", stringPassed);
+    console.log("dateObj:", dateObj);
+    console.log("hours:", hours);
+    console.log("minutes:", minutes);
+    console.log("hoursString:", hoursString);
+    console.log("timeString:", timeString);
+    console.log("}}}}}}}}}}}}}}}}}");
     console.groupEnd();
 
     return timeString;
@@ -326,8 +326,8 @@ class StringUtils {
   convertTimestampToDateString = (timestampStr: string): string => {
     const timestamp = Number(timestampStr); // Convert string to number
     const date = new Date(timestamp);
-    const mm = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const dd = String(date.getDate()).padStart(2, "0");
     const yyyy = date.getFullYear();
 
     return `${mm}-${dd}-${yyyy}`;
@@ -336,24 +336,24 @@ class StringUtils {
   logDateToHHMM(time: Date): string {
     const actualTime = time instanceof Date ? time : new Date(time);
     let hours = actualTime.getHours();
-    const minutes = String(actualTime.getMinutes()).padStart(2, '0');
+    const minutes = String(actualTime.getMinutes()).padStart(2, "0");
 
-    const amOrPm = hours >= 12 ? 'PM' : 'AM';
+    const amOrPm = hours >= 12 ? "PM" : "AM";
 
     const humanReadableTime = `${hours}:${minutes}`;
-    console.group('StringUtils.logDateToHHMM: ');
+    console.group("StringUtils.logDateToHHMM: ");
     console.log(
-      'actualTime:',
+      "actualTime:",
       actualTime,
-      'hours:',
+      "hours:",
       hours,
-      'minutes:',
+      "minutes:",
       minutes,
-      'amOrPm:',
+      "amOrPm:",
       amOrPm,
     );
     console.log();
-    console.log('{{{{{ humanReadableTime }}}}}:', humanReadableTime, amOrPm);
+    console.log("{{{{{ humanReadableTime }}}}}:", humanReadableTime, amOrPm);
     console.log();
     console.groupEnd();
 
@@ -381,15 +381,15 @@ class StringUtils {
   ) {
     console.group(firstString);
     console.log(
-      'Clocked In Time: ',
+      "Clocked In Time: ",
       this.dateToHHMM(inTime),
-      'Clocked Out Time:',
+      "Clocked Out Time:",
       this.dateToHHMM(outTime),
-      'Jobs:',
+      "Jobs:",
       jobs,
     );
     console.log();
-    console.log('Event Object: ', eventObject);
+    console.log("Event Object: ", eventObject);
 
     console.log(lastString);
     console.groupEnd();

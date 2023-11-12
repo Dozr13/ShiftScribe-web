@@ -41,11 +41,17 @@ const JobInformationPage = () => {
   }, [auth.orgId, db]);
 
   const handleDelete = async (id: string) => {
-    await db.update(`orgs/${auth.orgId}/jobs`, {
-      [id]: null,
-    });
+    try {
+      await db.update(`orgs/${auth.orgId}/jobs`, {
+        [id]: null,
+      });
 
-    enqueueSnackbar("Job deleted successfully", { variant: "error" });
+      setJobs((prevJobs) => prevJobs.filter((job) => job.id !== id));
+
+      enqueueSnackbar("Job deleted successfully", { variant: "success" });
+    } catch (error) {
+      enqueueSnackbar("Error deleting job", { variant: "error" });
+    }
   };
 
   const handleJobAdded = (newJobData: Job) => {

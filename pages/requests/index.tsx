@@ -1,8 +1,8 @@
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { QueryConstraint, equalTo, orderByKey } from "firebase/database";
 import { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
 import { useCallback, useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import ProtectedRoute from "../../components/protected-route";
 import RequestListItem from "../../components/requests-list-item";
 import { useAuth } from "../../context/AuthContext";
@@ -22,6 +22,7 @@ const ViewRequestsPage = () => {
   const auth = useAuth();
   const db = useFirebase();
   const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [isChecked, setIsChecked] = useState<boolean[]>([]);
   const [loading, setLoading] = useState(false);
@@ -38,13 +39,14 @@ const ViewRequestsPage = () => {
       setLoading(false);
 
       if (!res.exists()) {
-        let errorMessage = "No records match this request.";
-        toast.error(errorMessage);
+        enqueueSnackbar("No records match this request.", {
+          variant: "error",
+        });
       }
 
       return res.toJSON() as TimeRecords;
     },
-    [auth.orgId, db],
+    [auth.orgId, db, enqueueSnackbar],
   );
 
   const displayRequests = useCallback(async (): Promise<RequestData[]> => {
@@ -93,11 +95,13 @@ const ViewRequestsPage = () => {
       setLoading(false);
       return requestsArray;
     } catch (error) {
-      toast.error("Error fetching requests.");
+      enqueueSnackbar("Error fetching requests.", {
+        variant: "error",
+      });
       setLoading(false);
       return [];
     }
-  }, [auth.orgId, auth.user, db, fetchData]);
+  }, [auth.orgId, auth.user, db, enqueueSnackbar, fetchData]);
 
   useEffect(() => {
     if (auth.permissionLevel >= PermissionLevel.MANAGER) {
@@ -165,7 +169,9 @@ const ViewRequestsPage = () => {
               },
             });
           } catch (error) {
-            toast.error("Error approving request.");
+            enqueueSnackbar("Error approving request.", {
+              variant: "error",
+            });
           }
         }
 

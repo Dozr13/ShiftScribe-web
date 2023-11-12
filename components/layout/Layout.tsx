@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import { Toaster } from "react-hot-toast";
 import Header from "../header";
 
@@ -6,11 +7,19 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <>
       <Toaster position="bottom-right" reverseOrder={false} />
       <Header>
-        <main
-          style={{ backgroundColor: "var(--background-color)", flexGrow: 1 }}
+        <Box
+          component="main"
+          sx={{
+            backgroundColor: "var(--background-color)",
+            flexGrow: 1,
+            minHeight: "100vh",
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+          }}
         >
           {children}
-        </main>
+        </Box>
       </Header>
     </>
   );

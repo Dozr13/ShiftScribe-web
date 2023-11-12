@@ -1,4 +1,3 @@
-// pages/_app.tsx
 import type { AppProps } from "next/app";
 import { SnackbarProvider } from "notistack";
 import Layout from "../components/layout/Layout";

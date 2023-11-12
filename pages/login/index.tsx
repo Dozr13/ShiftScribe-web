@@ -8,40 +8,62 @@ import {
   Typography,
 } from "@mui/material";
 import { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
 import * as Yup from "yup";
 import * as theme from "../../constants/theme";
 import { useAuth } from "../../context/AuthContext";
 import { DASHBOARD } from "../../utils/constants/routes.constants";
 import { loginSchema } from "../../validations/login.validation";
 
-const LoginPage = () => {
-  type FormData = Yup.InferType<typeof loginSchema>;
+type FormData = Yup.InferType<typeof loginSchema>;
 
-  const { signIn } = useAuth();
+const LoginPage = () => {
+  const { getUserData, signIn } = useAuth();
   const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [accessDeniedMessage, setAccessDeniedMessage] = useState("");
 
   const methods = useForm<FormData>({
     mode: "onBlur",
     resolver: yupResolver(loginSchema),
   });
+
   const {
     handleSubmit,
     formState: { errors, isSubmitting },
-    setError,
   } = methods;
 
   const onSubmit = async (data: FormData) => {
-    const toastId = toast.loading("Logging in...");
     try {
       await signIn(data.email, data.password);
-      toast.success("Successfully logged in!", { id: toastId });
+      enqueueSnackbar("Successfully logged in!", { variant: "success" });
       router.push(DASHBOARD);
     } catch (error: any) {
-      toast.error(error.message, { id: toastId });
+      enqueueSnackbar(error.message, { variant: "error" });
     }
   };
+
+  // TODO: Implement a auth level check at login
+  // const onSubmit = async (data: FormData) => {
+  //   try {
+  //     const userCredentials = await signIn(data.email, data.password);
+  //     // Assuming you have a method to fetch user profile
+  //     const userProfile = await getUserData(userCredentials.user);
+
+  //     if (userProfile.accessLevel < PermissionLevel.MANAGER) {
+  //       setAccessDeniedMessage("You do not have the appropriate access level.");
+  //       return;
+  //     }
+
+  //     enqueueSnackbar("Successfully logged in!", { variant: "success" });
+  //     router.push(DASHBOARD);
+  //   } catch (error: any) {
+  //     enqueueSnackbar(error.message, { variant: "error" });
+  //   }
+  // };
 
   return (
     <Container
@@ -112,6 +134,11 @@ const LoginPage = () => {
           </Box>
         </FormProvider>
       </Paper>
+      {accessDeniedMessage && (
+        <Typography color="error" sx={{ mt: 2 }}>
+          {accessDeniedMessage}
+        </Typography>
+      )}
     </Container>
   );
 };

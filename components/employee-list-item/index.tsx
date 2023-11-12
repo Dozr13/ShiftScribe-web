@@ -16,9 +16,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { useSnackbar } from "notistack";
 import * as theme from "../../constants/theme";
 import { EMAIL_REGEX } from "../../utils/constants/regex.constants";
-import { showToast } from "../../utils/toast";
 
 export interface Employee {
   id: string;
@@ -41,6 +41,7 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
 }) => {
   const auth = useAuth();
   const db = useFirebase();
+  const { enqueueSnackbar } = useSnackbar();
 
   const { id, accessLevel, userData } = employee;
 
@@ -70,10 +71,17 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
 
   const handleSave = async () => {
     if (employeeName.trim() === "")
-      return showToast("Employee Name cannot be empty", false);
+      return enqueueSnackbar("Employee Name cannot be empty", {
+        variant: "error",
+      });
     if (employeeEmail.trim() === "")
-      return showToast("Employee Email cannot be empty", false);
-    if (!isValidEmail) return showToast("Please enter a valid email", false);
+      return enqueueSnackbar("Employee Email cannot be empty", {
+        variant: "error",
+      });
+    if (!isValidEmail)
+      return enqueueSnackbar("Please enter a valid email", {
+        variant: "error",
+      });
 
     const accessLevelNumber = employeeAccessLevel;
 
@@ -82,7 +90,9 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
       accessLevelNumber < 1 ||
       accessLevelNumber > 4
     ) {
-      return showToast("Access level must be a number between 1 and 4", false);
+      return enqueueSnackbar("Access level must be a number between 1 and 4", {
+        variant: "error",
+      });
     }
 
     await db.update(`orgs/${auth.orgId}/members/${employee.id}`, {
@@ -117,7 +127,9 @@ const EmployeeListItem: React.FC<EmployeeListItemProps> = ({
     if (!isNaN(parsedValue) && parsedValue >= 0 && parsedValue <= 4) {
       setEmployeeAccessLevel(parsedValue);
     } else {
-      showToast("Access level must be a number between 1 and 4", false);
+      enqueueSnackbar("Access level must be a number between 1 and 4", {
+        variant: "error",
+      });
     }
   };
 

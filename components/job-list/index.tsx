@@ -11,7 +11,6 @@ import React, { useState } from "react";
 import * as theme from "../../constants/theme";
 import { useAuth } from "../../context/AuthContext";
 import { useFirebase } from "../../context/FirebaseContext";
-import { showToast } from "../../utils/toast";
 import EditableTextField from "../inputs/EditableTextField";
 
 export interface Job {
@@ -42,9 +41,13 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onDelete }) => {
 
   const handleSave = async () => {
     if (jobName.trim() === "")
-      return showToast("Job name cannot be empty", false);
+      return enqueueSnackbar("Job name cannot be empty", {
+        variant: "error",
+      });
     if (jobNumber.trim() === "")
-      return showToast("Job number cannot be empty", false);
+      return enqueueSnackbar("Job number cannot be empty", {
+        variant: "error",
+      });
 
     await db.update(`orgs/${auth.orgId}/jobs/${job.id}`, {
       jobName: jobName,

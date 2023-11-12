@@ -2,11 +2,11 @@
 import { AppBar, Box, Grid, Toolbar, Typography } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
 import React from "react";
 import * as theme from "../../constants/theme";
 import { useAuth } from "../../context/AuthContext";
 import { DASHBOARD, LOGIN } from "../../utils/constants/routes.constants";
-import { showToast } from "../../utils/toast";
 import NavigationLinks from "./NavigationLinks";
 
 const headerStyles = {
@@ -18,15 +18,22 @@ const headerStyles = {
 const Header = ({ children }: { children: React.ReactNode }) => {
   const { user, signOut } = useAuth();
   const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleLogout = async () => {
-    showToast("Logging out...");
+    enqueueSnackbar("Logging out...", {
+      variant: "info",
+    });
     try {
       await signOut();
-      showToast("You are now logged out");
+      enqueueSnackbar("You are now logged out", {
+        variant: "success",
+      });
       router.push(LOGIN);
     } catch (error: any) {
-      showToast(error.message, false);
+      enqueueSnackbar("There was an error, please try again.", {
+        variant: "error",
+      });
     }
   };
 

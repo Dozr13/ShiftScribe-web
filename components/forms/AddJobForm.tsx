@@ -10,8 +10,6 @@ import { useSnackbar } from "notistack";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useFirebase } from "../../context/FirebaseContext";
-import { OrgJobs } from "../../types/data";
-import { SPACE_REPLACE_REGEX } from "../../utils/constants/regex.constants";
 import SubmitButton from "../form-components/SubmitButton";
 import { Job } from "../job-list";
 
@@ -43,18 +41,6 @@ const AddJobForm = ({ onJobAdded }: AddJobFormProps) => {
         return;
       }
 
-      const jobKey = jobNameValue
-        .replace(SPACE_REPLACE_REGEX, "_")
-        .toLowerCase();
-
-      const exists = await db.exists(`orgs/${auth.orgId}/jobs/${jobKey}`);
-      if (exists) {
-        enqueueSnackbar("Job already exists with this name.", {
-          variant: "error",
-        });
-        return;
-      }
-
       setLoading(true);
 
       const newJobData = {
@@ -63,15 +49,19 @@ const AddJobForm = ({ onJobAdded }: AddJobFormProps) => {
         jobAddress: jobAddressValue,
       };
 
-      await db.update(`orgs/${auth.orgId}/jobs`, {
-        [jobKey]: newJobData,
-      } as OrgJobs);
+      const jobKey = await db.push(`orgs/${auth.orgId}/jobs`, newJobData);
 
-      setJobNameValue("");
-      setJobNumberValue("");
-      setJobAddressValue("");
+      if (jobKey) {
+        setJobNameValue("");
+        setJobNumberValue("");
+        setJobAddressValue("");
 
-      onJobAdded({ id: jobKey, ...newJobData });
+        onJobAdded({ id: jobKey, ...newJobData });
+
+        enqueueSnackbar("Job added successfully", { variant: "success" });
+      } else {
+        enqueueSnackbar("Error generating job key", { variant: "error" });
+      }
 
       setLoading(false);
     } catch (error) {

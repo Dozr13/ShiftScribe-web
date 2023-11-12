@@ -7,9 +7,9 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import { StringUtils } from "../../lib";
-import { EventObject, RequestData } from "../../types/data";
+import { RequestData } from "../../types/data";
 
 interface IRequestListItem {
   requests: RequestData[];
@@ -26,27 +26,9 @@ const RequestListItem = ({
   onApprove,
   onDeny,
 }: IRequestListItem) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [selectedJobs, setSelectedJobs] = useState<EventObject[]>([]);
-
   useEffect(() => {
     setIsChecked(Array(requests.length).fill(false));
   }, [requests, setIsChecked]);
-
-  const handlePopoverOpen = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    jobs: EventObject[],
-  ) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedJobs(jobs);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-    setSelectedJobs([]);
-  };
-
-  const open = Boolean(anchorEl);
 
   useEffect(() => {
     setIsChecked(Array(requests.length).fill(false));
@@ -63,16 +45,6 @@ const RequestListItem = ({
     for (const id of idsToDeny) {
       onDeny(id);
     }
-  };
-
-  const formatRequestDetails = (request: RequestData) => {
-    return `Submitted By: ${
-      request.submitter
-    }, Date: ${StringUtils.timestampToMMDDYYYY(
-      request.dateRequest,
-    )}, In: ${StringUtils.timestampToHHMM(
-      request.inRequest,
-    )}, Out: ${StringUtils.timestampToHHMM(request.outRequest)}`;
   };
 
   return (
@@ -106,7 +78,7 @@ const RequestListItem = ({
                 <Grid item xs={11}>
                   <Typography variant="body1" component="div">
                     Submitted By: {request.submitter} - Date:{" "}
-                    {StringUtils.timestampToMMDDYYYY(request.dateRequest)}
+                    {StringUtils.timestampToMMDDYYYY(request.id)}
                   </Typography>
                   <Typography variant="body2" component="div">
                     In: {StringUtils.timestampToHHMM(request.inRequest)} - Out:{" "}

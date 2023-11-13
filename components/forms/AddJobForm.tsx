@@ -57,8 +57,6 @@ const AddJobForm = ({ onJobAdded }: AddJobFormProps) => {
         setJobAddressValue("");
 
         onJobAdded({ id: jobKey, ...newJobData });
-
-        enqueueSnackbar("Job added successfully", { variant: "success" });
       } else {
         enqueueSnackbar("Error generating job key", { variant: "error" });
       }

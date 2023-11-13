@@ -65,7 +65,7 @@ const JobInformationPage = () => {
       {loading && <LoadingScreen />}
       <Box
         sx={{
-          maxHeight: "100vh",
+          overflow: "hidden",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",

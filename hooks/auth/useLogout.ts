@@ -1,22 +1,26 @@
-// utils/auth.ts
+"use client";
 import { useRouter } from "next/router";
-import { toast } from "react-hot-toast";
+import { useSnackbar } from "notistack";
 import { useAuth } from "../../context/AuthContext";
 import { LOGIN } from "../../utils/constants/routes.constants";
-import { useSnackbar } from "notistack";
 
 export const useLogout = () => {
   const auth = useAuth();
   const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleLogout = async () => {
-    const toastId = toast.loading("Logging out...");
     try {
       await auth.signOut();
-      toast.success("You are now logged out", { id: toastId });
-      router.push(LOGIN);
-    } catch (error: any) {
-      toast.error(error.message, { id: toastId });
+      await router.push(LOGIN);
+
+      enqueueSnackbar("You are now logged out", {
+        variant: "success",
+      });
+    } catch (error) {
+      enqueueSnackbar("There was an error, please try again.", {
+        variant: "error",
+      });
     }
   };
 

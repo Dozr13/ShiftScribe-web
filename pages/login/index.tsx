@@ -1,12 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  Box,
-  Button,
-  Container,
-  Paper,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Paper, TextField, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
@@ -66,20 +59,28 @@ const LoginPage = () => {
   // };
 
   return (
-    <Container
+    <Box
       sx={{
+        overflow: "hidden",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
-        height: "100vh",
+        width: "100%",
       }}
     >
+      <Typography variant="h3" color="textSecondary" sx={{ my: 4 }}>
+        Welcome to ShiftScribe
+      </Typography>
+
+      <Typography variant="h6" color="textSecondary">
+        Please Sign In to continue
+      </Typography>
       <Paper
         elevation={3}
         sx={{
           p: 4,
           mx: "auto",
-          my: "20vh",
+          my: "10vh",
           width: "20vw",
           bgcolor: theme.BACKGROUND_COLOR,
           border: 2,
@@ -139,7 +140,7 @@ const LoginPage = () => {
           {accessDeniedMessage}
         </Typography>
       )}
-    </Container>
+    </Box>
   );
 };
 

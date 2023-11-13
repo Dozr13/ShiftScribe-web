@@ -1,3 +1,4 @@
+"use client";
 import {
   Unsubscribe,
   User,
@@ -10,24 +11,24 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
-} from 'firebase/auth';
-import { child, get, getDatabase, ref, set, update } from 'firebase/database';
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { PermissionLevel } from '../lib';
-import { FIREBASE_AUTH } from '../lib/Firebase';
-import { OrgProfile, UserData } from '../types/data';
-import { ResponseBad, ResponseOk } from '../types/response';
+} from "firebase/auth";
+import { child, get, getDatabase, ref, set, update } from "firebase/database";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { PermissionLevel } from "../lib";
+import { FIREBASE_AUTH } from "../lib/Firebase";
+import { OrgProfile, UserData } from "../types/data";
+import { ResponseBad, ResponseOk } from "../types/response";
 
 const ERROR_TYPE = {
-  UserExists: 'auth/email-already-in-use',
-  WeakPassword: 'auth/weak-password',
-  UserNotFound: 'auth/user-not-found',
-  WrongPassword: 'auth/wrong-password',
-  InvalidEmail: 'auth/invalid-email',
-  EmailInUse: 'auth/email-already-in-use',
-  TooManyRequests: 'auth/too-many-requests',
-  OrgNotValid: 'OrgNotValid',
-  Unknown: 'Unknown',
+  UserExists: "auth/email-already-in-use",
+  WeakPassword: "auth/weak-password",
+  UserNotFound: "auth/user-not-found",
+  WrongPassword: "auth/wrong-password",
+  InvalidEmail: "auth/invalid-email",
+  EmailInUse: "auth/email-already-in-use",
+  TooManyRequests: "auth/too-many-requests",
+  OrgNotValid: "OrgNotValid",
+  Unknown: "Unknown",
 } as const;
 
 /**
@@ -97,7 +98,7 @@ const getErrorResponse = (res: any): ResponseBad<keyof typeof ERROR_TYPE> => {
     }
   }
 
-  console.warn('Uncaught Error: ' + res.code);
+  console.warn("Uncaught Error: " + res.code);
 
   return {
     success: false,
@@ -130,7 +131,7 @@ const Context = {
    * @param Name Org Name
    */
   validateOrg: async (Name: string) => {
-    if (Name.trim() === '') return false;
+    if (Name.trim() === "") return false;
     return await isValidOrg(Name);
   },
 

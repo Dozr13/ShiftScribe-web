@@ -1,6 +1,7 @@
 import {
   Box,
   ClickAwayListener,
+  Divider,
   Grid,
   Paper,
   Tooltip,
@@ -182,6 +183,7 @@ const EmployeeInformationPage = () => {
             >
               Actions
             </Grid>
+            <Divider sx={{ width: "100%", mt: 4 }} />
           </Grid>
 
           {/* List of employees */}

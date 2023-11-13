@@ -25,7 +25,6 @@ const PurgeOldRecords = ({
     const data = await fetchDataFunction();
 
     try {
-      // Define the date range for purging, e.g., records older than 2 weeks
       const purgeBeforeDate = new Date();
       purgeBeforeDate.setDate(purgeBeforeDate.getDate() - 14); // 14 days in the past
 
@@ -74,7 +73,7 @@ const PurgeOldRecords = ({
       color="error"
       onClick={handlePurge}
       disabled={loading}
-      sx={{ mt: 3 }}
+      sx={{ fontSize: "18px", my: 4, px: 3, py: 2 }}
     >
       Purge Records
     </Button>

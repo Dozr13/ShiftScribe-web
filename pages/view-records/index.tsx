@@ -164,6 +164,7 @@ export const ViewRecordsPage = () => {
                     color="primary"
                     onClick={generateCSV}
                     disabled={loadingCSV}
+                    sx={{ fontSize: "18px", px: 4, py: 2 }}
                   >
                     {loadingCSV ? (
                       <CircularProgress size={24} />

@@ -2,7 +2,7 @@ import { Box, Divider, Grid, Paper, Typography } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import AddJobForm from "../../components/forms/AddJobForm";
-import JobListItem, { Job } from "../../components/job-list";
+import JobListItem, { Job } from "../../components/job-list/JobListItem";
 import ProtectedRoute from "../../components/protected-route";
 import * as theme from "../../constants/theme";
 import { useAuth } from "../../context/AuthContext";

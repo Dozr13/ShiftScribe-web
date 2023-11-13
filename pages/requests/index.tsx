@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
 import { useCallback, useEffect, useState } from "react";
 import ProtectedRoute from "../../components/protected-route";
-import RequestListItem from "../../components/requests-list-item";
+import RequestListItem from "../../components/requests-list-item/RequestListIem";
 import { useAuth } from "../../context/AuthContext";
 import { useFirebase } from "../../context/FirebaseContext";
 import { PermissionLevel } from "../../lib";
@@ -200,7 +200,6 @@ const ViewRequestsPage = () => {
     <ProtectedRoute>
       <Box
         sx={{
-          maxHeight: "100vh",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -210,7 +209,19 @@ const ViewRequestsPage = () => {
         <Typography variant="h3" color="textSecondary" sx={{ my: 4 }}>
           Time Adjustment Requests
         </Typography>
-
+        {/* <Paper
+          sx={{
+            p: 5,
+            border: 2,
+            borderColor: theme.BORDER_COLOR,
+            bgcolor: theme.HEADER_BACKGROUND_COLOR,
+            borderRadius: 2,
+            overflowY: "scroll",
+            maxHeight: "90%",
+            width: "70vw",
+            "&::-webkit-scrollbar": { display: "none" },
+          }}
+        > */}
         {loading ? (
           <CircularProgress />
         ) : requests.length > 0 ? (
@@ -243,6 +254,7 @@ const ViewRequestsPage = () => {
             </Button>
           </Box>
         )}
+        {/* </Paper> */}
       </Box>
     </ProtectedRoute>
   );

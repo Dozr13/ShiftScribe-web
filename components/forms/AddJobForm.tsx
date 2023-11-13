@@ -11,7 +11,7 @@ import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useFirebase } from "../../context/FirebaseContext";
 import SubmitButton from "../form-components/SubmitButton";
-import { Job } from "../job-list";
+import { Job } from "../job-list/JobListItem";
 
 interface AddJobFormProps {
   onJobAdded: (newJobData: Job) => void;

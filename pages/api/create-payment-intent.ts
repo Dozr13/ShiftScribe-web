@@ -1,16 +1,16 @@
-import Cors from 'cors';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { Stripe } from 'stripe';
+import Cors from "cors";
+import { NextApiRequest, NextApiResponse } from "next";
+import { Stripe } from "stripe";
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY as string;
 
 const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: '2022-11-15',
+  apiVersion: "2023-10-16",
 });
 
 const cors = Cors({
-  origin: 'exp://192.168.0.226:19000',
-  methods: ['POST'],
+  origin: "exp://192.168.0.226:19000",
+  methods: ["POST"],
 });
 
 async function runMiddleware(
@@ -33,7 +33,7 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   // console.log('req.method', req.method);
-  if (req.method !== 'POST') {
+  if (req.method !== "POST") {
     return res.status(405).end();
   }
 
@@ -42,8 +42,8 @@ export default async function handler(
   try {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: 2500,
-      currency: 'usd',
-      payment_method_types: ['card'],
+      currency: "usd",
+      payment_method_types: ["card"],
     });
 
     const clientSecret = paymentIntent.client_secret;

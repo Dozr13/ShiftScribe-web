@@ -1,8 +1,9 @@
 "use client";
+import { Typography } from "@mui/material";
 import React from "react";
 
 const Requests = () => {
-  return <div>Requests</div>;
+  return <Typography>Requests</Typography>;
 };
 
 export default Requests;

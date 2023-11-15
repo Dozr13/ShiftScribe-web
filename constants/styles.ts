@@ -11,17 +11,37 @@ export const linkStyles = {
   cursor: "pointer",
 };
 
-const containerStyles = {
+export const dashboardStyle = {
+  paperContainer: {
+    padding: 3,
+    marginTop: 2,
+    background: "linear-gradient(155deg, #ffffff, #000)",
+    borderRadius: "12px",
+  },
+  gridContainer: {
+    marginTop: 2,
+  },
+};
+
+export const dashboardLinkButtonStyle = {
+  "&:hover": {
+    backgroundColor: "rgba(0, 0, 0, 0.04)",
+  },
+  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+  borderRadius: 4,
+};
+
+export const containerStyles = {
   padding: "16px",
   backgroundColor: "lightgray",
 };
 
-const titleStyles = {
+export const titleStyles = {
   color: "blue",
   textAlign: "center",
 };
 
-const paragraphStyles = {
+export const paragraphStyles = {
   fontSize: "14px",
   lineHeight: "1.5",
 };

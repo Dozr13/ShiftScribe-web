@@ -10,8 +10,7 @@ interface LoginFieldsProps {
 
 const LoginFields = ({ email, password }: LoginFieldsProps) => {
   return (
-    <Box style={{ width: "97%" }}>
-      {/* Email Field */}
+    <Box style={{ width: "100%" }}>
       <Field
         as={StyledTextField}
         fullWidth
@@ -21,12 +20,12 @@ const LoginFields = ({ email, password }: LoginFieldsProps) => {
         label="Email"
         variant="outlined"
         placeholder="example@email.com"
+        autoComplete="email"
       />
       <ErrorContainer>
         <ErrorMessage name="email" component="div" />
       </ErrorContainer>
 
-      {/* Password Field */}
       <Field
         as={StyledTextField}
         fullWidth
@@ -36,6 +35,7 @@ const LoginFields = ({ email, password }: LoginFieldsProps) => {
         label="Password"
         variant="outlined"
         placeholder="Enter your password"
+        autoComplete="current-password"
       />
       <ErrorContainer>
         <ErrorMessage name="password" component="div" />

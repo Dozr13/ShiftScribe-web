@@ -1,6 +1,6 @@
 "use client";
 import useLoadingAndError from "../../hooks/useLoadingAndError";
-import LoadingScreen from "../ui/LoadingScreen";
+import LoadingScreen from "../loading/LoadingScreen";
 import RecordsCard from "./RecordsCard";
 
 const RecordsUI = () => {

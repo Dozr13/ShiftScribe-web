@@ -1,5 +1,7 @@
+import { Typography } from "@mui/material";
+
 const SignUp = () => {
-  return <div>SignUp</div>;
+  return <Typography>SignUp</Typography>;
 };
 
 export default SignUp;

@@ -1,6 +1,6 @@
 "use client";
 import { Formik, FormikHelpers } from "formik";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import { useAuthCtx } from "../../../context/AuthContext";
 import { LoginFormValues } from "../../../types/initial";
@@ -8,6 +8,7 @@ import LoginCard from "./LoginCard";
 import validationSchema from "./validation";
 
 const LoginForm = () => {
+  const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const { signIn } = useAuthCtx();
 
@@ -24,7 +25,7 @@ const LoginForm = () => {
     try {
       await signIn(values.email, values.password);
       enqueueSnackbar("Successfully logged in!", { variant: "success" });
-      redirect("/dashboard");
+      router.push("/");
     } catch (error: unknown) {
       if (error instanceof Error) {
         enqueueSnackbar(error.message, { variant: "error" });

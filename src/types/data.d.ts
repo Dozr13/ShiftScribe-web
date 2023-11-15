@@ -48,6 +48,23 @@ export interface OrgProfile {
   events?: Events;
 }
 
+type GridRowData = {
+  displayName: string;
+  email: string;
+  organization: string;
+  accessLevel: number;
+};
+
+export interface Employee {
+  id: string;
+  accessLevel: number;
+  userData: {
+    displayName: string;
+    email: string;
+    organization: string;
+  } | null;
+}
+
 interface TimeRecord {
   events?: Events;
   submitter?: string;

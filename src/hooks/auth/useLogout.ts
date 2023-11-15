@@ -8,7 +8,6 @@ export const useLogout = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const handleLogout = async () => {
-    console.log("IN HANDLELOGOUT");
     enqueueSnackbar("Logging out...", {
       variant: "info",
     });

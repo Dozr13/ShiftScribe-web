@@ -1,10 +1,10 @@
 import { Card, CardContent, Typography } from "@mui/material";
 import { FormikProps } from "formik";
+import { redirect } from "next/navigation";
+import SubmitButton from "../../buttons/SignInButton";
 import SignUpButton from "../../buttons/SignUpButton";
-import SubmitButton from "../../buttons/SubmitButton";
 import ButtonContainer from "../../containers/ButtonContainer";
 import LoginFields from "./LoginFields"; // Adjust the import path as necessary
-import { redirect } from "next/navigation";
 
 interface LoginCardProps {
   formik: FormikProps<{
@@ -26,7 +26,7 @@ const LoginCard = ({ formik }: LoginCardProps) => {
         </Typography>
         <LoginFields email="" password="" />
         <ButtonContainer direction="column" size="small">
-          <SubmitButton isSubmitting={formik.isSubmitting} />
+          <SubmitButton isSigningIn={formik.isSubmitting} />
           <SignUpButton onClick={handleSignUpClick} />
         </ButtonContainer>
       </CardContent>

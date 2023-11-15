@@ -2,8 +2,8 @@
 import { Box } from "@mui/material";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Header from "../components/header";
 import { AuthContextProvider } from "../context/AuthContext";
+import Header from "../ui/header";
 import ThemeRegistry from "../utils/ThemeRegistry";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -13,11 +13,7 @@ const metadata: Metadata = {
   description: "Get to know more about Wade",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
       <body>
@@ -30,4 +26,6 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;

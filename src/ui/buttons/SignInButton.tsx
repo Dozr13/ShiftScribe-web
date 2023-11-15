@@ -1,23 +1,23 @@
 import { Button } from "@mui/material";
 import React from "react";
 
-interface SubmitButtonProps {
-  isSubmitting: boolean;
+interface SignInButtonProps {
+  isSigningIn: boolean;
 }
 
-const SubmitButton: React.FC<SubmitButtonProps> = ({ isSubmitting }) => {
+const SignInButton: React.FC<SignInButtonProps> = ({ isSigningIn }) => {
   return (
     <Button
       type="submit"
       variant="contained"
       color="primary"
-      disabled={isSubmitting}
+      disabled={isSigningIn}
       fullWidth
       sx={{ maxWidth: 345, mx: "auto", mt: 5 }}
     >
-      {isSubmitting ? "Submitting..." : "Submit"}
+      {isSigningIn ? "Signing in..." : "Sign In"}
     </Button>
   );
 };
 
-export default SubmitButton;
+export default SignInButton;

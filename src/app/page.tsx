@@ -1,18 +1,19 @@
 "use client";
 import { Grid } from "@mui/material";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import GridItemWrapper from "../components/containers/GridItemsWrapper";
-import PageContainer from "../components/containers/PageContainer";
+import { useRouter } from "next/navigation";
 import { useAuthCtx } from "../context/AuthContext";
+import GridItemWrapper from "../ui/containers/GridItemsWrapper";
+import PageContainer from "../ui/containers/PageContainer";
 
 export default function Home() {
   const { user } = useAuthCtx();
+  const router = useRouter();
 
   if (user) {
-    redirect("/dashboard");
+    router.push("/dashboard");
   } else {
-    redirect("/login");
+    router.push("/login");
   }
 
   return (

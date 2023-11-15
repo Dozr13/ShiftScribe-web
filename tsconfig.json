@@ -19,6 +19,11 @@
         "name": "next"
       }
     ],
+
+    "baseUrl": ".",
+    // "paths": {
+    //   "@/components/*": ["components/*"]
+    // }
     "paths": {
       "@/*": ["./src/*"]
     }

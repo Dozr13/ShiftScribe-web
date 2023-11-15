@@ -1,7 +1,7 @@
-import React from "react";
+import { Typography } from "@mui/material";
 
 const Jobs = () => {
-  return <div>Jobs</div>;
+  return <Typography>Jobs</Typography>;
 };
 
 export default Jobs;

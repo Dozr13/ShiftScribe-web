@@ -24,6 +24,8 @@
     "@types/node": "20.9.0",
     "@types/react": "18.2.37",
     "@types/react-dom": "18.2.15",
+    "ag-grid-community": "^30.2.1",
+    "ag-grid-react": "^30.2.1",
     "autoprefixer": "10.4.16",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

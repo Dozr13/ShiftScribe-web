@@ -1,8 +1,9 @@
-"use client";
-import { LoginForm } from "../../components/auth/login";
-import PageContainer from "../../components/containers/PageContainer";
+import { auth } from "@/services/firebase";
+import { LoginForm } from "../../ui/auth/login";
+import PageContainer from "../../ui/containers/PageContainer";
 
 const Login = () => {
+  console.log("Verify", auth.config);
   return (
     <PageContainer
       mainMessage="ShiftScribe"

@@ -3,7 +3,7 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 // import LoadingScreen from "../loading";
 import { Box } from "@mui/material";
-import RecordsUI from "../../ui/records/RecordsUI";
+import RecordsUI from "../../components/records/RecordsUI";
 
 export const Records = () => {
   return (

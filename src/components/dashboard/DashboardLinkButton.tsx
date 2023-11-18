@@ -18,7 +18,6 @@ const DashboardLinkButton = ({ title, route }: DashboardLinkButtonProps) => {
               size="large"
               color="primary"
               fullWidth
-              component="a"
               style={{ justifyContent: "center" }}
             >
               <Typography variant="h6" color={TEXT_COLOR}>

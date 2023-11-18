@@ -1,7 +1,7 @@
+import signUp from "@/services/signup";
 import { Button, Container, TextField, Typography } from "@mui/material";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { useAuthCtx } from "../../../context/AuthContext";
 
 const validationSchema = yup.object({
   email: yup
@@ -12,7 +12,7 @@ const validationSchema = yup.object({
 });
 
 const SignupForm = () => {
-  const { signUp } = useAuthCtx();
+  // const { signUp } = useAuthCtx();
 
   const formik = useFormik({
     initialValues: {
@@ -21,7 +21,7 @@ const SignupForm = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      signUp(values);
+      signUp({ email: values.email, password: values.password });
       console.log("Form values:", values);
     },
   });

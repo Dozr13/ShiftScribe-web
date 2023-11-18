@@ -1,4 +1,4 @@
-import DashboardCard from "../../ui/dashboard/DashboardCard";
+import DashboardCard from "../../components/dashboard/DashboardCard";
 
 const Dashboard = () => {
   return <DashboardCard />;

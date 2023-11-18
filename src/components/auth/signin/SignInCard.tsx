@@ -4,16 +4,16 @@ import { redirect } from "next/navigation";
 import SubmitButton from "../../buttons/SignInButton";
 import SignUpButton from "../../buttons/SignUpButton";
 import ButtonContainer from "../../containers/ButtonContainer";
-import LoginFields from "./LoginFields"; // Adjust the import path as necessary
+import SignInFields from "./SignInFields"; // Adjust the import path as necessary
 
-interface LoginCardProps {
+interface SignInCardProps {
   formik: FormikProps<{
     email: string;
     password: string;
   }>;
 }
 
-const LoginCard = ({ formik }: LoginCardProps) => {
+const SignInCard = ({ formik }: SignInCardProps) => {
   const handleSignUpClick = () => {
     redirect("/signup");
   };
@@ -22,9 +22,9 @@ const LoginCard = ({ formik }: LoginCardProps) => {
     <Card sx={{ maxWidth: 345, mx: "auto", mt: 5 }}>
       <CardContent>
         <Typography variant="h5" component="div" gutterBottom>
-          Login
+          SignIn
         </Typography>
-        <LoginFields email="" password="" />
+        <SignInFields email="" password="" />
         <ButtonContainer direction="column" size="small">
           <SubmitButton isSigningIn={formik.isSubmitting} />
           <SignUpButton onClick={handleSignUpClick} />
@@ -34,4 +34,4 @@ const LoginCard = ({ formik }: LoginCardProps) => {
   );
 };
 
-export default LoginCard;
+export default SignInCard;

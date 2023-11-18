@@ -15,12 +15,6 @@ const serviceAccount: ServiceAccount = {
   privateKey: `${process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n")}`,
 };
 
-// console.log(serviceAccount);
-// console.log(
-//   'process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL',
-//   `${process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL}`,
-// );
-
 if (!admin.apps.length) {
   try {
     admin.initializeApp({

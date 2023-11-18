@@ -1,14 +1,14 @@
 import { FormikHelpers } from "formik";
 
-export interface LoginFormValues {
+export interface SignInFormValues {
   email: string;
   password: string;
 }
 
-export interface LoginCardProps {
-  initialValues: LoginFormValues;
+export interface SignInCardProps {
+  initialValues: SignInFormValues;
   onSubmit: (
-    values: LoginFormValues,
-    { setSubmitting }: FormikHelpers<LoginFormValues>,
+    values: SignInFormValues,
+    { setSubmitting }: FormikHelpers<SignInFormValues>,
   ) => Promise<void>;
 }

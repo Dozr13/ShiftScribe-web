@@ -3,12 +3,12 @@ import { ErrorMessage, Field } from "formik";
 import ErrorContainer from "../../containers/ErrorContainer";
 import StyledTextField from "../../inputs/StyledTextField";
 
-interface LoginFieldsProps {
+interface SignInFieldsProps {
   email: string;
   password: string;
 }
 
-const LoginFields = ({ email, password }: LoginFieldsProps) => {
+const SignInFields = ({ email, password }: SignInFieldsProps) => {
   return (
     <Box style={{ width: "100%" }}>
       <Field
@@ -44,4 +44,4 @@ const LoginFields = ({ email, password }: LoginFieldsProps) => {
   );
 };
 
-export default LoginFields;
+export default SignInFields;

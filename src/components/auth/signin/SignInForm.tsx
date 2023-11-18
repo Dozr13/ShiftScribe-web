@@ -2,15 +2,14 @@
 import { Formik, FormikHelpers } from "formik";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
-import { useAuthCtx } from "../../../context/AuthContext";
-import { LoginFormValues } from "../../../types/initial";
-import LoginCard from "./LoginCard";
+import signIn from "../../../services/signin";
+import { SignInFormValues } from "../../../types/initial";
+import SignInCard from "./SignInCard";
 import validationSchema from "./validation";
 
-const LoginForm = () => {
+const SignInForm = () => {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
-  const { signIn } = useAuthCtx();
 
   const initialValues = {
     email: "",
@@ -18,12 +17,11 @@ const LoginForm = () => {
   };
 
   const onSubmit = async (
-    values: LoginFormValues,
-    actions: FormikHelpers<LoginFormValues>,
+    values: SignInFormValues,
+    actions: FormikHelpers<SignInFormValues>,
   ) => {
-    console.log("IN ON SUBMIT", values.email, values.password);
     try {
-      await signIn(values.email, values.password);
+      await signIn({ email: values.email, password: values.password });
       enqueueSnackbar("Successfully logged in!", { variant: "success" });
       router.push("/");
     } catch (error: unknown) {
@@ -45,11 +43,11 @@ const LoginForm = () => {
     >
       {(formikProps) => (
         <form onSubmit={formikProps.handleSubmit}>
-          <LoginCard formik={formikProps} />
+          <SignInCard formik={formikProps} />
         </form>
       )}
     </Formik>
   );
 };
 
-export default LoginForm;
+export default SignInForm;

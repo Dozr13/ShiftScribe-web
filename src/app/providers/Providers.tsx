@@ -1,8 +1,8 @@
 "use client";
 
 import { SnackbarProvider } from "notistack";
+import ThemeRegistry from "../../components/themeRegistry/ThemeRegistry";
 import { AuthContextProvider } from "../../context/AuthContext";
-import ThemeRegistry from "../../utils/ThemeRegistry";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (

@@ -1,23 +1,70 @@
+"use client";
 import { Box, Button, Modal } from "@mui/material";
-import { useState } from "react";
+import { get, ref } from "firebase/database";
+import { useEffect, useState } from "react";
 import deleteEmployee from "../../app/actions/deleteEmployee";
 import updateEmployee from "../../app/actions/updateEmployee";
-import { useAuthCtx } from "../../context/AuthContext";
-// import { Employee } from "../../types/data";
 import { fetchEmployeeData } from "../../lib/employeeApi";
+import { firebaseDatabase } from "../../services/firebase";
 import DeleteConfirmation from "./DeleteConfirmation";
-import EmployeeGrid, { Employee } from "./EmployeeGrid";
+import EmployeeGrid, {
+  Employee,
+  UpdatableEmployeeUserData,
+} from "./EmployeeGrid";
 import EmployeeModal from "./EmployeeModal";
 
 interface EmployeeCardProps {
-  initialEmployees: Employee[] | null;
+  orgId: string;
 }
 
-const EmployeeCard = ({ initialEmployees }: EmployeeCardProps) => {
-  const auth = useAuthCtx();
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
-    null,
+const EmployeeCard: React.FC<EmployeeCardProps> = ({ orgId }) => {
+  const [selectedEmployee, setSelectedEmployee] =
+    useState<UpdatableEmployeeUserData | null>(null);
+
+  const [initialEmployees, setInitialEmployees] = useState<Employee[] | null>(
+    [],
   );
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [orgId]);
+
+  const fetchEmployees = async () => {
+    if (!orgId) return;
+
+    setLoading(true);
+
+    try {
+      const orgMembersRef = ref(firebaseDatabase, `orgs/${orgId}/members`);
+      const orgMembersSnapshot = await get(orgMembersRef);
+
+      if (orgMembersSnapshot.exists()) {
+        const membersData = orgMembersSnapshot.val();
+        const memberIds = Object.keys(membersData);
+
+        const employeesArray = await Promise.all(
+          memberIds.map(async (memberId) => {
+            const userRef = ref(firebaseDatabase, `users/${memberId}`);
+            const userSnapshot = await get(userRef);
+            const userData = userSnapshot.val();
+
+            return {
+              id: memberId,
+              ...membersData[memberId],
+              userData,
+            };
+          }),
+        );
+
+        setInitialEmployees(employeesArray);
+      }
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const openEditModal = () => setEditModalOpen(true);
@@ -28,16 +75,17 @@ const EmployeeCard = ({ initialEmployees }: EmployeeCardProps) => {
 
   const handleDelete = async (employeeId: string) => {
     await deleteEmployee(`employees/${employeeId}`);
-    await fetchEmployeeData(auth.orgId);
+    await fetchEmployeeData(orgId ?? "");
   };
 
   const handleEdit = async (
     employeeId: string,
     updatedData: Partial<Employee>,
   ) => {
+    console.log("UPDATED DATAAAA: ", updatedData);
     try {
       await updateEmployee(`employees/${employeeId}`, updatedData);
-      await fetchEmployeeData(auth.orgId);
+      fetchEmployees(); // Refresh the employee data
     } catch (error) {
       console.error("Error updating employee:", error);
     }
@@ -52,7 +100,7 @@ const EmployeeCard = ({ initialEmployees }: EmployeeCardProps) => {
   };
 
   return (
-    <Box style={{ width: "50vw", padding: "20px" }}>
+    <Box style={{ height: "100%", width: "50%", padding: "20px" }}>
       <EmployeeGrid
         employees={initialEmployees}
         setSelectedEmployee={setSelectedEmployee}
@@ -94,8 +142,9 @@ const EmployeeCard = ({ initialEmployees }: EmployeeCardProps) => {
             >
               <EmployeeModal
                 employee={selectedEmployee}
-                onSave={closeEditModal} // Pass a callback to handle save
+                onSave={closeEditModal}
                 onEdit={handleEdit}
+                onUpdated={fetchEmployees}
               />
             </Box>
           </Modal>

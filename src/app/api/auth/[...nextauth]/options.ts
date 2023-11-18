@@ -4,20 +4,16 @@ import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
-import { FIREBASE_AUTH } from "../../../../../lib/Firebase";
+import { firebaseAuth } from "../../../../services/firebase";
 import admin from "../../../../services/firebase-admin";
 import { Employee } from "../../../../types/data";
-// import { CustomSession } from "../../../../types/session";
-
-interface CustomSession extends Session {
-  user: ShiftScribeUser & User;
-}
 
 interface ShiftScribeUser extends User {
   accessLevel?: number;
   organization?: string;
   displayName?: string;
   email?: string;
+  role?: string;
 }
 
 interface MyJWT extends JWT {
@@ -30,6 +26,7 @@ interface MyJWT extends JWT {
       organization: string;
     };
   };
+  role?: string;
 }
 
 const jwtCallback = async ({
@@ -42,8 +39,8 @@ const jwtCallback = async ({
   user?: User | null;
   account?: Account | null;
   profile?: Profile | null;
-}) => {
-  console.log("JWT callback token:", token);
+}): Promise<MyJWT> => {
+  // console.log("JWT callback token:", token);
 
   const email = token.email || profile?.email;
 
@@ -61,19 +58,86 @@ const jwtCallback = async ({
     }
 
     if (userSnapshot) {
+      const orgRef = admin
+        .database()
+        .ref(`/orgs/${userSnapshot.organization}/members/${userSnapshot.id}`);
+      const orgData = await orgRef.once("value");
+      const orgSnapshot = orgData.val();
+
       token.employee = {
         id: userSnapshot.id,
-        accessLevel: userSnapshot.accessLevel,
+        accessLevel: orgSnapshot?.accessLevel,
         userData: {
           displayName: userSnapshot.displayName,
           email: userSnapshot.email,
           organization: userSnapshot.organization,
+          accessLevel: userSnapshot.accessLevel,
         },
       };
+
+      // TODO: FIGURE OUT
+
+      // export enum UserRole {
+      //   Unverified = 0,
+      //   User = 1,
+      //   Manager = 2,
+      //   Admin = 3,
+      //   Superuser = 4,
+      // }
+
+      // export enum UserRoleLabel {
+      //   Unverified = "Unverified",
+      //   User = "User",
+      //   Manager = "Manager",
+      //   Admin = "Admin",
+      //   Superuser = "Superuser",
+      // }
+
+      // switch (userSnapshot.accessLevel) {
+      //   case UserRole.Unverified:
+      //     token.role = UserRoleLabel.Unverified;
+      //     break;
+      //   case UserRole.User:
+      //     token.role = UserRoleLabel.User
+      //     break;
+      //   case UserRole.Manager:
+      //     token.role = UserRoleLabel.Manager
+      //     break;
+      //   case UserRole.Admin:
+      //     token.role = UserRoleLabel.Admin
+      //     break;
+      //   case UserRole.Superuser:
+      //     token.role = UserRoleLabel.Superuser;
+      //     break;
+      //   default:
+      //     token.role = "Guest";
+      // }
+
+      switch (orgSnapshot?.accessLevel) {
+        case 0:
+          token.role = "Unverified";
+          break;
+        case 1:
+          token.role = "User";
+          break;
+        case 2:
+          token.role = "Manager";
+          break;
+        case 3:
+          token.role = "Admin";
+          break;
+        case 4:
+          token.role = "Superuser";
+          break;
+        default:
+          token.role = "UNKNOWN";
+      }
     }
   }
 
-  return token;
+  // console.log("####### token::::: ", token);
+
+  return token as MyJWT;
 };
 
 const sessionCallback = async ({
@@ -83,20 +147,19 @@ const sessionCallback = async ({
   session: Session;
   token: JWT;
 }) => {
-  console.log("token in session", token);
-  console.log("session in session", session);
+  // console.log("token in session", token);
+  // console.log("session in session", session);
 
-  // Check if token is defined and has the employee property
-  if (token && "employee" in token) {
-    const myToken = token as MyJWT; // Safely cast the token to MyJWT
+  if (token && "role" in token) {
+    const myToken = token as MyJWT;
 
     if (myToken.employee) {
-      const user = session.user as ShiftScribeUser; // Cast session.user to your custom user type
+      const user = session.user as ShiftScribeUser;
       user.displayName = myToken.employee.userData.displayName;
       user.email = myToken.employee.userData.email;
       user.accessLevel = myToken.employee.accessLevel;
       user.organization = myToken.employee.userData.organization;
-      // Set other properties as needed
+      user.role = myToken.role;
     }
   }
 
@@ -121,11 +184,13 @@ export const options = {
           const password = credentials.password;
 
           const userCredential = await signInWithEmailAndPassword(
-            FIREBASE_AUTH,
+            firebaseAuth,
             email,
             password,
           );
           const user = userCredential.user;
+
+          // console.log("UUUuuuuuuSSERRRRR", user);
 
           return {
             id: user.uid,
@@ -182,10 +247,7 @@ export const options = {
 };
 
 function determineAccessLevel(profile: any): number {
-  // Implement logic to determine access level based on the profile
-  // For example:
-  console.log(profile, typeof profile);
-  if (profile.email === "wadejp8@gmail.com") {
+  if (profile.email === "dev@deploy.com") {
     return 4; // Admin
   }
   return 1; // Default to User

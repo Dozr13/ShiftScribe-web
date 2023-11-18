@@ -1,9 +1,10 @@
 "use client";
 import useLoadingAndError from "../../hooks/useLoadingAndError";
+import { SessionUserProps } from "../dashboard/DashboardCard";
 import LoadingScreen from "../loading/LoadingScreen";
 import RecordsCard from "./RecordsCard";
 
-const RecordsUI = () => {
+const RecordsUI: React.FC<SessionUserProps> = ({ user }) => {
   const { isLoading, error, startLoading, stopLoading, handleError } =
     useLoadingAndError();
 
@@ -15,6 +16,7 @@ const RecordsUI = () => {
         startLoading={startLoading}
         stopLoading={startLoading}
         handleError={handleError}
+        orgId={user.organization ?? ""}
       />
     </>
   );

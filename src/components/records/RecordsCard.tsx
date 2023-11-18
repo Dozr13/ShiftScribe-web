@@ -1,12 +1,11 @@
 import { Box, Grid, IconButton, Modal, Paper, Typography } from "@mui/material";
 import { useSnackbar } from "notistack";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { FaCalendar, FaTimes } from "react-icons/fa";
 import {
   BORDER_COLOR,
   HEADER_BACKGROUND_COLOR,
 } from "../../../constants/theme";
-import { useAuthCtx } from "../../context/AuthContext";
 import { useFirebase } from "../../context/FirebaseContext";
 import useDateRange from "../../hooks/useDateRange";
 import generateCSVContent from "../../utils/GenerateCsvContent";
@@ -21,14 +20,15 @@ interface RecordsCardProps {
   startLoading: () => void;
   stopLoading: () => void;
   handleError: (errorMessage: string) => void;
+  orgId: string;
 }
 
-const RecordsCard = ({
+const RecordsCard: React.FC<RecordsCardProps> = ({
   startLoading,
   stopLoading,
   handleError,
-}: RecordsCardProps) => {
-  const auth = useAuthCtx();
+  orgId,
+}) => {
   const db = useFirebase();
   const { dateState, setDateState } = useDateRange();
   const { enqueueSnackbar } = useSnackbar();
@@ -36,9 +36,9 @@ const RecordsCard = ({
   const [loadingCSV, setLoadingCSV] = useState<boolean>(false);
   const [csv, setCsv] = useState<string>();
 
-  useEffect(() => {
-    console.log("Updated csv:", csv);
-  }, [csv]);
+  // useEffect(() => {
+  //   console.log("Updated csv:", csv);
+  // }, [csv]);
 
   const generateCSV = async () => {
     const effectiveStartDate =
@@ -46,11 +46,12 @@ const RecordsCard = ({
     const effectiveEndDate = dateState[0].endDate ?? new Date();
     setLoadingCSV(true);
 
+    console.log(orgId);
     const records = await handleFetchData(effectiveStartDate, effectiveEndDate);
     if (records) {
       const csvContent = await generateCSVContent({
         readUserFunction: db.read,
-        orgId: auth.orgId,
+        orgId,
         startDate: effectiveStartDate,
         endDate: effectiveEndDate,
         data: records,
@@ -72,7 +73,7 @@ const RecordsCard = ({
       try {
         const data = await fetchData(
           db,
-          auth.orgId,
+          orgId,
           effectiveStartDate,
           effectiveEndDate,
         );
@@ -84,7 +85,7 @@ const RecordsCard = ({
         stopLoading();
       }
     },
-    [startLoading, db, auth.orgId, handleError, stopLoading],
+    [startLoading, db, orgId, handleError, stopLoading],
   );
 
   const handleShowDateRange = () => {
@@ -96,7 +97,7 @@ const RecordsCard = ({
   };
 
   return (
-    <PageContainer mainMessage={`Documents for: ${auth.orgId}`}>
+    <PageContainer mainMessage={`Documents for: ${orgId}`}>
       <Paper
         sx={{
           p: 4,
@@ -141,7 +142,7 @@ const RecordsCard = ({
               </Grid>
               <Grid item>
                 <PurgeOldRecords
-                  orgId={auth.orgId}
+                  orgId={orgId}
                   fetchDataFunction={purgeOldRecordsWrapper}
                 />
               </Grid>

@@ -1,7 +1,5 @@
-import DashboardCard from "../../components/dashboard/DashboardCard";
-
 const Dashboard = () => {
-  return <DashboardCard />;
+  return <div />;
 };
 
 export default Dashboard;

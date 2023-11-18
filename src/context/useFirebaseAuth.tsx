@@ -1,6 +1,6 @@
 import { User } from "firebase/auth"; // Import User type from Firebase
 import { useEffect, useState } from "react";
-import { FIREBASE_AUTH } from "../../lib/Firebase";
+import { firebaseAuth } from "../services/firebase";
 
 // Define the type for the formatted auth user
 interface AuthUser {
@@ -31,7 +31,7 @@ export default function useFirebaseAuth() {
   };
 
   useEffect(() => {
-    const unsubscribe = FIREBASE_AUTH.onAuthStateChanged(authStateChanged);
+    const unsubscribe = firebaseAuth.onAuthStateChanged(authStateChanged);
     return () => unsubscribe();
   }, []);
 

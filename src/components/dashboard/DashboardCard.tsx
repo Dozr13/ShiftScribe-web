@@ -1,20 +1,26 @@
-"use client";
 import { Box, Button, Divider, Grid, Paper, Typography } from "@mui/material";
+import { redirect } from "next/navigation";
 import { ACCENT_COLOR } from "../../../constants/colorPalette";
 import { dashboardStyle } from "../../../constants/styles";
-import { PermissionLevel } from "../../../lib";
-import { useAuthCtx } from "../../context/AuthContext";
-import { useLogout } from "../../hooks/auth/useLogout";
+import { UserRole } from "../../../lib/Enum";
 import PageContainer from "../containers/PageContainer";
 import DashboardLinkButton from "./DashboardLinkButton";
 
-const DashboardCard = () => {
-  const auth = useAuthCtx();
-  const logout = useLogout();
+export interface SessionUserProps {
+  user: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    accessLevel: number;
+    role?: any;
+    organization?: string | null;
+  };
+}
 
+const DashboardCard: React.FC<SessionUserProps> = ({ user }) => {
   return (
-    <PageContainer mainMessage={`Welcome ${auth.user?.displayName}`}>
-      {auth.permissionLevel >= PermissionLevel.SUPERUSER ? (
+    <PageContainer mainMessage={`Welcome ${user.name}`}>
+      {user.accessLevel >= UserRole.Manager ? (
         <Paper elevation={3} sx={dashboardStyle.paperContainer}>
           <Typography variant="h5" gutterBottom>
             Dashboard
@@ -32,7 +38,11 @@ const DashboardCard = () => {
           <Typography variant="h6" color={ACCENT_COLOR} gutterBottom>
             Insufficient permissions to access this page.
           </Typography>
-          <Button variant="contained" color="secondary" onClick={() => logout}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={redirect("/denied")}
+          >
             Logout
           </Button>
         </Box>

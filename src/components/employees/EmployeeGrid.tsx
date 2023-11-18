@@ -22,9 +22,18 @@ export interface Employee {
   } | null;
 }
 
+export interface UpdatableEmployeeUserData {
+  id: string;
+  accessLevel: number;
+  displayName: string;
+  email: string;
+}
+
 interface EmployeeGridProps {
   employees: Employee[] | null;
-  setSelectedEmployee: Dispatch<SetStateAction<Employee | null>>;
+  setSelectedEmployee: Dispatch<
+    SetStateAction<UpdatableEmployeeUserData | null>
+  >;
 }
 
 const EmployeeGrid: React.FC<EmployeeGridProps> = ({

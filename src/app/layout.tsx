@@ -5,6 +5,7 @@ import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ScheduleIcon from "@mui/icons-material/Schedule";
+import SettingsIcon from "@mui/icons-material/Settings";
 import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 import {
   AppBar,
@@ -42,17 +43,17 @@ const LINKS = [
 ];
 
 const PLACEHOLDER_LINKS = [
-  // { text: "Settings", icon: SettingsIcon },
+  { text: "Settings", href: "/temp-member", icon: SettingsIcon },
   // { text: "Support", icon: SupportIcon },
-  { text: "Login", icon: LoginIcon },
-  { text: "Logout", icon: LogoutIcon },
+  // { text: "Login", icon: LoginIcon },
+  // { text: "Logout", icon: LogoutIcon },
 ];
 
 const RootLayout = async ({ children }: { children: React.ReactNode }) => {
   const session = await getServerSession(options);
 
   if (!session) {
-    redirect("/api/auth/signin?callbackUrl=/temp-member");
+    redirect("/api/auth/signin?callbackUrl=/");
   }
 
   const authLink = session
@@ -111,6 +112,16 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
             </List>
             <Divider sx={{ mt: "auto" }} />
             <List>
+              {PLACEHOLDER_LINKS.map(({ text, href, icon: Icon }) => (
+                <ListItem key={href} disablePadding>
+                  <ListItemButton component={Link} href={href}>
+                    <ListItemIcon>
+                      <Icon />
+                    </ListItemIcon>
+                    <ListItemText primary={text} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
               <ListItem key={authLink.text} disablePadding>
                 <ListItemButton component={Link} href={authLink.href}>
                   <ListItemIcon>

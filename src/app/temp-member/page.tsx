@@ -10,7 +10,7 @@ const TempMember = async () => {
     redirect("/api/auth/signin?callbackUrl=/temp-member");
   }
 
-  console.log("SESSION", session, typeof session);
+  // console.log("SESSION", session, typeof session);
   return (
     <div>
       <h1>TEMP MEMBER WOOT</h1>

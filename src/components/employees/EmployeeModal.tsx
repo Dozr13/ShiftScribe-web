@@ -6,12 +6,13 @@ import {
   Typography,
 } from "@mui/material";
 import { FieldHookConfig, Form, Formik, useField } from "formik";
-import { Employee } from "./EmployeeGrid";
+import { UpdatableEmployeeUserData } from "./EmployeeGrid";
 
 interface EmployeeModalProps {
-  employee: Employee | null;
+  employee: UpdatableEmployeeUserData | null;
   onSave: () => void;
   onEdit: (id: string, data: any) => Promise<void>;
+  onUpdated: () => Promise<void>;
 }
 
 type FormikTextFieldProps = FieldHookConfig<string> & TextFieldProps;
@@ -30,16 +31,21 @@ const FormikTextField = (props: FormikTextFieldProps) => {
   );
 };
 
-const EmployeeModal = ({ employee, onSave, onEdit }: EmployeeModalProps) => {
+const EmployeeModal = ({
+  employee,
+  onSave,
+  onEdit,
+  onUpdated,
+}: EmployeeModalProps) => {
+  console.log("EMPLOYEE", employee);
+  console.log("userData.displayName", employee?.displayName);
   return (
     <Box>
-      <Typography>
-        Edit information for {employee?.userData?.displayName}
-      </Typography>
+      <Typography>Edit information for {employee?.displayName}</Typography>
       <Formik
         initialValues={{
-          displayName: employee?.userData?.displayName || "",
-          email: employee?.userData?.email || "",
+          displayName: employee?.displayName ?? "",
+          email: employee?.email || "",
           accessLevel: employee?.accessLevel || "",
         }}
         onSubmit={async (values) => {
@@ -47,6 +53,7 @@ const EmployeeModal = ({ employee, onSave, onEdit }: EmployeeModalProps) => {
             await onEdit(employee.id, values);
           }
           onSave();
+          onUpdated();
         }}
       >
         {({ isSubmitting }) => (

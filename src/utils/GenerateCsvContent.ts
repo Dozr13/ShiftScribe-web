@@ -5,7 +5,7 @@ import { TimeRecord, UserData, UserDataTotals } from "../types/data";
 
 interface GenerateCSVContentParams {
   readUserFunction: (Path: string) => Promise<DataSnapshot>;
-  orgId: string;
+  orgId: string | null | undefined;
   data: Record<string, TimeRecord>;
   startDate?: Date;
   endDate?: Date;

@@ -5,7 +5,8 @@ interface CustomSession extends Session {
     name?: string | null;
     email?: string | null;
     image?: string | null;
-    role?: string | null;
+    accessLevel: number;
+    role?: UserRoleLabel | null;
     organization?: string | null;
   };
 }

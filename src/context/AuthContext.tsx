@@ -16,7 +16,7 @@ import {
 import { child, get, getDatabase, ref, set, update } from "firebase/database";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { PermissionLevel } from "../../lib";
-import { FIREBASE_AUTH } from "../../lib/Firebase";
+import { firebaseAuth } from "../services/firebase";
 import { OrgProfile, UserData } from "../types/data";
 import { ResponseBad, ResponseOk } from "../types/response";
 
@@ -122,7 +122,7 @@ const Context = {
   signIn: (email: string, password: string) => {
     console.log("IN SIGNIN", email, password);
     return new Promise<SignupResponse<UserCredential>>((res) => {
-      signInWithEmailAndPassword(FIREBASE_AUTH, email, password)
+      signInWithEmailAndPassword(firebaseAuth, email, password)
         .then((User) => res({ success: true, data: User }))
         .catch((e) => res(getErrorResponse(e)));
     });
@@ -155,7 +155,7 @@ const Context = {
       isValidOrg(organization).then((r) => {
         if (!r) res({ success: false, error: ERROR_TYPE.OrgNotValid });
         else
-          createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
+          createUserWithEmailAndPassword(firebaseAuth, email, password)
             .then(async (authUser) => {
               await updateProfile(authUser.user, {
                 displayName: username,
@@ -202,7 +202,7 @@ const Context = {
   // ): Promise<SignupResponse<UserCredential>> => {
   //   try {
   //     const authUser = await createUserWithEmailAndPassword(
-  //       FIREBASE_AUTH,
+  //       firebaseAuth,
   //       email,
   //       password,
   //     );
@@ -266,7 +266,7 @@ const Context = {
    * @returns Promise<void>
    */
   signOut: () => {
-    return signOut(FIREBASE_AUTH);
+    return signOut(firebaseAuth);
   },
 
   /**
@@ -277,7 +277,7 @@ const Context = {
    * @returns Unsubscribe Callback
    */
   onAuthChange: (Fn: (user: User | null) => void): Unsubscribe => {
-    return onAuthStateChanged(FIREBASE_AUTH, Fn);
+    return onAuthStateChanged(firebaseAuth, Fn);
   },
 
   /**
@@ -286,7 +286,7 @@ const Context = {
    * @returns Promise<boolean>
    */
   doesUserExist: async (email: string) => {
-    return await fetchSignInMethodsForEmail(FIREBASE_AUTH, email).then(
+    return await fetchSignInMethodsForEmail(firebaseAuth, email).then(
       (result) => {
         return result.length > 0;
       },
@@ -322,7 +322,7 @@ export const AuthContextProvider = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, async (authUser) => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async (authUser) => {
       setIsReady(false);
       setIsLoading(true);
 

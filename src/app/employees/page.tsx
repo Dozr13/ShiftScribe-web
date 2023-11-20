@@ -8,10 +8,10 @@ import { options } from "../api/auth/[...nextauth]/options";
 const EmployeesPage = async () => {
   const session = (await getServerSession(options)) as CustomSession;
 
-  if (!session) {
+  if (session.user.accessLevel <= 1) {
     redirect("/api/auth/signin?callbackUrl=/temp-member");
   }
-
+  console.log("sess", session);
   return (
     <PageContainer
       mainMessage={`Employee List for ${session.user.organization}`}

@@ -1,7 +1,7 @@
 "use server";
 
-import { updateData } from "../../lib/employeeApi";
-import { Employee } from "../../types/data";
+import { updateData } from "../../../lib/employeeApi";
+import { Employee } from "../../../types/data";
 
 export default async function updateEmployee(
   employeeId: string,

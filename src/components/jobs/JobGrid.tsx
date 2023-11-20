@@ -11,20 +11,15 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useState } from "react";
-import { Employee, GridRowData } from "../../types/data";
+import { JobsGridRowData, OrgJob } from "../../types/data";
 
-interface EmployeeGridProps {
-  employees: Employee[];
-  setSelectedEmployee: (employee: Employee | undefined) => void;
+interface JobGridProps {
+  jobs: OrgJob[];
+  setSelectedJob: (job: OrgJob | undefined) => void;
 }
 
-const EmployeeGrid: React.FC<EmployeeGridProps> = ({
-  employees,
-  setSelectedEmployee,
-}) => {
+const JobGrid: React.FC<JobGridProps> = ({ jobs, setSelectedJob }) => {
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
-
-  // console.log("EMPLOYEEEESSSSS", employees);
 
   useEffect(() => {
     const handleResize = () => {
@@ -40,20 +35,6 @@ const EmployeeGrid: React.FC<EmployeeGridProps> = ({
     };
   }, [gridApi]);
 
-  // const onRowClick = () => {
-  //   if (gridApi) {
-  //     const selectedNodes = gridApi.getSelectedNodes();
-
-  //     if (selectedNodes.length > 0) {
-  //       const selectedData = selectedNodes.map((node) => node.data);
-  //       console.log("SSSS", selectedData);
-  //       setSelectedEmployee(selectedData[0]);
-  //     } else {
-  //       setSelectedEmployee(undefined);
-  //     }
-  //   }
-  // };
-
   const onGridReady = (params: GridReadyEvent) => {
     setGridApi(params.api);
     params.api.sizeColumnsToFit();
@@ -66,33 +47,36 @@ const EmployeeGrid: React.FC<EmployeeGridProps> = ({
     return undefined;
   };
 
-  const rowData: GridRowData[] = employees!.map((employee) => ({
-    id: employee.id,
-    displayName: employee.userData?.displayName,
-    email: employee.userData?.email,
-    organization: employee.userData?.organization,
-    accessLevel: employee.accessLevel,
+  const rowData: JobsGridRowData[] = jobs!.map((job) => ({
+    id: job.id,
+    jobName: job.jobName,
+    jobNumber: job.jobNumber,
+    jobAddress: job.jobAddress,
   }));
 
   const columnDefs = [
-    { headerName: "Name", field: "displayName", width: 100, flex: 1 },
-    { headerName: "Email", field: "email", width: 100, flex: 1 },
-    { headerName: "Organization", field: "organization", width: 100, flex: 1 },
-    { headerName: "Access Level", field: "accessLevel", width: 100, flex: 1 },
+    { headerName: "Job Name", field: "jobName", width: 100, flex: 1 },
+    { headerName: "Job Number", field: "jobNumber", width: 100, flex: 1 },
+    { headerName: "Address", field: "jobAddress", width: 100, flex: 1 },
   ] as ColDef[];
 
   const onRowSelected = (event: RowSelectedEvent) => {
     if (event.node.isSelected()) {
       const selectedId = event.data.id;
-      const fullEmployee = employees.find((emp) => emp.id === selectedId);
 
-      if (fullEmployee) {
-        setSelectedEmployee(fullEmployee);
+      console.log("Selected ID: ", selectedId);
+
+      const fullJob = jobs.find((job) => job.id === selectedId);
+
+      console.log("FULL JOB: ", fullJob);
+
+      if (fullJob) {
+        setSelectedJob(fullJob);
       } else {
-        console.error("Selected employee not found");
+        console.error("Selected job not found");
       }
     } else {
-      setSelectedEmployee(undefined);
+      setSelectedJob(undefined);
     }
   };
 
@@ -111,4 +95,4 @@ const EmployeeGrid: React.FC<EmployeeGridProps> = ({
   );
 };
 
-export default EmployeeGrid;
+export default JobGrid;

@@ -13,8 +13,8 @@ import {
   set,
   update,
 } from "firebase/database";
-import { firebaseApp } from "../services/firebase";
-import { Employee } from "../types/data";
+import { firebaseApp, firebaseDatabase } from "../services/firebase";
+import { OrgJob } from "../types/data";
 
 /**
  * Delete data at a given path.
@@ -37,35 +37,46 @@ export const exists = async (Path: string): Promise<boolean> => {
 };
 
 /**
- * Fetches employees for a given organization.
+ * Fetches jobs for a given organization.
  * @param orgId The organization ID.
- * @returns An array of Employee objects.
+ * @returns An array of job objects.
  */
-export const fetchEmployeeData = async (orgId: string): Promise<Employee[]> => {
+export const fetchJobData = async (orgId: string): Promise<OrgJob[]> => {
   const db = getDatabase(firebaseApp);
-  const orgMembersSnapshot = await get(child(ref(db), `orgs/${orgId}/members`));
+  const orgJobsSnapshot = await get(child(ref(db), `orgs/${orgId}/jobs`));
 
-  if (!orgMembersSnapshot.exists()) {
+  if (!orgJobsSnapshot.exists()) {
     return [];
   }
 
-  const membersData = orgMembersSnapshot.val();
-  const memberIds = Object.keys(membersData);
+  const jobsData = orgJobsSnapshot.val();
+  const jobIds = Object.keys(jobsData);
 
-  const employeesArray: Employee[] = await Promise.all(
-    memberIds.map(async (memberId) => {
-      const userSnapshot = await get(child(ref(db), `users/${memberId}`));
-      const userData = userSnapshot.val();
+  const jobsArray: OrgJob[] = await Promise.all(
+    jobIds.map(async (jobId) => {
+      const jobData = jobsData[jobId];
 
       return {
-        id: memberId,
-        ...membersData[memberId],
-        userData,
+        id: jobId,
+        ...jobData,
       };
     }),
   );
 
-  return employeesArray;
+  return jobsArray;
+};
+
+export const updateJobData = async (
+  path: string,
+  payload: { [key: string]: any },
+) => {
+  const jobRef = ref(firebaseDatabase, path);
+  await update(jobRef, payload);
+};
+
+export const deleteJobData = async (path: string) => {
+  const jobRef = ref(firebaseDatabase, path);
+  await remove(jobRef);
 };
 
 /**
@@ -151,12 +162,12 @@ export const safeWrite = (
  * @param Data
  * @returns
  */
-export const updateData = (
-  Path: string,
-  Data: Record<string, unknown>,
-): Promise<void> => {
-  return update(ref(getDatabase(), Path), Data);
-};
+// export const updateJobData = (
+//   Path: string,
+//   Data: Record<string, unknown>,
+// ): Promise<void> => {
+//   return update(ref(getDatabase(), Path), Data);
+// }; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 /**
  * Listen for changes at a specified path.

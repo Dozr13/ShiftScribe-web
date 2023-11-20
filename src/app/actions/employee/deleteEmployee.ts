@@ -1,6 +1,6 @@
 "use server";
 
-import { deleteData } from "../../lib/employeeApi";
+import { deleteData } from "../../../lib/employeeApi";
 
 export default async function deleteEmployee(employeeId: string) {
   // Validation or authorization checks

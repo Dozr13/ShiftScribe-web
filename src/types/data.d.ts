@@ -16,6 +16,7 @@ export interface OrgData {
 }
 
 export interface OrgJob {
+  id: string;
   jobName: string;
   jobNumber: string;
   jobAddress: string;
@@ -55,6 +56,12 @@ type GridRowData = {
   accessLevel: number;
 };
 
+type JobsGridRowData = {
+  jobName: string;
+  jobNumber: string;
+  jobAddress: string;
+};
+
 export interface Employee {
   id: string;
   accessLevel: number;
@@ -62,7 +69,7 @@ export interface Employee {
     displayName: string;
     email: string;
     organization: string;
-  } | null;
+  };
 }
 
 interface TimeRecord {

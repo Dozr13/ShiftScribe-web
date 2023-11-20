@@ -1,3 +1,4 @@
+"use client";
 import {
   Box,
   Button,
@@ -6,13 +7,12 @@ import {
   Typography,
 } from "@mui/material";
 import { FieldHookConfig, Form, Formik, useField } from "formik";
-import { UpdatableEmployeeUserData } from "./EmployeeGrid";
+import * as Yup from "yup";
+import { Employee } from "../../types/data";
 
 interface EmployeeModalProps {
-  employee: UpdatableEmployeeUserData | null;
-  onSave: () => void;
-  onEdit: (id: string, data: any) => Promise<void>;
-  onUpdated: () => Promise<void>;
+  onSave: (updatedEmployee: Employee) => void;
+  employee: Employee;
 }
 
 type FormikTextFieldProps = FieldHookConfig<string> & TextFieldProps;
@@ -31,29 +31,45 @@ const FormikTextField = (props: FormikTextFieldProps) => {
   );
 };
 
-const EmployeeModal = ({
-  employee,
-  onSave,
-  onEdit,
-  onUpdated,
-}: EmployeeModalProps) => {
-  console.log("EMPLOYEE", employee);
-  console.log("userData.displayName", employee?.displayName);
+const EmployeeModal = ({ employee, onSave }: EmployeeModalProps) => {
+  const validationSchema = Yup.object().shape({
+    displayName: Yup.string().required("Display Name is required"),
+    email: Yup.string()
+      .email("Invalid email format")
+      .required("Email is required"),
+    accessLevel: Yup.number()
+      .required("Access Level is required")
+      .min(0, "Access Level must be between 0 and 4")
+      .max(4, "Access Level must be between 0 and 4"),
+  });
+
+  const initialValues = {
+    displayName: employee.userData?.displayName,
+    email: employee.userData?.email,
+    organization: employee.userData?.organization,
+    accessLevel: employee.accessLevel || 0,
+  };
+
   return (
     <Box>
-      <Typography>Edit information for {employee?.displayName}</Typography>
+      <Typography>Edit information for {initialValues.displayName}</Typography>
       <Formik
-        initialValues={{
-          displayName: employee?.displayName ?? "",
-          email: employee?.email || "",
-          accessLevel: employee?.accessLevel || "",
-        }}
-        onSubmit={async (values) => {
-          if (employee) {
-            await onEdit(employee.id, values);
-          }
-          onSave();
-          onUpdated();
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={(values, { setSubmitting }) => {
+          const updatedEmployee: Employee = {
+            ...employee,
+            userData: {
+              displayName: values.displayName,
+              email: values.email,
+              organization: values.organization,
+            },
+            accessLevel: values.accessLevel,
+          };
+
+          console.log("Submitting updated employee:", updatedEmployee);
+          onSave(updatedEmployee);
+          setSubmitting(false);
         }}
       >
         {({ isSubmitting }) => (
@@ -74,6 +90,16 @@ const EmployeeModal = ({
                 placeholder="Enter email"
                 fullWidth
                 margin="normal"
+              />
+              {/* Assuming organization is not editable */}
+              <FormikTextField
+                name="organization"
+                type="text"
+                label="Organization"
+                placeholder="Enter organization"
+                fullWidth
+                margin="normal"
+                disabled
               />
               <FormikTextField
                 name="accessLevel"

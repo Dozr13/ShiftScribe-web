@@ -22,6 +22,7 @@ import {
 } from "@mui/material";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import ThemeRegistry from "../components/themeRegistry/ThemeRegistry";
@@ -77,6 +78,21 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
               <DashboardIcon
                 sx={{ color: "#444", mr: 2, transform: "translateY(-2px)" }}
               />
+              {/* <Box
+                sx={{
+                  color: "#444",
+                  mr: 2,
+                  pt: 1,
+                  transform: "translateY(-2px)",
+                }}
+              >
+                <Image
+                  src="/logo.png"
+                  width={50}
+                  height={50}
+                  alt="Picture of the author"
+                />
+              </Box> */}
               <Typography variant="h6" color="text.primary">
                 ShiftScribe
               </Typography>

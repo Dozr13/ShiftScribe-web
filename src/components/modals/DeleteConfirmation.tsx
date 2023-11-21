@@ -3,11 +3,12 @@ import { forwardRef } from "react";
 
 interface DeleteConfirmationProps {
   onClose: () => void;
-  onConfirm: () => void; // Change here
+  onConfirm: () => void;
+  message: string;
 }
 
 const DeleteConfirmation = forwardRef<HTMLDivElement, DeleteConfirmationProps>(
-  ({ onClose, onConfirm }, ref) => {
+  ({ onClose, onConfirm, message }, ref) => {
     return (
       <Box
         ref={ref}
@@ -23,15 +24,14 @@ const DeleteConfirmation = forwardRef<HTMLDivElement, DeleteConfirmationProps>(
           borderRadius: 2,
           boxShadow: 24,
           overflowY: "auto",
+          textAlign: "center",
         }}
       >
         <Typography variant="h6" gutterBottom>
           Confirm Delete
         </Typography>
-        <Typography>
-          Are you sure you want to remove this job information?
-        </Typography>
-        <Box display="flex" justifyContent="space-around" mt={2}>
+        <Typography>{message}</Typography>
+        <Box display="flex" justifyContent="space-evenly" mt={4}>
           <Button variant="outlined" color="primary" onClick={onClose}>
             Cancel
           </Button>

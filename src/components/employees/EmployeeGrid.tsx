@@ -24,8 +24,6 @@ const EmployeeGrid: React.FC<EmployeeGridProps> = ({
 }) => {
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
 
-  // console.log("EMPLOYEEEESSSSS", employees);
-
   useEffect(() => {
     const handleResize = () => {
       if (gridApi) {
@@ -83,7 +81,7 @@ const EmployeeGrid: React.FC<EmployeeGridProps> = ({
   };
 
   return (
-    <Box className="ag-theme-alpine" style={{ height: 400, width: "100%" }}>
+    <Box className="ag-theme-alpine" sx={{ width: "70vw", height: "100%" }}>
       <AgGridReact
         rowSelection="single"
         onRowSelected={onRowSelected}

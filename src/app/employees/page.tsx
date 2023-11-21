@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import PageHeader from "../../components/containers/PageHeader";
 import EmployeeCard from "../../components/employees/EmployeeCard";
 import { CustomSession } from "../../types/session";
 import { options } from "../api/auth/[...nextauth]/options";
@@ -7,15 +8,20 @@ import { options } from "../api/auth/[...nextauth]/options";
 const EmployeesPage = async () => {
   const session = (await getServerSession(options)) as CustomSession;
 
-  if (session.user.accessLevel <= 1) {
+  if (!session || session.user.accessLevel <= 1 || !session.user.organization) {
     redirect("/api/auth/signin?callbackUrl=/temp-member");
   }
-  console.log("sess", session);
+
+  const orgId = session.user.organization;
+
   return (
     // <PageContainer
     //   mainMessage={`Employee List for ${session.user.organization}`}
     // >
-    <EmployeeCard orgId={session.user.organization ?? ""} />
+    <>
+      <PageHeader mainMessage={`Employee List for ${orgId}`} />
+      <EmployeeCard orgId={orgId} />
+    </>
     // </PageContainer>
   );
 };

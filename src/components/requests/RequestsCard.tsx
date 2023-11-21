@@ -4,15 +4,14 @@ import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import {
   addJob,
-  // addJob,
   deleteJob,
   fetchJobs,
   updateJob,
 } from "../../app/actions/jobActions";
 import { OrgJob } from "../../types/data";
+import JobGrid from "../jobs/JobGrid";
+import JobModal from "../jobs/JobModal";
 import DeleteConfirmation from "../modals/DeleteConfirmation";
-import JobGrid from "./JobGrid";
-import JobModal from "./JobModal";
 
 interface JobCardProps {
   orgId: string;

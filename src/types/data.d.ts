@@ -62,6 +62,13 @@ type JobsGridRowData = {
   jobAddress: string;
 };
 
+// TODO: implement this as Employee userData
+export interface User {
+  displayName: string;
+  email: string;
+  organization: string;
+}
+
 export interface Employee {
   id: string;
   accessLevel: number;

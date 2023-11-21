@@ -33,7 +33,7 @@ const FormikTextField = (props: FormikTextFieldProps) => {
 
 const EmployeeModal = ({ employee, onSave }: EmployeeModalProps) => {
   const validationSchema = Yup.object().shape({
-    displayName: Yup.string().required("Display Name is required"),
+    displayName: Yup.string().required("Employee Name is required"),
     email: Yup.string()
       .email("Invalid email format")
       .required("Email is required"),
@@ -44,12 +44,13 @@ const EmployeeModal = ({ employee, onSave }: EmployeeModalProps) => {
   });
 
   const initialValues = {
-    displayName: employee.userData?.displayName,
-    email: employee.userData?.email,
-    organization: employee.userData?.organization,
-    accessLevel: employee.accessLevel || 0,
+    displayName: employee?.userData?.displayName,
+    email: employee?.userData?.email,
+    organization: employee?.userData?.organization,
+    accessLevel: employee?.accessLevel,
   };
 
+  console.log(initialValues);
   return (
     <Box>
       <Typography>Edit information for {initialValues.displayName}</Typography>

@@ -40,20 +40,6 @@ const EmployeeGrid: React.FC<EmployeeGridProps> = ({
     };
   }, [gridApi]);
 
-  // const onRowClick = () => {
-  //   if (gridApi) {
-  //     const selectedNodes = gridApi.getSelectedNodes();
-
-  //     if (selectedNodes.length > 0) {
-  //       const selectedData = selectedNodes.map((node) => node.data);
-  //       console.log("SSSS", selectedData);
-  //       setSelectedEmployee(selectedData[0]);
-  //     } else {
-  //       setSelectedEmployee(undefined);
-  //     }
-  //   }
-  // };
-
   const onGridReady = (params: GridReadyEvent) => {
     setGridApi(params.api);
     params.api.sizeColumnsToFit();
@@ -106,6 +92,10 @@ const EmployeeGrid: React.FC<EmployeeGridProps> = ({
         rowData={rowData}
         columnDefs={columnDefs}
         animateRows={true}
+        pagination={true}
+        paginationPageSize={5}
+        enableRangeSelection={true}
+        domLayout="autoHeight"
       />
     </Box>
   );

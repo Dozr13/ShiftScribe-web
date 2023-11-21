@@ -6,10 +6,10 @@ import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import SettingsIcon from "@mui/icons-material/Settings";
+import SupportIcon from "@mui/icons-material/Support";
 import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 import {
   AppBar,
-  Box,
   Divider,
   Drawer,
   List,
@@ -22,9 +22,9 @@ import {
 } from "@mui/material";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import PageContainer from "../components/containers/PageContainer";
 import ThemeRegistry from "../components/themeRegistry/ThemeRegistry";
 import { options } from "./api/auth/[...nextauth]/options";
 
@@ -33,9 +33,9 @@ const metadata: Metadata = {
   description: "Keeping your time, so you don't have to!",
 };
 
-const DRAWER_WIDTH = 240;
+export const DRAWER_WIDTH = 240;
 
-const LINKS = [
+export const LINKS = [
   { text: "Home", href: "/", icon: HomeIcon },
   { text: "Records", href: "/records", icon: WorkHistoryIcon },
   { text: "Requests", href: "/requests", icon: ScheduleIcon },
@@ -43,11 +43,9 @@ const LINKS = [
   { text: "Jobs", href: "/jobs", icon: LocationSearchingIcon },
 ];
 
-const PLACEHOLDER_LINKS = [
+export const PLACEHOLDER_LINKS = [
   { text: "Settings", href: "/temp-member", icon: SettingsIcon },
-  // { text: "Support", icon: SupportIcon },
-  // { text: "Login", icon: LoginIcon },
-  // { text: "Logout", icon: LogoutIcon },
+  { text: "Support", href: "/temp-member", icon: SupportIcon },
 ];
 
 const RootLayout = async ({ children }: { children: React.ReactNode }) => {
@@ -78,21 +76,6 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
               <DashboardIcon
                 sx={{ color: "#444", mr: 2, transform: "translateY(-2px)" }}
               />
-              {/* <Box
-                sx={{
-                  color: "#444",
-                  mr: 2,
-                  pt: 1,
-                  transform: "translateY(-2px)",
-                }}
-              >
-                <Image
-                  src="/logo.png"
-                  width={50}
-                  height={50}
-                  alt="Picture of the author"
-                />
-              </Box> */}
               <Typography variant="h6" color="text.primary">
                 ShiftScribe
               </Typography>
@@ -148,18 +131,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
               </ListItem>
             </List>
           </Drawer>
-          <Box
-            component="main"
-            sx={{
-              flexGrow: 1,
-              bgcolor: "background.default",
-              ml: `${DRAWER_WIDTH}px`,
-              mt: ["48px", "56px", "64px"],
-              p: 3,
-            }}
-          >
-            {children}
-          </Box>
+          <PageContainer>{children}</PageContainer>
         </ThemeRegistry>
       </body>
     </html>

@@ -35,7 +35,7 @@ const FormikTextField = (props: FormikTextFieldProps) => {
 const JobModal = ({ isAddMode, job, onSave }: JobModalProps) => {
   const validationSchema = Yup.object().shape({
     jobName: Yup.string().required("Job Name is required"),
-    jobNumber: Yup.number().optional(),
+    jobNumber: Yup.string().optional(),
     jobAddress: Yup.string().optional(),
   });
 

@@ -1,5 +1,5 @@
 "use client";
-import { Box, Button, Modal } from "@mui/material";
+import { Box, Button, Modal, SelectChangeEvent } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import {
@@ -26,10 +26,17 @@ const JobCard = ({ orgId }: JobCardProps) => {
   const [jobModalOpen, setJobModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isAddMode, setIsAddMode] = useState(false);
+  const [paginationPageSize, setPaginationPageSize] = useState(10);
+  const pageSizes = [5, 10, 20, 50, 100];
 
   useEffect(() => {
     fetchJobs(orgId, setJobs);
   }, [orgId]);
+
+  const handlePageSizeChange = (event: SelectChangeEvent) => {
+    const newSize = parseInt(event.target.value, 10);
+    setPaginationPageSize(newSize);
+  };
 
   const openAddJobModal = () => {
     setSelectedJob({ id: "", jobName: "", jobNumber: "", jobAddress: "" });
@@ -109,15 +116,43 @@ const JobCard = ({ orgId }: JobCardProps) => {
     }
   };
 
+  const footerHeight = "50px";
   return (
-    <Box style={{ height: "100%", width: "50%", padding: "20px" }}>
-      <JobGrid jobs={jobs} setSelectedJob={setSelectedJob} />
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        height: "80%",
+        width: "100%",
+        overflow: "hidden",
+      }}
+    >
+      {/* Main grid container */}
+      <Box
+        sx={{
+          flexGrow: 1,
+          marginBottom: footerHeight,
+        }}
+      >
+        <JobGrid jobs={jobs} setSelectedJob={setSelectedJob} />
+      </Box>
 
-      <Box display="flex" justifyContent="space-around" mt={2} sx={{ p: 4 }}>
+      {/* Footer with page size selector and action buttons */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-evenly",
+          alignItems: "center",
+          padding: 2,
+          height: footerHeight,
+          width: "50%",
+        }}
+      >
+        {/* Action buttons */}
         <Button variant="contained" onClick={openAddJobModal}>
           Add
         </Button>
-
         <Button
           variant="contained"
           onClick={openJobModal}
@@ -134,6 +169,7 @@ const JobCard = ({ orgId }: JobCardProps) => {
         </Button>
       </Box>
 
+      {/* Modals */}
       {jobModalOpen && (
         <Modal open={jobModalOpen} onClose={() => setJobModalOpen(false)}>
           <Box
@@ -159,7 +195,6 @@ const JobCard = ({ orgId }: JobCardProps) => {
           </Box>
         </Modal>
       )}
-
       {deleteModalOpen && (
         <Modal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
           <DeleteConfirmation

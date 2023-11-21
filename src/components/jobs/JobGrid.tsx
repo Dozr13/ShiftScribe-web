@@ -1,4 +1,11 @@
-import { Box } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from "@mui/material";
 import {
   ColDef,
   GridApi,
@@ -10,16 +17,20 @@ import {
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { JobsGridRowData, OrgJob } from "../../types/data";
 
 interface JobGridProps {
   jobs: OrgJob[];
+  // paginationPageSize: number;
   setSelectedJob: (job: OrgJob | undefined) => void;
 }
 
 const JobGrid: React.FC<JobGridProps> = ({ jobs, setSelectedJob }) => {
+  const gridRef = useRef<AgGridReact>(null);
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
+  const [paginationPageSize, setPaginationPageSize] = useState(10);
+  // const pageSizes = [5, 10, 20, 50, 100];
 
   useEffect(() => {
     const handleResize = () => {
@@ -54,21 +65,34 @@ const JobGrid: React.FC<JobGridProps> = ({ jobs, setSelectedJob }) => {
     jobAddress: job.jobAddress,
   }));
 
-  const columnDefs = [
-    { headerName: "Job Name", field: "jobName", width: 100, flex: 1 },
-    { headerName: "Job Number", field: "jobNumber", width: 100, flex: 1 },
-    { headerName: "Address", field: "jobAddress", width: 100, flex: 1 },
-  ] as ColDef[];
+  const columnDefs: ColDef[] = [
+    {
+      headerName: "Job Name",
+      field: "jobName",
+      sortable: true,
+      filter: true,
+      resizable: true,
+    },
+    {
+      headerName: "Job Number",
+      field: "jobNumber",
+      sortable: true,
+      filter: true,
+      resizable: true,
+    },
+    {
+      headerName: "Address",
+      field: "jobAddress",
+      sortable: true,
+      filter: true,
+      resizable: true,
+    },
+  ];
 
   const onRowSelected = (event: RowSelectedEvent) => {
     if (event.node.isSelected()) {
       const selectedId = event.data.id;
-
-      console.log("Selected ID: ", selectedId);
-
       const fullJob = jobs.find((job) => job.id === selectedId);
-
-      console.log("FULL JOB: ", fullJob);
 
       if (fullJob) {
         setSelectedJob(fullJob);
@@ -80,8 +104,19 @@ const JobGrid: React.FC<JobGridProps> = ({ jobs, setSelectedJob }) => {
     }
   };
 
+  const handlePageSizeChange = (event: SelectChangeEvent<number>) => {
+    const newSize = parseInt(event.target.value as string, 10);
+
+    if (!isNaN(newSize)) {
+      setPaginationPageSize(newSize);
+      if (gridApi) {
+        gridApi.paginationSetPageSize(newSize);
+      }
+    }
+  };
+
   return (
-    <Box className="ag-theme-alpine" style={{ height: 400, width: "100%" }}>
+    <Box className="ag-theme-alpine" sx={{ width: "50vw", height: "100%" }}>
       <AgGridReact
         rowSelection="single"
         onRowSelected={onRowSelected}
@@ -89,8 +124,30 @@ const JobGrid: React.FC<JobGridProps> = ({ jobs, setSelectedJob }) => {
         getRowStyle={getRowStyle}
         rowData={rowData}
         columnDefs={columnDefs}
+        ref={gridRef}
         animateRows={true}
+        pagination={true}
+        paginationPageSize={paginationPageSize}
+        enableRangeSelection={true}
       />
+      <Box sx={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
+        <FormControl variant="standard" sx={{ minWidth: 120 }}>
+          <InputLabel id="pagination-page-size-label">Page Size</InputLabel>
+          <Select
+            labelId="pagination-page-size-label"
+            id="pagination-page-size-select"
+            value={paginationPageSize}
+            label="Page Size"
+            onChange={handlePageSizeChange}
+          >
+            {[5, 10, 20, 50].map((size) => (
+              <MenuItem key={size} value={size}>
+                {size}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
     </Box>
   );
 };

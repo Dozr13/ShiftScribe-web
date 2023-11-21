@@ -5,3 +5,5 @@ export async function GET() {
     hello: "world",
   });
 }
+
+// TODO: REMOVE

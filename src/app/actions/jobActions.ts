@@ -13,6 +13,7 @@ export const fetchJobs = async (
     const formattedJobs: OrgJob[] = jobsData
       ? Object.entries(jobsData).map(([firebaseId, jobData]) => ({
           ...(jobData as OrgJob),
+          id: firebaseId,
         }))
       : [];
     setJobs(formattedJobs);

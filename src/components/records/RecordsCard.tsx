@@ -10,7 +10,6 @@ import { useFirebase } from "../../context/FirebaseContext";
 import useDateRange from "../../hooks/useDateRange";
 import generateCSVContent from "../../utils/GenerateCsvContent";
 import { fetchData, getLastSundayTwoWeeksPrior } from "../../utils/dataService";
-import PageContainer from "../containers/PageContainer";
 import DateRangePicker from "./DateRangePicker";
 import DownloadCsvButton from "./DownloadCsvButton";
 import GenerateCsvButton from "./GenerateCsvButton";
@@ -97,7 +96,8 @@ const RecordsCard: React.FC<RecordsCardProps> = ({
   };
 
   return (
-    <PageContainer mainMessage={`Documents for: ${orgId}`}>
+    // <PageContainer mainMessage={`Documents for: ${orgId}`}>
+    <>
       <Paper
         sx={{
           p: 4,
@@ -192,7 +192,7 @@ const RecordsCard: React.FC<RecordsCardProps> = ({
           </Box>
         </Modal>
       )}
-    </PageContainer>
+    </>
   );
 };
 

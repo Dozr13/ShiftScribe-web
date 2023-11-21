@@ -1,4 +1,4 @@
-import PageContainer from "@/components/containers/PageContainer";
+import PageHeader from "@/components/containers/PageHeader";
 import JobCard from "@/components/jobs/JobCard";
 import { CustomSession } from "@/types/session";
 import { getServerSession } from "next-auth";
@@ -15,9 +15,10 @@ const JobsPage = async () => {
   const orgId = session.user.organization;
 
   return (
-    <PageContainer mainMessage={`Job List for ${orgId}`}>
+    <>
+      <PageHeader mainMessage={`Job List for ${orgId}`} />
       <JobCard orgId={orgId} />
-    </PageContainer>
+    </>
   );
 };
 

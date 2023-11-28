@@ -1,7 +1,8 @@
 import { Typography } from "@mui/material";
+import SignupForm from "../../components/auth/signup/SignUp";
 
 const SignUp = () => {
-  return <Typography>SignUp</Typography>;
+  return <SignupForm />;
 };
 
 export default SignUp;

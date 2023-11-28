@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import PageHeader from "../../components/containers/PageHeader";
-import RequestsCard from "../../components/requests/RequestsCard";
+import RequestsCard from "../../components/requests/RequestCard";
 import { CustomSession } from "../../types/session";
 import { options } from "../api/auth/[...nextauth]/options";
 

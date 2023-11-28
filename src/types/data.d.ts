@@ -49,7 +49,7 @@ export interface OrgProfile {
   events?: Events;
 }
 
-type GridRowData = {
+type EmployeesGridRowData = {
   displayName: string;
   email: string;
   organization: string;
@@ -60,6 +60,15 @@ type JobsGridRowData = {
   jobName: string;
   jobNumber: string;
   jobAddress: string;
+};
+
+type RequestsGridRowData = {
+  submitter: string;
+  dateRequest: number;
+  inRequest: number;
+  outRequest: number;
+  jobs: EventObject[];
+  totalTimeRequested: number;
 };
 
 // TODO: implement this as Employee userData

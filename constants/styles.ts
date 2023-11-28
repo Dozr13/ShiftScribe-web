@@ -13,8 +13,12 @@ export const linkStyles = {
 
 export const dashboardStyle = {
   paperContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    top: 0,
     padding: 3,
-    marginTop: 2,
     background: "linear-gradient(155deg, #ffffff, #000)",
     borderRadius: "12px",
   },

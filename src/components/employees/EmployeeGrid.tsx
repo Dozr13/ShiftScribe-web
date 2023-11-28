@@ -11,7 +11,7 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useState } from "react";
-import { Employee, GridRowData } from "../../types/data";
+import { Employee, EmployeesGridRowData } from "../../types/data";
 
 interface EmployeeGridProps {
   employees: Employee[];
@@ -50,7 +50,7 @@ const EmployeeGrid: React.FC<EmployeeGridProps> = ({
     return undefined;
   };
 
-  const rowData: GridRowData[] = employees!.map((employee) => ({
+  const rowData: EmployeesGridRowData[] = employees!.map((employee) => ({
     id: employee.id,
     displayName: employee.userData?.displayName,
     email: employee.userData?.email,

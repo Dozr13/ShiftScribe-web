@@ -10,3 +10,11 @@ interface CustomSession extends Session {
     organization?: string | null;
   };
 }
+
+export interface ShiftScribeUser extends User {
+  accessLevel?: number;
+  organization?: string;
+  displayName?: string;
+  email?: string;
+  role?: string;
+}

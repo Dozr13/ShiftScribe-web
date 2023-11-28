@@ -13,11 +13,11 @@ import JobGrid from "../jobs/JobGrid";
 import JobModal from "../jobs/JobModal";
 import DeleteConfirmation from "../modals/DeleteConfirmation";
 
-interface JobCardProps {
+interface RequestCardProps {
   orgId: string;
 }
 
-const JobCard = ({ orgId }: JobCardProps) => {
+const RequestCard = ({ orgId }: RequestCardProps) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [jobs, setJobs] = useState<OrgJob[]>([]);
@@ -212,4 +212,4 @@ const JobCard = ({ orgId }: JobCardProps) => {
   );
 };
 
-export default JobCard;
+export default RequestCard;

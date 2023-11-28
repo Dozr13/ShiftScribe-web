@@ -34,8 +34,7 @@
 // PageContainer.tsx
 import { Box } from "@mui/material";
 import React from "react";
-import { DRAWER_WIDTH } from "../../app/layout";
-
+import { DRAWER_WIDTH } from "../../../constants/sizes";
 interface PageContainerProps {
   children: React.ReactNode;
 }

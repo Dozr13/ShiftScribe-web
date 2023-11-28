@@ -75,44 +75,6 @@ const jwtCallback = async ({
         },
       };
 
-      // TODO: FIGURE OUT
-
-      // export enum UserRole {
-      //   Unverified = 0,
-      //   User = 1,
-      //   Manager = 2,
-      //   Admin = 3,
-      //   Superuser = 4,
-      // }
-
-      // export enum UserRoleLabel {
-      //   Unverified = "Unverified",
-      //   User = "User",
-      //   Manager = "Manager",
-      //   Admin = "Admin",
-      //   Superuser = "Superuser",
-      // }
-
-      // switch (userSnapshot.accessLevel) {
-      //   case UserRole.Unverified:
-      //     token.role = UserRoleLabel.Unverified;
-      //     break;
-      //   case UserRole.User:
-      //     token.role = UserRoleLabel.User
-      //     break;
-      //   case UserRole.Manager:
-      //     token.role = UserRoleLabel.Manager
-      //     break;
-      //   case UserRole.Admin:
-      //     token.role = UserRoleLabel.Admin
-      //     break;
-      //   case UserRole.Superuser:
-      //     token.role = UserRoleLabel.Superuser;
-      //     break;
-      //   default:
-      //     token.role = "Guest";
-      // }
-
       switch (orgSnapshot?.accessLevel) {
         case 0:
           token.role = "Unverified";
@@ -135,8 +97,6 @@ const jwtCallback = async ({
     }
   }
 
-  // console.log("####### token::::: ", token);
-
   return token as MyJWT;
 };
 
@@ -147,9 +107,6 @@ const sessionCallback = async ({
   session: Session;
   token: JWT;
 }) => {
-  // console.log("token in session", token);
-  // console.log("session in session", session);
-
   if (token && "role" in token) {
     const myToken = token as MyJWT;
 
@@ -248,7 +205,7 @@ export const options = {
 
 function determineAccessLevel(profile: any): number {
   if (profile.email === "dev@deploy.com") {
-    return 4; // Admin
+    return 4;
   }
-  return 1; // Default to User
+  return 1;
 }

@@ -89,7 +89,7 @@ const RequestGrid: React.FC<RequestGridProps> = ({
 
     return {
       id: request.id,
-      submitter: request.submitter,
+      submitter: request.submitterName!,
       dateRequest: dateRequest,
       inRequest: inRequest,
       outRequest: outRequest,
@@ -98,7 +98,7 @@ const RequestGrid: React.FC<RequestGridProps> = ({
     };
   };
 
-  const rowData = requests.map(formatRequestForDisplay);
+  const rowData = requests.map((request) => formatRequestForDisplay(request));
 
   const columnDefs: ColDef[] = [
     {

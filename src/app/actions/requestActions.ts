@@ -1,26 +1,62 @@
-import { off, onValue, ref, remove, set } from "firebase/database";
+import { get, off, onValue, ref, remove, set } from "firebase/database";
 import { firebaseDatabase } from "../../services/firebase";
-import { EventObject, OrgRequests } from "../../types/data";
+import { EventObject, OrgRequests, User } from "../../types/data";
 
+// export const fetchRequests = async (
+//   orgId: string,
+//   setRequests: (requests: OrgRequests[]) => void,
+// ) => {
+//   const requestsRef = ref(firebaseDatabase, `orgs/${orgId}/adjustmentRequests`);
+
+//   const unsubscribe = onValue(requestsRef, (snapshot) => {
+//     const requestData = snapshot.val();
+//     const formattedRequests: OrgRequests[] = requestData
+//       ? Object.entries(requestData).map(([firebaseId, jobData]) => ({
+//           ...(jobData as OrgRequests),
+//           id: firebaseId,
+//         }))
+//       : [];
+//     setRequests(formattedRequests);
+//   });
+
+//   return () => off(requestsRef, "value", unsubscribe);
+// };
 export const fetchRequests = async (
   orgId: string,
   setRequests: (requests: OrgRequests[]) => void,
 ) => {
   const requestsRef = ref(firebaseDatabase, `orgs/${orgId}/adjustmentRequests`);
-  const unsubscribe = onValue(requestsRef, (snapshot) => {
-    const requestData = snapshot.val();
-    const formattedRequests: OrgRequests[] = requestData
-      ? Object.entries(requestData).map(([firebaseId, jobData]) => ({
-          ...(jobData as OrgRequests),
-          id: firebaseId,
-        }))
-      : [];
-    setRequests(formattedRequests);
-  });
 
-  return () => off(requestsRef, "value", unsubscribe);
+  onValue(requestsRef, async (snapshot) => {
+    const requestData = snapshot.val();
+    if (!requestData) {
+      setRequests([]);
+      return;
+    }
+
+    const requestsWithUserData: OrgRequests[] = [];
+
+    for (const [firebaseId, jobData] of Object.entries(requestData)) {
+      const request = jobData as OrgRequests;
+      request.id = firebaseId;
+
+      // Fetch user data for each request
+      const userRef = ref(firebaseDatabase, `/users/${request.submitter}`);
+      const userSnapshot = await get(userRef);
+      const userInfo = (userSnapshot.val() || {}) as User;
+
+      // Append user display name to the request
+      requestsWithUserData.push({
+        ...request,
+        submitterName: userInfo.displayName || "Unknown User",
+      });
+    }
+
+    setRequests(requestsWithUserData);
+  });
 };
 
+// TODO: May refine
 export const approveRequest = async (
   orgId: string,
   requestId: string,
@@ -35,19 +71,8 @@ export const approveRequest = async (
     `orgs/${orgId}/timeRecords/${requestId}`,
   );
 
-  try {
-    await set(timeRecordsRef, timeRecordData);
-    await remove(requestRef);
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error("Error moving request to timeRecords: " + error.message);
-    } else {
-      console.error("An unknown error occurred:", error);
-      throw new Error(
-        "An unknown error occurred while moving request to timeRecords",
-      );
-    }
-  }
+  await set(timeRecordsRef, timeRecordData);
+  await remove(requestRef);
 };
 
 export const denyRequest = async (

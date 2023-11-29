@@ -31,17 +31,9 @@ const JobGrid: React.FC<JobGridProps> = ({ jobs, setSelectedJob }) => {
   const [paginationPageSize, setPaginationPageSize] = useState(10);
 
   useEffect(() => {
-    const handleResize = () => {
-      if (gridApi) {
-        gridApi.sizeColumnsToFit();
-      }
-    };
-
+    const handleResize = () => gridApi?.sizeColumnsToFit();
     window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => window.removeEventListener("resize", handleResize);
   }, [gridApi]);
 
   const onGridReady = (params: GridReadyEvent) => {
@@ -126,7 +118,6 @@ const JobGrid: React.FC<JobGridProps> = ({ jobs, setSelectedJob }) => {
         animateRows={true}
         pagination={true}
         paginationPageSize={paginationPageSize}
-        enableRangeSelection={true}
       />
 
       <Box sx={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>

@@ -83,7 +83,6 @@ const GenericGrid = <T extends object>({
         animateRows={true}
         pagination={true}
         paginationPageSize={paginationPageSize}
-        enableRangeSelection={true}
       />
       <Box sx={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
         <FormControl variant="standard" sx={{ minWidth: 120 }}>

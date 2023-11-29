@@ -18,30 +18,26 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useRef, useState } from "react";
-import { JobsGridRowData, OrgJob, RequestsGridRowData } from "../../types/data";
+import stringUtils from "../../../lib/StringUtils";
+import { OrgRequests, RequestsGridRowData } from "../../types/data";
 
 interface RequestGridProps {
-  requests: RequestData[];
-  setSelectedJob: (job: OrgJob | undefined) => void;
+  requests: OrgRequests[];
+  setSelectedRequest: (request: OrgRequests | undefined) => void;
 }
 
-const RequestGrid: React.FC<RequestGridProps> = ({ jobs, setSelectedJob }) => {
+const RequestGrid: React.FC<RequestGridProps> = ({
+  requests,
+  setSelectedRequest,
+}) => {
   const gridRef = useRef<AgGridReact>(null);
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [paginationPageSize, setPaginationPageSize] = useState(10);
 
   useEffect(() => {
-    const handleResize = () => {
-      if (gridApi) {
-        gridApi.sizeColumnsToFit();
-      }
-    };
-
+    const handleResize = () => gridApi?.sizeColumnsToFit();
     window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => window.removeEventListener("resize", handleResize);
   }, [gridApi]);
 
   const onGridReady = (params: GridReadyEvent) => {
@@ -56,15 +52,53 @@ const RequestGrid: React.FC<RequestGridProps> = ({ jobs, setSelectedJob }) => {
     return undefined;
   };
 
-  const rowData: RequestsGridRowData[] = requests!.map((request) => ({
-    id: request.id,
-    submitter: request.submitter,
-    dateRequest: request.dateRequest,
-    inRequest: request.inRequest,
-    outRequest: request.outRequest,
-    jobs: request.jobs,
-    totalTimeRequested: request.totalTimeRequested,
-  }));
+  const formatRequestForDisplay = (
+    request: OrgRequests,
+  ): RequestsGridRowData => {
+    let inRequestTimestamp: number | null = null;
+    let outRequestTimestamp: number | null = null;
+    let jobSet = new Set<string>();
+
+    if (request.events) {
+      Object.entries(request.events).forEach(([timestamp, event]) => {
+        if (event.type === "clockin" && !inRequestTimestamp) {
+          inRequestTimestamp = parseInt(timestamp);
+        }
+        if (event.type === "clockout" && !outRequestTimestamp) {
+          outRequestTimestamp = parseInt(timestamp);
+        }
+        if (event.job) {
+          jobSet.add(event.job);
+        }
+      });
+    }
+    const formattedJobs =
+      jobSet.size > 0 ? Array.from(jobSet).join(", ") : "No Jobs";
+    const totalTime =
+      inRequestTimestamp && outRequestTimestamp
+        ? stringUtils.timestampHM(outRequestTimestamp - inRequestTimestamp)
+        : "N/A";
+
+    const dateRequest = stringUtils.convertTimestampToDateString(request.id);
+    const inRequest = inRequestTimestamp
+      ? stringUtils.timestampToHHMM(inRequestTimestamp)
+      : "N/A";
+    const outRequest = outRequestTimestamp
+      ? stringUtils.timestampToHHMM(outRequestTimestamp)
+      : "N/A";
+
+    return {
+      id: request.id,
+      submitter: request.submitter,
+      dateRequest: dateRequest,
+      inRequest: inRequest,
+      outRequest: outRequest,
+      jobs: formattedJobs,
+      totalTimeRequested: totalTime,
+    };
+  };
+
+  const rowData = requests.map(formatRequestForDisplay);
 
   const columnDefs: ColDef[] = [
     {
@@ -114,15 +148,15 @@ const RequestGrid: React.FC<RequestGridProps> = ({ jobs, setSelectedJob }) => {
   const onRowSelected = (event: RowSelectedEvent) => {
     if (event.node.isSelected()) {
       const selectedId = event.data.id;
-      const fullJob = jobs.find((job) => job.id === selectedId);
+      const fullRequest = requests.find((req) => req.id === selectedId);
 
-      if (fullJob) {
-        setSelectedJob(fullJob);
+      if (fullRequest) {
+        setSelectedRequest(fullRequest);
       } else {
         console.error("Selected job not found");
       }
     } else {
-      setSelectedJob(undefined);
+      setSelectedRequest(undefined);
     }
   };
 
@@ -150,7 +184,6 @@ const RequestGrid: React.FC<RequestGridProps> = ({ jobs, setSelectedJob }) => {
         animateRows={true}
         pagination={true}
         paginationPageSize={paginationPageSize}
-        enableRangeSelection={true}
       />
 
       <Box sx={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>

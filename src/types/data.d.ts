@@ -63,12 +63,13 @@ type JobsGridRowData = {
 };
 
 type RequestsGridRowData = {
+  id: string;
   submitter: string;
-  dateRequest: number;
-  inRequest: number;
-  outRequest: number;
-  jobs: EventObject[];
-  totalTimeRequested: number;
+  dateRequest: string;
+  inRequest: string;
+  outRequest: string;
+  jobs: string;
+  totalTimeRequested: string;
 };
 
 // TODO: implement this as Employee userData
@@ -145,16 +146,17 @@ type UserProfileDataGeneric<T> = {
 
 export type UserProfileDataTimestamps = DateOrNumber<UserProfileData>;
 
-type RequestData = {
-  id: number;
+type OrgRequests = {
+  id: string;
   submitter: string;
-  dateRequest: number;
-  inRequest: number;
-  outRequest: number;
-  jobs: EventObject[];
-  totalTimeRequested: number;
+  dateRequest: number; // Timestamp of when the request was made
+  inRequest: number; // Timestamp for the time-in event
+  outRequest: number; // Timestamp for the time-out event
+  jobs: EventObject[]; // Array of job events
+  totalTimeRequested: number; // Total time requested in the events
+  events: Record<string, EventObject>; // Map of timestamp strings to EventObjects
 };
 
-type FullProfileData = UserProfileData & RequestData;
+type FullProfileData = UserProfileData & OrgRequests;
 
-export type EitherProfileData = UserProfileData | RequestData;
+export type EitherProfileData = UserProfileData | OrgRequests;

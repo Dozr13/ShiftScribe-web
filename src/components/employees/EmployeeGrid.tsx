@@ -92,7 +92,6 @@ const EmployeeGrid: React.FC<EmployeeGridProps> = ({
         animateRows={true}
         pagination={true}
         paginationPageSize={5}
-        enableRangeSelection={true}
         domLayout="autoHeight"
       />
     </Box>

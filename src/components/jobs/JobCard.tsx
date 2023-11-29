@@ -95,8 +95,8 @@ const JobCard = ({ orgId }: JobCardProps) => {
 
       enqueueSnackbar("Job updated successfully", { variant: "success" });
 
-      setJobModalOpen(false);
       setSelectedJob(undefined);
+      setJobModalOpen(false);
 
       fetchJobs(orgId, setJobs);
     }

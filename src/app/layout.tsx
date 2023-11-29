@@ -23,6 +23,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
   //   // redirect("/");
   // }
 
+  // TODO: Ensure removal for prod
   if (user) {
     console.log("Access Level:", user.accessLevel);
     console.log("Organization:", user.organization);
@@ -36,8 +37,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
       <body>
         <ThemeRegistry>
           <AppWrapper session={session ?? null} />
-          {!session && <HomePage />}
-          <PageContainer>{children}</PageContainer>
+          <PageContainer>{!session ? <HomePage /> : children}</PageContainer>
         </ThemeRegistry>
       </body>
     </html>

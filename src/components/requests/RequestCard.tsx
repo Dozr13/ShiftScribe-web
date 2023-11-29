@@ -3,15 +3,14 @@ import { Box, Button, Modal } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import {
-  addJob,
-  deleteJob,
-  fetchJobs,
-  updateJob,
-} from "../../app/actions/jobActions";
-import { OrgJob } from "../../types/data";
-import JobGrid from "../jobs/JobGrid";
-import JobModal from "../jobs/JobModal";
+  approveRequest,
+  denyRequest,
+  fetchRequests,
+} from "../../app/actions/requestActions";
+import { OrgRequests } from "../../types/data";
 import DeleteConfirmation from "../modals/DeleteConfirmation";
+import RequestGrid from "./RequestGrid";
+import RequestModal from "./RequestModal";
 
 interface RequestCardProps {
   orgId: string;
@@ -20,17 +19,18 @@ interface RequestCardProps {
 const RequestCard = ({ orgId }: RequestCardProps) => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const [jobs, setJobs] = useState<OrgJob[]>([]);
-  const [selectedJob, setSelectedJob] = useState<OrgJob | undefined>(undefined);
-  const [jobModalOpen, setJobModalOpen] = useState(false);
+  const [requests, setRequests] = useState<OrgRequests[]>([]);
+  const [selectedRequest, setSelectedRequest] = useState<
+    OrgRequests | undefined
+  >(undefined);
+  const [requestModalOpen, setRequestModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [isAddMode, setIsAddMode] = useState(false);
 
   useEffect(() => {
     let unsubscribe: () => void;
 
     const init = async () => {
-      unsubscribe = await fetchJobs(orgId, setJobs);
+      await fetchRequests(orgId, setRequests);
     };
 
     init();
@@ -42,80 +42,47 @@ const RequestCard = ({ orgId }: RequestCardProps) => {
     };
   }, [orgId]);
 
-  const openAddJobModal = () => {
-    setSelectedJob({ id: "", jobName: "", jobNumber: "", jobAddress: "" });
-    setIsAddMode(true);
-    setJobModalOpen(true);
-  };
-
-  const openJobModal = () => {
-    if (selectedJob) {
-      setJobModalOpen(true);
+  const openRequestModal = () => {
+    if (selectedRequest) {
+      setRequestModalOpen(true);
     } else {
-      setSelectedJob(undefined);
-      setJobModalOpen(false);
+      setSelectedRequest(undefined);
+      setRequestModalOpen(false);
     }
   };
 
-  const handleAddNewJob = async (newJob: Partial<OrgJob>) => {
-    if (!newJob.jobName || !newJob.jobNumber || !newJob.jobAddress) {
-      enqueueSnackbar("Job name and number are required", { variant: "error" });
-      return;
-    }
-
-    try {
-      await addJob(orgId, newJob.jobName, newJob.jobNumber, newJob.jobAddress);
-      enqueueSnackbar("Job updated successfully", { variant: "success" });
-
-      fetchJobs(orgId, setJobs);
-    } catch (error) {
-      console.error("Error adding new job:", error);
-      enqueueSnackbar("Error adding new job", { variant: "success" });
-    }
-    setJobModalOpen(false);
-    setIsAddMode(false);
-  };
-
-  const handleEdit = async (updatedJob: Partial<OrgJob>) => {
-    if (!updatedJob.jobName) {
-      enqueueSnackbar("Job name is required", { variant: "error" });
-      return;
-    }
-
-    if (selectedJob) {
+  const handleApprove = async () => {
+    if (selectedRequest) {
       try {
-        await updateJob(orgId, selectedJob.id, updatedJob);
+        const timeRecordData = {
+          events: selectedRequest.events || {},
+          submitter: selectedRequest.submitter,
+        };
 
-        fetchJobs(orgId, setJobs);
+        await approveRequest(orgId, selectedRequest.id, timeRecordData);
+        enqueueSnackbar("Request approved successfully", {
+          variant: "success",
+        });
+        fetchRequests(orgId, setRequests);
       } catch (error) {
-        console.error("Error updating job:", error);
-        enqueueSnackbar("Error updating job", { variant: "error" });
+        console.error("Error approving request:", error);
+        enqueueSnackbar("Error approving request", { variant: "error" });
       }
-
-      enqueueSnackbar("Job updated successfully", { variant: "success" });
-
-      setJobModalOpen(false);
-      setSelectedJob(undefined);
-
-      fetchJobs(orgId, setJobs);
     }
+
+    setSelectedRequest(undefined);
+    setRequestModalOpen(false);
   };
 
-  const handleDelete = async () => {
-    console.log("selectedJob", selectedJob);
-    console.log("selectedJob ID", selectedJob?.id);
-    if (selectedJob?.id) {
+  const handleDeny = async () => {
+    if (selectedRequest?.id) {
       try {
-        await deleteJob(orgId, selectedJob.id);
-
-        enqueueSnackbar("Job deleted successfully", { variant: "success" });
-
-        setDeleteModalOpen(false);
-        setSelectedJob(undefined);
-        fetchJobs(orgId, setJobs);
+        await denyRequest(orgId, selectedRequest.id);
+        enqueueSnackbar("Request denied successfully", { variant: "success" });
+        fetchRequests(orgId, setRequests);
       } catch (error) {
-        console.error("Error deleting job:", error);
-        enqueueSnackbar("Error deleting job", { variant: "error" });
+        console.error("Error denying request:", error);
+        enqueueSnackbar("Error denying request", { variant: "error" });
       }
     }
   };
@@ -139,7 +106,10 @@ const RequestCard = ({ orgId }: RequestCardProps) => {
           marginBottom: footerHeight,
         }}
       >
-        <JobGrid jobs={jobs} setSelectedJob={setSelectedJob} />
+        <RequestGrid
+          requests={requests}
+          setSelectedRequest={setSelectedRequest}
+        />
       </Box>
 
       {/* Footer with page size selector and action buttons */}
@@ -153,29 +123,28 @@ const RequestCard = ({ orgId }: RequestCardProps) => {
           width: "50%",
         }}
       >
-        {/* Action buttons */}
-        <Button variant="contained" onClick={openAddJobModal}>
-          Add
-        </Button>
         <Button
           variant="contained"
-          onClick={openJobModal}
-          disabled={!selectedJob}
+          onClick={openRequestModal}
+          disabled={!selectedRequest}
         >
-          Edit
+          Approve
         </Button>
         <Button
           variant="contained"
           onClick={() => setDeleteModalOpen(true)}
-          disabled={!selectedJob}
+          disabled={!selectedRequest}
         >
-          Delete
+          Deny
         </Button>
       </Box>
 
       {/* Modals */}
-      {jobModalOpen && (
-        <Modal open={jobModalOpen} onClose={() => setJobModalOpen(false)}>
+      {requestModalOpen && (
+        <Modal
+          open={requestModalOpen}
+          onClose={() => setRequestModalOpen(false)}
+        >
           <Box
             sx={{
               position: "absolute",
@@ -191,10 +160,9 @@ const RequestCard = ({ orgId }: RequestCardProps) => {
               overflowY: "auto",
             }}
           >
-            <JobModal
-              job={selectedJob!}
-              onSave={isAddMode ? handleAddNewJob : handleEdit}
-              isAddMode={isAddMode}
+            <RequestModal
+              request={selectedRequest!}
+              onApprove={handleApprove}
             />
           </Box>
         </Modal>
@@ -202,7 +170,7 @@ const RequestCard = ({ orgId }: RequestCardProps) => {
       {deleteModalOpen && (
         <Modal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
           <DeleteConfirmation
-            onConfirm={handleDelete}
+            onConfirm={handleDeny}
             onClose={() => setDeleteModalOpen(false)}
             message="Are you sure you want to remove this job information?"
           />

@@ -7,7 +7,7 @@ import {
   denyRequest,
   fetchRequests,
 } from "../../app/actions/requestActions";
-import { OrgRequests } from "../../types/data";
+import { OrgRequest } from "../../types/data";
 import DeleteConfirmation from "../modals/DeleteConfirmation";
 import RequestGrid from "./RequestGrid";
 import RequestModal from "./RequestModal";
@@ -19,9 +19,9 @@ interface RequestCardProps {
 const RequestCard = ({ orgId }: RequestCardProps) => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const [requests, setRequests] = useState<OrgRequests[]>([]);
+  const [requests, setRequests] = useState<OrgRequest[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<
-    OrgRequests | undefined
+    OrgRequest | undefined
   >(undefined);
   const [requestModalOpen, setRequestModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);

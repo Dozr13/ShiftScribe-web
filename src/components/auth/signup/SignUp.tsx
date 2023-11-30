@@ -35,7 +35,7 @@ const SignupForm = () => {
     validationSchema: validationSchema,
     onSubmit: (values) => {
       signUp(values);
-      console.log("Form values:", values);
+      // console.log("Form values:", values);
     },
   });
 

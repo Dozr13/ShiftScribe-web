@@ -1,1 +1,2 @@
 export const DRAWER_WIDTH = 240;
+export const INITIAL_PAGINATION_PAGE_SIZE = 10;

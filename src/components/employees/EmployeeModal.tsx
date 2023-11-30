@@ -50,7 +50,6 @@ const EmployeeModal = ({ employee, onSave }: EmployeeModalProps) => {
     accessLevel: employee?.accessLevel,
   };
 
-  console.log(initialValues);
   return (
     <Box>
       <Typography>Edit information for {initialValues.displayName}</Typography>
@@ -68,7 +67,6 @@ const EmployeeModal = ({ employee, onSave }: EmployeeModalProps) => {
             accessLevel: values.accessLevel,
           };
 
-          console.log("Submitting updated employee:", updatedEmployee);
           onSave(updatedEmployee);
           setSubmitting(false);
         }}

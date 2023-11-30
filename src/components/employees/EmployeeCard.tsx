@@ -68,12 +68,7 @@ const EmployeeCard = ({ orgId }: EmployeeCardProps) => {
   //   }
   // };
 
-  useEffect(() => {
-    console.log("dfasdsad", employees);
-  }, [employees]);
-
   const handleEdit = async (updatedEmployee: Employee) => {
-    console.log("updatedEmployee", updatedEmployee);
     if (selectedEmployee) {
       try {
         await updateEmployee(orgId, selectedEmployee.id, updatedEmployee);

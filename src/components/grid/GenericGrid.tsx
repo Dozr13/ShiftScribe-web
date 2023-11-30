@@ -10,9 +10,7 @@ import {
   ColDef,
   GridApi,
   GridReadyEvent,
-  RowClassParams,
   RowSelectedEvent,
-  RowStyle,
 } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -24,6 +22,7 @@ interface GenericGridProps<T> {
   columnDefs: ColDef[];
   onRowSelected: (data: T) => void;
   idField: keyof T;
+  allowMultipleSelection?: boolean;
 }
 
 const GenericGrid = <T extends object>({
@@ -31,17 +30,14 @@ const GenericGrid = <T extends object>({
   columnDefs,
   onRowSelected,
   idField,
+  allowMultipleSelection = false,
 }: GenericGridProps<T>) => {
   const gridRef = useRef<AgGridReact>(null);
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [paginationPageSize, setPaginationPageSize] = useState(10);
 
   useEffect(() => {
-    const handleResize = () => {
-      if (gridApi) {
-        gridApi.sizeColumnsToFit();
-      }
-    };
+    const handleResize = () => gridApi?.sizeColumnsToFit();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [gridApi]);
@@ -69,14 +65,11 @@ const GenericGrid = <T extends object>({
   };
 
   return (
-    <Box className="ag-theme-alpine" sx={{ width: "100%", height: "100%" }}>
+    <Box className="ag-theme-alpine" sx={{ width: "70vw", height: "100%" }}>
       <AgGridReact
-        rowSelection="single"
+        rowSelection={allowMultipleSelection ? "multiple" : "single"}
         onRowSelected={handleRowSelection}
         onGridReady={onGridReady}
-        getRowStyle={(params: RowClassParams): RowStyle | undefined =>
-          params.node.isSelected() ? { background: "red" } : undefined
-        }
         rowData={rowData}
         columnDefs={columnDefs}
         ref={gridRef}

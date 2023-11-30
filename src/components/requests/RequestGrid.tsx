@@ -1,109 +1,29 @@
+import { ColDef } from "ag-grid-community";
+import { OrgRequest } from "../../types/data";
 import {
-  Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-} from "@mui/material";
-import {
-  ColDef,
-  GridApi,
-  GridReadyEvent,
-  RowClassParams,
-  RowSelectedEvent,
-  RowStyle,
-} from "ag-grid-community";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
-import { AgGridReact } from "ag-grid-react";
-import { useEffect, useRef, useState } from "react";
-import stringUtils from "../../../lib/StringUtils";
-import { OrgRequests, RequestsGridRowData } from "../../types/data";
+  calculateTotalTime,
+  extractDate,
+  extractJobs,
+  extractTime,
+} from "../../utils/eventUtils";
+import GenericGrid from "../grid/GenericGrid";
 
 interface RequestGridProps {
-  requests: OrgRequests[];
-  setSelectedRequest: (request: OrgRequests | undefined) => void;
+  requests: OrgRequest[];
+  setSelectedRequest: (request: OrgRequest | undefined) => void;
 }
 
 const RequestGrid: React.FC<RequestGridProps> = ({
   requests,
   setSelectedRequest,
 }) => {
-  const gridRef = useRef<AgGridReact>(null);
-  const [gridApi, setGridApi] = useState<GridApi | null>(null);
-  const [paginationPageSize, setPaginationPageSize] = useState(10);
-
-  useEffect(() => {
-    const handleResize = () => gridApi?.sizeColumnsToFit();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [gridApi]);
-
-  const onGridReady = (params: GridReadyEvent) => {
-    setGridApi(params.api);
-    params.api.sizeColumnsToFit();
-  };
-
-  const getRowStyle = (params: RowClassParams): RowStyle | undefined => {
-    if (params.node.isSelected()) {
-      return { background: "red" };
-    }
-    return undefined;
-  };
-
-  const formatRequestForDisplay = (
-    request: OrgRequests,
-  ): RequestsGridRowData => {
-    let inRequestTimestamp: number | null = null;
-    let outRequestTimestamp: number | null = null;
-    let jobSet = new Set<string>();
-
-    if (request.events) {
-      Object.entries(request.events).forEach(([timestamp, event]) => {
-        if (event.type === "clockin" && !inRequestTimestamp) {
-          inRequestTimestamp = parseInt(timestamp);
-        }
-        if (event.type === "clockout" && !outRequestTimestamp) {
-          outRequestTimestamp = parseInt(timestamp);
-        }
-        if (event.job) {
-          jobSet.add(event.job);
-        }
-      });
-    }
-    const formattedJobs =
-      jobSet.size > 0 ? Array.from(jobSet).join(", ") : "No Jobs";
-    const totalTime =
-      inRequestTimestamp && outRequestTimestamp
-        ? stringUtils.timestampHM(outRequestTimestamp - inRequestTimestamp)
-        : "N/A";
-
-    const dateRequest = stringUtils.convertTimestampToDateString(request.id);
-    const inRequest = inRequestTimestamp
-      ? stringUtils.timestampToHHMM(inRequestTimestamp)
-      : "N/A";
-    const outRequest = outRequestTimestamp
-      ? stringUtils.timestampToHHMM(outRequestTimestamp)
-      : "N/A";
-
-    return {
-      id: request.id,
-      submitter: request.submitterName!,
-      dateRequest: dateRequest,
-      inRequest: inRequest,
-      outRequest: outRequest,
-      jobs: formattedJobs,
-      totalTimeRequested: totalTime,
-    };
-  };
-
-  const rowData = requests.map((request) => formatRequestForDisplay(request));
-
   const columnDefs: ColDef[] = [
     {
       headerName: "Submitter",
-      field: "submitter",
+      field: "submitterName",
+      valueGetter: (params) => {
+        return params.data.submitterName || "No matching account";
+      },
       sortable: true,
       filter: true,
       resizable: true,
@@ -111,6 +31,8 @@ const RequestGrid: React.FC<RequestGridProps> = ({
     {
       headerName: "Date",
       field: "dateRequest",
+      valueGetter: (params) => extractDate(params.data.id),
+
       sortable: true,
       filter: true,
       resizable: true,
@@ -118,6 +40,7 @@ const RequestGrid: React.FC<RequestGridProps> = ({
     {
       headerName: "Time In",
       field: "inRequest",
+      valueGetter: (params) => extractTime(params.data.events, "clockin"),
       sortable: true,
       filter: true,
       resizable: true,
@@ -125,6 +48,7 @@ const RequestGrid: React.FC<RequestGridProps> = ({
     {
       headerName: "Time Out",
       field: "outRequest",
+      valueGetter: (params) => extractTime(params.data.events, "clockout"),
       sortable: true,
       filter: true,
       resizable: true,
@@ -132,6 +56,8 @@ const RequestGrid: React.FC<RequestGridProps> = ({
     {
       headerName: "Jobs",
       field: "jobs",
+      valueGetter: (params: { data: OrgRequest }) =>
+        extractJobs(params.data.events),
       sortable: true,
       filter: true,
       resizable: true,
@@ -139,72 +65,26 @@ const RequestGrid: React.FC<RequestGridProps> = ({
     {
       headerName: "Total Time",
       field: "totalTimeRequested",
+      valueGetter: (params: { data: OrgRequest }) =>
+        calculateTotalTime(params.data.events),
       sortable: true,
       filter: true,
       resizable: true,
     },
   ];
 
-  const onRowSelected = (event: RowSelectedEvent) => {
-    if (event.node.isSelected()) {
-      const selectedId = event.data.id;
-      const fullRequest = requests.find((req) => req.id === selectedId);
-
-      if (fullRequest) {
-        setSelectedRequest(fullRequest);
-      } else {
-        console.error("Selected job not found");
-      }
-    } else {
-      setSelectedRequest(undefined);
-    }
-  };
-
-  const handlePageSizeChange = (event: SelectChangeEvent<number>) => {
-    const newSize = parseInt(event.target.value as string, 10);
-
-    if (!isNaN(newSize)) {
-      setPaginationPageSize(newSize);
-      if (gridApi) {
-        gridApi.paginationSetPageSize(newSize);
-      }
-    }
+  const handleRowSelected = (selectedRequest: OrgRequest) => {
+    setSelectedRequest(selectedRequest);
   };
 
   return (
-    <Box className="ag-theme-alpine" sx={{ width: "70vw", height: "100%" }}>
-      <AgGridReact
-        rowSelection="single"
-        onRowSelected={onRowSelected}
-        onGridReady={onGridReady}
-        getRowStyle={getRowStyle}
-        rowData={rowData}
-        columnDefs={columnDefs}
-        ref={gridRef}
-        animateRows={true}
-        pagination={true}
-        paginationPageSize={paginationPageSize}
-      />
-
-      <Box sx={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
-        <FormControl variant="standard" sx={{ minWidth: 120 }}>
-          <InputLabel id="pagination-page-size-label">Page Size</InputLabel>
-          <Select
-            labelId="pagination-page-size-label"
-            id="pagination-page-size-select"
-            value={paginationPageSize}
-            label="Page Size"
-            onChange={handlePageSizeChange}
-          >
-            {[5, 10, 20, 50].map((size) => (
-              <MenuItem key={size} value={size}>
-                {size}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-    </Box>
+    <GenericGrid<OrgRequest>
+      rowData={requests}
+      columnDefs={columnDefs}
+      onRowSelected={handleRowSelected}
+      idField="id"
+      allowMultipleSelection={true}
+    />
   );
 };
 

@@ -1,9 +1,9 @@
 "use client";
 import { Box, Button, Typography } from "@mui/material";
-import { OrgRequests } from "../../types/data";
+import { OrgRequest } from "../../types/data";
 
 interface RequestModalProps {
-  request: OrgRequests;
+  request: OrgRequest;
   onApprove: () => void;
 }
 

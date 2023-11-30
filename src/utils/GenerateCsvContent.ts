@@ -1,7 +1,7 @@
 import { DataSnapshot } from "firebase/database";
-import stringUtils from "../../lib/StringUtils";
 import timeParser from "../../lib/TimeParser";
 import { TimeRecord, UserData, UserDataTotals } from "../types/data";
+import stringUtils from "./StringUtils";
 
 interface GenerateCSVContentParams {
   readUserFunction: (Path: string) => Promise<DataSnapshot>;
@@ -78,7 +78,7 @@ const generateCSVContent = async ({
     let summary: UserDataTotals[] = [];
 
     for (const key in data) {
-      const record = data[key]; // ! ERROR
+      const record = data[key];
       if (!record.events || record.submitter !== employeeId) continue;
 
       const userInfo = allUsers[record.submitter];

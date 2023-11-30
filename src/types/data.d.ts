@@ -50,13 +50,13 @@ export interface OrgProfile {
 }
 
 type EmployeesGridRowData = {
-  displayName: string;
-  email: string;
-  organization: string;
+  id: string;
   accessLevel: number;
+  userData: User;
 };
 
 type JobsGridRowData = {
+  id: string;
   jobName: string;
   jobNumber: string;
   jobAddress: string;
@@ -71,6 +71,8 @@ type RequestsGridRowData = {
   jobs: string;
   totalTimeRequested: string;
   submitterName?: string;
+  events: Record<string, EventObject>;
+  submitterName?: string;
 };
 
 // TODO: implement this as Employee userData
@@ -83,11 +85,7 @@ export interface User {
 export interface Employee {
   id: string;
   accessLevel: number;
-  userData: {
-    displayName: string;
-    email: string;
-    organization: string;
-  };
+  userData: User;
 }
 
 interface TimeRecord {
@@ -147,19 +145,13 @@ type UserProfileDataGeneric<T> = {
 
 export type UserProfileDataTimestamps = DateOrNumber<UserProfileData>;
 
-// TODO: Making adjustments in order to use events where needed
-type OrgRequests = {
+type OrgRequest = {
   id: string;
   submitter: string;
-  dateRequest: number;
-  inRequest: number;
-  outRequest: number;
-  jobs: EventObject[];
-  totalTimeRequested: number;
-  events: Record<string, EventObject>;
+  events: Events;
   submitterName?: string;
 };
 
-type FullProfileData = UserProfileData & OrgRequests;
+type FullProfileData = UserProfileData & OrgRequest;
 
-export type EitherProfileData = UserProfileData | OrgRequests;
+export type EitherProfileData = UserProfileData | OrgRequest;

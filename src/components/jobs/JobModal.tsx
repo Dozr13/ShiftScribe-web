@@ -60,8 +60,7 @@ const JobModal = ({ isAddMode, job, onSave }: JobModalProps) => {
             jobAddress: values.jobAddress,
           };
 
-          console.log("Submitting updated job:", updatedJob);
-          onSave(updatedJob); // ! ERROR 1
+          onSave(updatedJob);
           setSubmitting(false);
         }}
       >

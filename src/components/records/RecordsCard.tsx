@@ -35,10 +35,6 @@ const RecordsCard: React.FC<RecordsCardProps> = ({
   const [loadingCSV, setLoadingCSV] = useState<boolean>(false);
   const [csv, setCsv] = useState<string>();
 
-  // useEffect(() => {
-  //   console.log("Updated csv:", csv);
-  // }, [csv]);
-
   const generateCSV = async () => {
     const effectiveStartDate =
       dateState[0].startDate ?? getLastSundayTwoWeeksPrior();

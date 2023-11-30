@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import stringUtils from "../../../lib/StringUtils";
+import stringUtils from "../../utils/StringUtils";
 
 interface DownloadCsvButtonProps {
   csv: string;

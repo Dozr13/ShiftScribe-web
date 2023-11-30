@@ -1,8 +1,10 @@
+import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { fetchEmployees } from "../../app/actions/employeeActions";
 import { Employee } from "../../types/data";
 
 export const useEmployees = (orgId: string) => {
+  const { enqueueSnackbar } = useSnackbar();
   const [employees, setEmployees] = useState<Employee[]>([]);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export const useEmployees = (orgId: string) => {
       await fetchEmployees(orgId, setEmployees);
     } catch (error) {
       console.error("Error refreshing employees:", error);
-      // Optionally handle the error
+      enqueueSnackbar("Error refreshing employees", { variant: "error" });
     }
   };
 

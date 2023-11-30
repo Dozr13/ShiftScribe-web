@@ -103,8 +103,6 @@ const JobCard = ({ orgId }: JobCardProps) => {
   };
 
   const handleDelete = async () => {
-    console.log("selectedJob", selectedJob);
-    console.log("selectedJob ID", selectedJob?.id);
     if (selectedJob?.id) {
       try {
         await deleteJob(orgId, selectedJob.id);

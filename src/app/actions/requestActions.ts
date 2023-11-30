@@ -1,29 +1,10 @@
-import { get, off, onValue, ref, remove, set } from "firebase/database";
+import { get, onValue, ref, remove, set } from "firebase/database";
 import { firebaseDatabase } from "../../services/firebase";
-import { EventObject, OrgRequests, User } from "../../types/data";
+import { EventObject, OrgRequest, User } from "../../types/data";
 
-// export const fetchRequests = async (
-//   orgId: string,
-//   setRequests: (requests: OrgRequests[]) => void,
-// ) => {
-//   const requestsRef = ref(firebaseDatabase, `orgs/${orgId}/adjustmentRequests`);
-
-//   const unsubscribe = onValue(requestsRef, (snapshot) => {
-//     const requestData = snapshot.val();
-//     const formattedRequests: OrgRequests[] = requestData
-//       ? Object.entries(requestData).map(([firebaseId, jobData]) => ({
-//           ...(jobData as OrgRequests),
-//           id: firebaseId,
-//         }))
-//       : [];
-//     setRequests(formattedRequests);
-//   });
-
-//   return () => off(requestsRef, "value", unsubscribe);
-// };
 export const fetchRequests = async (
   orgId: string,
-  setRequests: (requests: OrgRequests[]) => void,
+  setRequests: (requests: OrgRequest[]) => void,
 ) => {
   const requestsRef = ref(firebaseDatabase, `orgs/${orgId}/adjustmentRequests`);
 
@@ -34,18 +15,16 @@ export const fetchRequests = async (
       return;
     }
 
-    const requestsWithUserData: OrgRequests[] = [];
+    const requestsWithUserData: OrgRequest[] = [];
 
     for (const [firebaseId, jobData] of Object.entries(requestData)) {
-      const request = jobData as OrgRequests;
+      const request = jobData as OrgRequest;
       request.id = firebaseId;
 
-      // Fetch user data for each request
       const userRef = ref(firebaseDatabase, `/users/${request.submitter}`);
       const userSnapshot = await get(userRef);
       const userInfo = (userSnapshot.val() || {}) as User;
 
-      // Append user display name to the request
       requestsWithUserData.push({
         ...request,
         submitterName: userInfo.displayName || "Unknown User",

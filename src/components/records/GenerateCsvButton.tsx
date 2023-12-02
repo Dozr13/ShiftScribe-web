@@ -1,20 +1,21 @@
 import { Button, CircularProgress } from "@mui/material";
 
-interface generateCsvButtonProps {
-  onGenerateCSV: () => Promise<void>;
+interface GenerateCsvButtonProps {
+  onGenerateCSV: () => void;
   disabled: boolean;
 }
 
 const GenerateCsvButton = ({
   disabled,
   onGenerateCSV,
-}: generateCsvButtonProps) => {
+}: GenerateCsvButtonProps) => {
   return (
     <Button
       variant="contained"
       color="primary"
       onClick={onGenerateCSV}
-      sx={{ fontSize: "18px", px: 4, py: 2 }}
+      disabled={disabled}
+      sx={{ fontSize: "18px", my: 4, px: 3, py: 2 }}
     >
       {disabled ? <CircularProgress size={24} /> : "Generate CSV"}
     </Button>

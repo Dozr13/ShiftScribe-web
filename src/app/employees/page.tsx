@@ -15,14 +15,10 @@ const EmployeesPage = async () => {
   const orgId = session.user.organization;
 
   return (
-    // <PageContainer
-    //   mainMessage={`Employee List for ${session.user.organization}`}
-    // >
     <>
       <PageHeader mainMessage={`Employee List for ${orgId}`} />
       <EmployeeCard orgId={orgId} />
     </>
-    // </PageContainer>
   );
 };
 

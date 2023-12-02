@@ -27,6 +27,7 @@ const DownloadCsvButton = ({
       download={filename}
       onClick={resetCsv}
       variant="contained"
+      sx={{ fontSize: "18px", my: 4, px: 3, py: 2 }}
     >
       Click to Download CSV
     </Button>

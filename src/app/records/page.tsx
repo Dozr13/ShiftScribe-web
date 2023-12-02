@@ -4,7 +4,7 @@ import "react-date-range/dist/theme/default.css";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import PageHeader from "../../components/containers/PageHeader";
-import RecordsUI from "../../components/records/RecordsUI";
+import RecordsCard from "../../components/records/RecordsCard";
 import { CustomSession } from "../../types/session";
 import { options } from "../api/auth/[...nextauth]/options";
 
@@ -20,7 +20,7 @@ export const Records = async () => {
   return (
     <>
       <PageHeader mainMessage={`Records for: ${orgId}`} />
-      <RecordsUI user={session.user} />
+      <RecordsCard orgId={orgId} />
     </>
   );
 };

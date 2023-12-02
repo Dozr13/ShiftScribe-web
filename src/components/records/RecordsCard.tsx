@@ -1,98 +1,74 @@
+"use client";
 import { Box, Grid, IconButton, Modal, Paper, Typography } from "@mui/material";
 import { useSnackbar } from "notistack";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { FaCalendar, FaTimes } from "react-icons/fa";
 import {
   BORDER_COLOR,
   HEADER_BACKGROUND_COLOR,
 } from "../../../constants/theme";
-import { useFirebase } from "../../context/FirebaseContext";
+import {
+  fetchAndGenerateCSV,
+  purgeOldRecords,
+} from "../../app/actions/recordsActions";
 import useDateRange from "../../hooks/useDateRange";
-import generateCSVContent from "../../utils/GenerateCsvContent";
-import { fetchData, getLastSundayTwoWeeksPrior } from "../../utils/dataService";
+import { getLastSundayTwoWeeksPrior } from "../../utils/dataService";
 import DateRangePicker from "./DateRangePicker";
 import DownloadCsvButton from "./DownloadCsvButton";
 import GenerateCsvButton from "./GenerateCsvButton";
 import PurgeOldRecords from "./PurgeOldRecords";
 
 interface RecordsCardProps {
-  startLoading: () => void;
-  stopLoading: () => void;
-  handleError: (errorMessage: string) => void;
   orgId: string;
 }
 
-const RecordsCard: React.FC<RecordsCardProps> = ({
-  startLoading,
-  stopLoading,
-  handleError,
-  orgId,
-}) => {
-  const db = useFirebase();
-  const { dateState, setDateState } = useDateRange();
+const RecordsCard: React.FC<RecordsCardProps> = ({ orgId }) => {
   const { enqueueSnackbar } = useSnackbar();
+  const { dateState, setDateState } = useDateRange();
   const [showDateRange, setShowDateRange] = useState(false);
   const [loadingCSV, setLoadingCSV] = useState<boolean>(false);
   const [csv, setCsv] = useState<string>();
 
+  const effectiveStartDate =
+    dateState[0].startDate ?? getLastSundayTwoWeeksPrior();
+  const effectiveEndDate = dateState[0].endDate ?? new Date();
+
   const generateCSV = async () => {
-    const effectiveStartDate =
-      dateState[0].startDate ?? getLastSundayTwoWeeksPrior();
-    const effectiveEndDate = dateState[0].endDate ?? new Date();
     setLoadingCSV(true);
+    const { success, csv, message } = await fetchAndGenerateCSV(
+      orgId,
+      effectiveStartDate,
+      effectiveEndDate,
+    );
 
-    console.log(orgId);
-    const records = await handleFetchData(effectiveStartDate, effectiveEndDate);
-    if (records) {
-      const csvContent = await generateCSVContent({
-        readUserFunction: db.read,
-        orgId,
-        startDate: effectiveStartDate,
-        endDate: effectiveEndDate,
-        data: records,
-      });
-
-      setCsv(csvContent);
+    if (success && csv) {
+      setCsv(csv);
     } else {
-      enqueueSnackbar("No records found for the selected date range.", {
-        variant: "error",
-      });
+      // TODO: Implement better error message for if the dates selected don't have any records
+      enqueueSnackbar(message || "An error occurred", { variant: "error" });
     }
-    console.log("csv", csv);
     setLoadingCSV(false);
   };
-
-  const handleFetchData = useCallback(
-    async (effectiveStartDate?: Date, effectiveEndDate?: Date) => {
-      startLoading();
-      try {
-        const data = await fetchData(
-          db,
-          orgId,
-          effectiveStartDate,
-          effectiveEndDate,
-        );
-        console.log("Fetched Data:", data);
-        return data;
-      } catch (error) {
-        handleError(error as string);
-      } finally {
-        stopLoading();
-      }
-    },
-    [startLoading, db, orgId, handleError, stopLoading],
-  );
 
   const handleShowDateRange = () => {
     setShowDateRange((prevShow) => !prevShow);
   };
 
-  const purgeOldRecordsWrapper = async (startDate?: Date, endDate?: Date) => {
-    return handleFetchData(startDate, endDate);
+  const purgeOldRecordsWrapper = async () => {
+    const startDate = dateState[0].startDate;
+    const endDate = dateState[0].endDate;
+    console.log("Purging records from:", startDate, "to", endDate);
+
+    const result = await purgeOldRecords(orgId, startDate, endDate);
+
+    if (result.success) {
+      enqueueSnackbar(result.message, { variant: "success" });
+    } else {
+      enqueueSnackbar(result.message, { variant: "error" });
+    }
   };
 
   return (
-    // <PageContainer mainMessage={`Documents for: ${orgId}`}>
     <>
       <Paper
         sx={{
@@ -139,7 +115,7 @@ const RecordsCard: React.FC<RecordsCardProps> = ({
               <Grid item>
                 <PurgeOldRecords
                   orgId={orgId}
-                  fetchDataFunction={purgeOldRecordsWrapper}
+                  purgeFunction={purgeOldRecordsWrapper}
                 />
               </Grid>
               <Grid item>

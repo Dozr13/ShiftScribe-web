@@ -1,7 +1,7 @@
 "use client";
 import { Box, Button, Modal } from "@mui/material";
 import { useSnackbar } from "notistack";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   deleteEmployee,
   updateEmployee,
@@ -24,27 +24,26 @@ const EmployeeCard = ({ orgId }: EmployeeCardProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const { employees, refreshEmployees } = useEmployees(orgId);
 
-  // const [employees, setEmployees] = useState<Employee[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState<
     Employee | undefined
   >(undefined);
   const [employeeModalOpen, setEmployeeModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [isAddMode, setIsAddMode] = useState(false);
+  // const [isAddMode, setIsAddMode] = useState(false);
 
-  const openAddEmployeeModal = () => {
-    setSelectedEmployee({
-      id: "",
-      accessLevel: 1,
-      userData: {
-        displayName: "",
-        email: "",
-        organization: orgId,
-      },
-    });
-    setIsAddMode(true);
-    setEmployeeModalOpen(true);
-  };
+  // const openAddEmployeeModal = () => {
+  //   setSelectedEmployee({
+  //     id: "",
+  //     accessLevel: 1,
+  //     userData: {
+  //       displayName: "",
+  //       email: "",
+  //       organization: orgId,
+  //     },
+  //   });
+  //   setIsAddMode(true);
+  //   setEmployeeModalOpen(true);
+  // };
 
   const openEmployeeModal = () => {
     if (selectedEmployee) {

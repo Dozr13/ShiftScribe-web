@@ -14,8 +14,10 @@ const TempMember = async () => {
   return (
     <div>
       <h1>TEMP MEMBER WOOT</h1>
+      <p>{session?.user?.uid}</p>
       <p>{session?.user?.email}</p>
       <p>{session?.user?.name}</p>
+      <p>{session?.user?.accessLevel}</p>
       <p>{session?.user?.role}</p>
       <p>{session?.user?.organization}</p>
     </div>

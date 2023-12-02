@@ -7,14 +7,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { firebaseAuth } from "../../../../services/firebase";
 import admin from "../../../../services/firebase-admin";
 import { Employee } from "../../../../types/data";
-
-interface ShiftScribeUser extends User {
-  accessLevel?: number;
-  organization?: string;
-  displayName?: string;
-  email?: string;
-  role?: string;
-}
+import { ShiftScribeUser } from "../../../../types/session";
 
 interface MyJWT extends JWT {
   employee?: {
@@ -58,6 +51,7 @@ const jwtCallback = async ({
     }
 
     if (userSnapshot) {
+      token.uid = userSnapshot.id;
       const orgRef = admin
         .database()
         .ref(`/orgs/${userSnapshot.organization}/members/${userSnapshot.id}`);
@@ -112,7 +106,8 @@ const sessionCallback = async ({
 
     if (myToken.employee) {
       const user = session.user as ShiftScribeUser;
-      user.displayName = myToken.employee.userData.displayName;
+      user.uid = myToken.employee.id;
+      myToken.employee.userData.displayName;
       user.email = myToken.employee.userData.email;
       user.accessLevel = myToken.employee.accessLevel;
       user.organization = myToken.employee.userData.organization;

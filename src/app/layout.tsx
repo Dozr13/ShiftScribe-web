@@ -25,6 +25,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
 
   // TODO: Ensure removal for prod
   // if (user) {
+  //   console.log("uid:", user.uid);
   //   console.log("Access Level:", user.accessLevel);
   //   console.log("Organization:", user.organization);
   //   console.log("DisplayName:", user.displayName);

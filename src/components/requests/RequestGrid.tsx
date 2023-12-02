@@ -17,6 +17,8 @@ const RequestGrid: React.FC<RequestGridProps> = ({
   requests,
   setSelectedRequest,
 }) => {
+  const idField: keyof OrgRequest = "id";
+
   const columnDefs: ColDef[] = [
     {
       headerName: "Submitter",
@@ -82,7 +84,7 @@ const RequestGrid: React.FC<RequestGridProps> = ({
       rowData={requests}
       columnDefs={columnDefs}
       onRowSelected={handleRowSelected}
-      idField="id"
+      idField={idField}
       allowMultipleSelection={true}
     />
   );

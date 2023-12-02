@@ -9,17 +9,18 @@ import {
   ListItemText,
 } from "@mui/material";
 import Link from "next/link";
-import { UserSessionProps } from "..";
+import { UserSessionProps } from ".";
 import {
-  INTRO_LINKS,
-  LINKS,
   PLACEHOLDER_LINKS,
   getAuthLink,
+  getLinks,
 } from "../../../../constants/navLinks";
 import { DRAWER_WIDTH } from "../../../../constants/sizes";
 
 const UserSideBar = ({ session }: UserSessionProps) => {
   const authLink = getAuthLink(session);
+  const organization = session?.user?.organization;
+  const links = getLinks(organization);
 
   return (
     <Drawer
@@ -42,7 +43,7 @@ const UserSideBar = ({ session }: UserSessionProps) => {
       {session && (
         <Box height={"100%"}>
           <List>
-            {LINKS.map(({ text, href, icon: Icon }) => (
+            {links.map(({ text, href, icon: Icon }) => (
               <ListItem key={href} disablePadding>
                 <ListItemButton component={Link} href={href}>
                   <ListItemIcon>
@@ -75,21 +76,6 @@ const UserSideBar = ({ session }: UserSessionProps) => {
             </ListItem>
           </List>
         </Box>
-      )}
-      {!session && (
-        <List sx={{ width: "100%", position: "absolute", bottom: 0 }}>
-          <Divider sx={{ mt: "auto" }} />
-          {INTRO_LINKS.map(({ text, href, icon: Icon }) => (
-            <ListItem key={href} disablePadding>
-              <ListItemButton component={Link} href={href}>
-                <ListItemIcon>
-                  <Icon />
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
       )}
     </Drawer>
   );

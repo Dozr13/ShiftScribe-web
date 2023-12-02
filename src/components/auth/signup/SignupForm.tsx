@@ -1,30 +1,19 @@
 "use client";
-import signUp from "@/services/signup";
 import { Button, Container, TextField, Typography } from "@mui/material";
 import { useFormik } from "formik";
 import Link from "next/link";
+import { useSnackbar } from "notistack";
+import { useEffect } from "react";
+import { signup } from "../../../app/actions/signupActions";
 import validationSchema from "../signin/validation";
 
-// // Validation schema
-// const validationSchema = yup.object({
-//   email: yup
-//     .string()
-//     .email('Invalid email format')
-//     .required('Email is required'),
-//   password: yup
-//     .string()
-//     .required('Password is required')
-//     .min(8, 'Password should be of minimum 8 characters length'),
-//   confirmPassword: yup
-//     .string()
-//     .oneOf([yup.ref('password'), null], 'Passwords must match')
-//     .required('Confirm password is required'),
-//   organization: yup
-//     .string()
-//     .required('Organization is required')
-// });
-
 const SignupForm = () => {
+  const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    console.log("IN SIGNUP FORM");
+  }, []);
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -33,9 +22,24 @@ const SignupForm = () => {
       organization: "",
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      signUp(values);
-      // console.log("Form values:", values);
+    onSubmit: async (values) => {
+      try {
+        const response = await signup(
+          values.email,
+          values.password,
+          values.organization,
+          values.email,
+        );
+
+        if (response.status === "success") {
+          enqueueSnackbar("Successfully signed up!", { variant: "success" });
+          // Perform any additional actions like redirection or state updates
+        } else {
+          enqueueSnackbar(response.data.message, { variant: "error" });
+        }
+      } catch (error) {
+        enqueueSnackbar("An unexpected error occurred", { variant: "error" });
+      }
     },
   });
 

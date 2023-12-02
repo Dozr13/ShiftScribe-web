@@ -8,6 +8,8 @@ interface JobGridProps {
 }
 
 const JobGrid: React.FC<JobGridProps> = ({ jobs, setSelectedJob }) => {
+  const idField: keyof JobsGridRowData = "id";
+
   const rowData: JobsGridRowData[] = jobs!.map((job) => ({
     id: job.id,
     jobName: job.jobName,
@@ -48,7 +50,7 @@ const JobGrid: React.FC<JobGridProps> = ({ jobs, setSelectedJob }) => {
       rowData={rowData}
       columnDefs={columnDefs}
       onRowSelected={handleRowSelected}
-      idField="id"
+      idField={idField}
       allowMultipleSelection={true}
     />
   );

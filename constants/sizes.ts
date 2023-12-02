@@ -1,2 +1,4 @@
 export const DRAWER_WIDTH = 240;
 export const INITIAL_PAGINATION_PAGE_SIZE = 10;
+
+export const GRID_PAGINATION_PAGE_SIZE_OPTIONS = [5, 10, 20, 50];

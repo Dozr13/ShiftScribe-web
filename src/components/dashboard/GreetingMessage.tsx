@@ -5,6 +5,7 @@ const GreetingMessage: React.FC = () => {
   return (
     <Box
       sx={{
+        mx: "10%",
         padding: "20px",
         backgroundColor: "#f5f5f5",
         borderRadius: "8px",

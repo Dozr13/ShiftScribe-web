@@ -1,8 +1,13 @@
-import { Typography } from "@mui/material";
-import SignupForm from "../../components/auth/signup/SignUp";
+import SignupForm from "../../components/auth/signup/SignupForm";
+import PageHeader from "../../components/containers/PageHeader";
 
 const SignUp = () => {
-  return <SignupForm />;
+  return (
+    <>
+      <PageHeader mainMessage={`Sign Up Today!`} />
+      <SignupForm />
+    </>
+  );
 };
 
 export default SignUp;

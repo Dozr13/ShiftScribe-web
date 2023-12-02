@@ -8,7 +8,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import Link from "next/link";
-import { INTRO_LINKS, LINKS } from "../../../../constants/navLinks";
+import { INTRO_LINKS } from "../../../../constants/navLinks";
 import { DRAWER_WIDTH } from "../../../../constants/sizes";
 
 const IntroSideBar = () => {
@@ -28,21 +28,8 @@ const IntroSideBar = () => {
       variant="permanent"
       anchor="left"
     >
-      <Divider />
-      <List>
-        {LINKS.map(({ text, href, icon: Icon }) => (
-          <ListItem key={href} disablePadding>
-            <ListItemButton component={Link} href={href}>
-              <ListItemIcon>
-                <Icon />
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-      <Divider sx={{ mt: "auto" }} />
-      <List>
+      <List sx={{ width: "100%", position: "absolute", bottom: 0 }}>
+        <Divider sx={{ mt: "auto" }} />
         {INTRO_LINKS.map(({ text, href, icon: Icon }) => (
           <ListItem key={href} disablePadding>
             <ListItemButton component={Link} href={href}>

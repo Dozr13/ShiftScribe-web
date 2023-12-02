@@ -9,13 +9,25 @@ import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
 import SupportIcon from "@mui/icons-material/Support";
 import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 import { Session } from "next-auth";
+import { UserData } from "../src/types/data";
+import routes from "../src/utils/routes";
 
-export const LINKS = [
-  { text: "Home", href: "/", icon: HomeIcon },
-  { text: "Records", href: "/records", icon: WorkHistoryIcon },
-  { text: "Requests", href: "/requests", icon: ScheduleIcon },
-  { text: "Employees", href: "/employees", icon: BadgeIcon },
-  { text: "Jobs", href: "/jobs", icon: LocationSearchingIcon },
+export const getLinks = (
+  organization: UserData["organization"] | null | undefined,
+) => [
+  { text: "Home", href: routes.dashboard(organization), icon: HomeIcon },
+  {
+    text: "Records",
+    href: routes.records(organization),
+    icon: WorkHistoryIcon,
+  },
+  { text: "Requests", href: routes.requests(organization), icon: ScheduleIcon },
+  { text: "Employees", href: routes.employees(organization), icon: BadgeIcon },
+  {
+    text: "Jobs",
+    href: routes.jobs(organization),
+    icon: LocationSearchingIcon,
+  },
 ];
 
 export const PLACEHOLDER_LINKS = [
@@ -26,12 +38,12 @@ export const PLACEHOLDER_LINKS = [
 export const INTRO_LINKS = [
   {
     text: "Login",
-    href: "/api/auth/signin",
+    href: routes.login,
     icon: LoginIcon,
   },
   {
     text: "Sign Up",
-    href: "/signup",
+    href: routes.signup,
     icon: SubscriptionsIcon,
   },
 ];
@@ -40,12 +52,12 @@ export const getAuthLink = (session: Session | null) => {
   return session
     ? {
         text: "Logout",
-        href: "/api/auth/signout?callbackUrl=/",
+        href: routes.logout,
         icon: LogoutIcon,
       }
     : {
         text: "Login",
-        href: "/api/auth/signin",
+        href: routes.login,
         icon: LoginIcon,
       };
 };

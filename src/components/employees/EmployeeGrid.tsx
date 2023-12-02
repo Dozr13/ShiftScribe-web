@@ -1,5 +1,4 @@
-import { ColDef, GridApi } from "ag-grid-community";
-import { useEffect, useState } from "react";
+import { ColDef } from "ag-grid-community";
 import { Employee, EmployeesGridRowData } from "../../types/data";
 import GenericGrid from "../grid/GenericGrid";
 
@@ -12,13 +11,7 @@ const EmployeeGrid: React.FC<EmployeeGridProps> = ({
   employees,
   setSelectedEmployee,
 }) => {
-  const [gridApi, setGridApi] = useState<GridApi | null>(null);
-
-  useEffect(() => {
-    const handleResize = () => gridApi?.sizeColumnsToFit();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [gridApi]);
+  const idField: keyof EmployeesGridRowData = "id";
 
   const rowData: EmployeesGridRowData[] = employees!.map((employee) => ({
     id: employee.id,
@@ -70,7 +63,7 @@ const EmployeeGrid: React.FC<EmployeeGridProps> = ({
       rowData={rowData}
       columnDefs={columnDefs}
       onRowSelected={handleRowSelected}
-      idField="id"
+      idField={idField}
     />
   );
 };

@@ -16,6 +16,10 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useRef, useState } from "react";
+import {
+  GRID_PAGINATION_PAGE_SIZE_OPTIONS,
+  INITIAL_PAGINATION_PAGE_SIZE,
+} from "../../../constants/sizes";
 
 interface GenericGridProps<T> {
   rowData: T[];
@@ -34,13 +38,15 @@ const GenericGrid = <T extends object>({
 }: GenericGridProps<T>) => {
   const gridRef = useRef<AgGridReact>(null);
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
-  const [paginationPageSize, setPaginationPageSize] = useState(10);
+  const [paginationPageSize, setPaginationPageSize] = useState(
+    INITIAL_PAGINATION_PAGE_SIZE,
+  );
 
   useEffect(() => {
     const handleResize = () => gridApi?.sizeColumnsToFit();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [gridApi]);
+  }, [gridApi, idField]);
 
   const onGridReady = (params: GridReadyEvent) => {
     setGridApi(params.api);
@@ -78,16 +84,16 @@ const GenericGrid = <T extends object>({
         paginationPageSize={paginationPageSize}
       />
       <Box sx={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
-        <FormControl variant="standard" sx={{ minWidth: 120 }}>
+        <FormControl variant="standard" sx={{ minWidth: 120, my: 2 }}>
           <InputLabel id="pagination-page-size-label">Page Size</InputLabel>
           <Select
             labelId="pagination-page-size-label"
-            id="pagination-page-size-select"
+            id="pagination-page-size"
             value={paginationPageSize}
             label="Page Size"
             onChange={handlePageSizeChange}
           >
-            {[5, 10, 20, 50].map((size) => (
+            {GRID_PAGINATION_PAGE_SIZE_OPTIONS.map((size) => (
               <MenuItem key={size} value={size}>
                 {size}
               </MenuItem>

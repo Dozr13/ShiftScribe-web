@@ -1,6 +1,6 @@
 import { DataSnapshot } from "firebase/database";
 import timeParser from "../../lib/TimeParser";
-import { TimeRecord, UserData, UserDataTotals } from "../types/data";
+import { TimeRecord, UserData, UserDataTotals } from "../../types/data";
 import stringUtils from "./StringUtils";
 
 interface GenerateCSVContentParams {

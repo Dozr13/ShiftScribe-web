@@ -2,12 +2,12 @@
 import { Box, Button, Modal } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
+import { OrgEmployee } from "../../../types/data";
 import {
   deleteEmployee,
   updateEmployee,
 } from "../../app/actions/employeeActions";
 import { useEmployees } from "../../hooks/employees/useEmployees";
-import { Employee } from "../../types/data";
 import DeleteConfirmation from "../modals/DeleteConfirmation";
 import EmployeeGrid from "./EmployeeGrid";
 import EmployeeModal from "./EmployeeModal";
@@ -25,7 +25,7 @@ const EmployeeCard = ({ orgId }: EmployeeCardProps) => {
   const { employees, refreshEmployees } = useEmployees(orgId);
 
   const [selectedEmployee, setSelectedEmployee] = useState<
-    Employee | undefined
+    OrgEmployee | undefined
   >(undefined);
   const [employeeModalOpen, setEmployeeModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -67,7 +67,7 @@ const EmployeeCard = ({ orgId }: EmployeeCardProps) => {
   //   }
   // };
 
-  const handleEdit = async (updatedEmployee: Employee) => {
+  const handleEdit = async (updatedEmployee: OrgEmployee) => {
     if (selectedEmployee) {
       try {
         await updateEmployee(orgId, selectedEmployee.id, updatedEmployee);

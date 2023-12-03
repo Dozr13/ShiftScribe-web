@@ -11,16 +11,20 @@ import {
 import Link from "next/link";
 import { UserSessionProps } from ".";
 import {
-  PLACEHOLDER_LINKS,
+  getAccountLinks,
   getAuthLink,
   getLinks,
 } from "../../../../constants/navLinks";
 import { DRAWER_WIDTH } from "../../../../constants/sizes";
+import stringUtils from "../../../utils/StringUtils";
 
 const UserSideBar = ({ session }: UserSessionProps) => {
   const authLink = getAuthLink(session);
   const organization = session?.user?.organization;
-  const links = getLinks(organization);
+  const formattedOrganization = stringUtils.slugify(organization!);
+
+  const links = getLinks(formattedOrganization);
+  const accountLinks = getAccountLinks(formattedOrganization);
 
   return (
     <Drawer
@@ -56,7 +60,7 @@ const UserSideBar = ({ session }: UserSessionProps) => {
           </List>
           <List sx={{ width: "100%", position: "absolute", bottom: 0 }}>
             <Divider sx={{ mt: "auto" }} />
-            {PLACEHOLDER_LINKS.map(({ text, href, icon: Icon }) => (
+            {accountLinks.map(({ text, href, icon: Icon }) => (
               <ListItem key={href} disablePadding>
                 <ListItemButton component={Link} href={href}>
                   <ListItemIcon>

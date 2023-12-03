@@ -13,8 +13,8 @@ import {
   set,
   update,
 } from "firebase/database";
+import { OrgJob } from "../../types/data";
 import { firebaseApp, firebaseDatabase } from "../services/firebase";
-import { OrgJob } from "../types/data";
 
 /**
  * Delete data at a given path.

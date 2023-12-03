@@ -1,6 +1,6 @@
 import * as employeeApi from "@/lib/employeeApi";
-import { Employee } from "@/types/data";
 import { get, getDatabase, off, onValue, ref, update } from "firebase/database";
+import { OrgEmployee } from "../../../types/data";
 import { firebaseDatabase } from "../../services/firebase";
 
 // TODO: See if there's a way to implement
@@ -21,7 +21,7 @@ import { firebaseDatabase } from "../../services/firebase";
 export const updateEmployee = async (
   orgId: string,
   employeeId: string,
-  updateData: Partial<Employee>,
+  updateData: Partial<OrgEmployee>,
 ): Promise<void> => {
   try {
     if (updateData.accessLevel !== undefined) {
@@ -32,7 +32,7 @@ export const updateEmployee = async (
       await update(accessLevelRef, { accessLevel: updateData.accessLevel });
     }
 
-    const userDataUpdates: Partial<Employee["userData"]> = {};
+    const userDataUpdates: Partial<OrgEmployee["userData"]> = {};
     if (updateData.userData?.displayName) {
       userDataUpdates.displayName = updateData.userData.displayName;
     }
@@ -86,7 +86,7 @@ export const fetchOrgMembers = (
 
 export const fetchUserData = async (
   membersData: Record<string, { accessLevel: number }>,
-): Promise<Employee[]> => {
+): Promise<OrgEmployee[]> => {
   const db = getDatabase();
 
   const employees = await Promise.all(
@@ -107,7 +107,7 @@ export const fetchUserData = async (
 
 export const fetchEmployees = async (
   orgId: string,
-  setEmployees: (employees: Employee[]) => void,
+  setEmployees: (employees: OrgEmployee[]) => void,
 ): Promise<() => void> => {
   let unsubscribeMembers: () => void;
 

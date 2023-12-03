@@ -13,8 +13,8 @@ import {
   set,
   update,
 } from "firebase/database";
+import { OrgEmployee } from "../../types/data";
 import { firebaseApp } from "../services/firebase";
-import { Employee } from "../types/data";
 
 /**
  * Delete data at a given path.
@@ -41,7 +41,9 @@ export const exists = async (Path: string): Promise<boolean> => {
  * @param orgId The organization ID.
  * @returns An array of Employee objects.
  */
-export const fetchEmployeeData = async (orgId: string): Promise<Employee[]> => {
+export const fetchEmployeeData = async (
+  orgId: string,
+): Promise<OrgEmployee[]> => {
   const db = getDatabase(firebaseApp);
   const orgMembersSnapshot = await get(child(ref(db), `orgs/${orgId}/members`));
 
@@ -52,7 +54,7 @@ export const fetchEmployeeData = async (orgId: string): Promise<Employee[]> => {
   const membersData = orgMembersSnapshot.val();
   const memberIds = Object.keys(membersData);
 
-  const employeesArray: Employee[] = await Promise.all(
+  const employeesArray: OrgEmployee[] = await Promise.all(
     memberIds.map(async (memberId) => {
       const userSnapshot = await get(child(ref(db), `users/${memberId}`));
       const userData = userSnapshot.val();

@@ -10,7 +10,9 @@ const routes = {
   requests: (organization: string | null | undefined) =>
     `/${organization}/requests`,
   profile: (organization: string | null | undefined) =>
-    `/${organization}/temp-member`,
+    `/${organization}/user-profile`,
+  orgOptions: (organization: string | null | undefined) =>
+    `/${organization}/organization-options`,
   login: "/api/auth/signin",
   signup: "/signup",
   about: "/about",

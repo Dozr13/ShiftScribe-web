@@ -1,11 +1,11 @@
-import { useRouter } from "next/router";
+import GreetingMessage from "../../components/dashboard/GreetingMessage";
 
-const OrganizationDashboard = () => {
-  const router = useRouter();
-  const { organization } = router.query; // Access the dynamic segment
-
-  // Use 'organization' to fetch data or render specific components
-  return <div>Dashboard for Organization ID: {organization}</div>;
+const Dashboard = async () => {
+  return (
+    <>
+      <GreetingMessage />
+    </>
+  );
 };
 
-export default OrganizationDashboard;
+export default Dashboard;

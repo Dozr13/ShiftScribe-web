@@ -57,7 +57,7 @@ const RecordsCard: React.FC<RecordsCardProps> = ({ orgId }) => {
   const purgeOldRecordsWrapper = async () => {
     const startDate = dateState[0].startDate;
     const endDate = dateState[0].endDate;
-    console.log("Purging records from:", startDate, "to", endDate);
+    // console.log("Purging records from:", startDate, "to", endDate);
 
     const result = await purgeOldRecords(orgId, startDate, endDate);
 

@@ -2,12 +2,12 @@
 import { Box, Button, Modal } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
+import { OrgRequest } from "../../../types/data";
 import {
   approveRequest,
   denyRequest,
   fetchRequests,
 } from "../../app/actions/requestActions";
-import { OrgRequest } from "../../types/data";
 import DeleteConfirmation from "../modals/DeleteConfirmation";
 import RequestGrid from "./RequestGrid";
 import RequestModal from "./RequestModal";

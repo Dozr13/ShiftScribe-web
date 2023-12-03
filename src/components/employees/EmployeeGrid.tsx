@@ -1,10 +1,10 @@
 import { ColDef } from "ag-grid-community";
-import { Employee, EmployeesGridRowData } from "../../types/data";
+import { EmployeesGridRowData, OrgEmployee } from "../../../types/data";
 import GenericGrid from "../grid/GenericGrid";
 
 interface EmployeeGridProps {
-  employees: Employee[];
-  setSelectedEmployee: (employee: Employee | undefined) => void;
+  employees: OrgEmployee[];
+  setSelectedEmployee: (employee: OrgEmployee | undefined) => void;
 }
 
 const EmployeeGrid: React.FC<EmployeeGridProps> = ({
@@ -54,12 +54,12 @@ const EmployeeGrid: React.FC<EmployeeGridProps> = ({
     },
   ];
 
-  const handleRowSelected = (employee: Employee) => {
+  const handleRowSelected = (employee: OrgEmployee) => {
     setSelectedEmployee(employee);
   };
 
   return (
-    <GenericGrid<Employee>
+    <GenericGrid<OrgEmployee>
       rowData={rowData}
       columnDefs={columnDefs}
       onRowSelected={handleRowSelected}

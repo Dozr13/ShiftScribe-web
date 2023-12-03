@@ -1,4 +1,4 @@
-import { EventObject } from "../types/data";
+import { EventObject } from "../../types/data";
 import stringUtils from "./StringUtils";
 
 export const calculateTotalTime = (events: Record<string, EventObject>) => {

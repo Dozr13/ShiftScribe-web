@@ -1,7 +1,7 @@
 import { off, onValue, ref, remove, update } from "firebase/database";
+import { OrgJob } from "../../../types/data";
 import { pushData } from "../../lib/jobApi";
 import { firebaseDatabase } from "../../services/firebase";
-import { OrgJob } from "../../types/data";
 
 export const fetchJobs = async (
   orgId: string,

@@ -1,10 +1,10 @@
 import PageHeader from "@/components/containers/PageHeader";
 import JobCard from "@/components/jobs/JobCard";
-import { CustomSession } from "@/types/session";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { options } from "../../api/auth/[...nextauth]/options";
+import { CustomSession } from "types/session";
 import routes from "../../../utils/routes";
+import { options } from "../../api/auth/[...nextauth]/options";
 
 const JobsPage = async () => {
   const session = (await getServerSession(options)) as CustomSession;

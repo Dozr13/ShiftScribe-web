@@ -6,8 +6,8 @@ import {
   ref,
   update,
 } from "firebase/database";
+import { TimeRecord, UserData, UserDataTotals } from "../../../types/data";
 import { firebaseDatabase } from "../../services/firebase";
-import { TimeRecord, UserData, UserDataTotals } from "../../types/data";
 import stringUtils from "../../utils/StringUtils";
 import timeParser from "../../utils/TimeParserUtils";
 

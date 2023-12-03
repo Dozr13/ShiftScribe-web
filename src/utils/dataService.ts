@@ -1,6 +1,6 @@
 import { QueryConstraint, endAt, orderByKey, startAt } from "firebase/database";
 import { StringUtils } from "../../lib"; // Assuming this is the correct import path
-import { TimeRecords } from "../types/data";
+import { TimeRecords } from "../../types/data";
 
 // Utility to format and set dates for Firebase
 export const formatAndSetDates = (

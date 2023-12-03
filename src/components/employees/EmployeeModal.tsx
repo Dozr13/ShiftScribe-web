@@ -8,11 +8,11 @@ import {
 } from "@mui/material";
 import { FieldHookConfig, Form, Formik, useField } from "formik";
 import * as Yup from "yup";
-import { Employee } from "../../types/data";
+import { OrgEmployee } from "../../../types/data";
 
 interface EmployeeModalProps {
-  onSave: (updatedEmployee: Employee) => void;
-  employee: Employee;
+  onSave: (updatedEmployee: OrgEmployee) => void;
+  employee: OrgEmployee;
 }
 
 type FormikTextFieldProps = FieldHookConfig<string> & TextFieldProps;
@@ -44,10 +44,11 @@ const EmployeeModal = ({ employee, onSave }: EmployeeModalProps) => {
   });
 
   const initialValues = {
+    id: employee?.id,
+    accessLevel: employee?.accessLevel,
     displayName: employee?.userData?.displayName,
     email: employee?.userData?.email,
     organization: employee?.userData?.organization,
-    accessLevel: employee?.accessLevel,
   };
 
   return (
@@ -57,14 +58,14 @@ const EmployeeModal = ({ employee, onSave }: EmployeeModalProps) => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting }) => {
-          const updatedEmployee: Employee = {
+          const updatedEmployee: OrgEmployee = {
             ...employee,
+            accessLevel: values.accessLevel,
             userData: {
               displayName: values.displayName,
               email: values.email,
               organization: values.organization,
             },
-            accessLevel: values.accessLevel,
           };
 
           onSave(updatedEmployee);

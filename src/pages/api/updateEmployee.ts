@@ -15,15 +15,15 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>,
 ) {
-  console.log("req.body: ", req.body);
+  // console.log("req.body: ", req.body);
   if (req.method === "PUT") {
     const { employeeId, orgId, displayName, email, accessLevel } = req.body;
 
-    console.log("employeeId ", employeeId);
-    console.log("orgId ", orgId);
-    console.log("displayName ", displayName);
-    console.log("email ", email);
-    console.log("accessLevel ", accessLevel);
+    // console.log("employeeId ", employeeId);
+    // console.log("orgId ", orgId);
+    // console.log("displayName ", displayName);
+    // console.log("email ", email);
+    // console.log("accessLevel ", accessLevel);
 
     if (
       !displayName ||

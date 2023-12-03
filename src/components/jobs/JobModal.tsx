@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { FieldHookConfig, Form, Formik, useField } from "formik";
 import * as Yup from "yup";
-import { OrgJob } from "../../types/data";
+import { OrgJob } from "../../../types/data";
 
 interface JobModalProps {
   isAddMode: boolean;

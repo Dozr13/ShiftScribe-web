@@ -9,8 +9,8 @@ import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
 import SupportIcon from "@mui/icons-material/Support";
 import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 import { Session } from "next-auth";
-import { UserData } from "../src/types/data";
 import routes from "../src/utils/routes";
+import { UserData } from "../types/data";
 
 export const getLinks = (
   organization: UserData["organization"] | null | undefined,
@@ -30,8 +30,15 @@ export const getLinks = (
   },
 ];
 
-export const PLACEHOLDER_LINKS = [
-  { text: "Settings", href: "/temp-member", icon: SettingsIcon },
+// export const PLACEHOLDER_LINKS = [
+//   { text: "Settings", href: "/temp-member", icon: SettingsIcon },
+//   { text: "Support", href: "/temp-client-member", icon: SupportIcon },
+// ];
+// TODO: Create Support page
+export const getAccountLinks = (
+  organization: UserData["organization"] | null | undefined,
+) => [
+  { text: "Settings", href: routes.profile(organization), icon: SettingsIcon },
   { text: "Support", href: "/temp-client-member", icon: SupportIcon },
 ];
 

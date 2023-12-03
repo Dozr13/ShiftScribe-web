@@ -5,13 +5,14 @@ export interface UserData {
 }
 
 export interface OrgData {
-  members?: {
+  members: {
     [key: number]: OrgProfile;
   };
   joinRequests?: {
     [key: number]: true;
   };
-  superuser?: string;
+  originalName: string;
+  superuser: string;
   timeRecords?: TimeRecords;
 }
 
@@ -62,6 +63,7 @@ type JobsGridRowData = {
   jobAddress: string;
 };
 
+// TODO: Refine and base on events
 type RequestsGridRowData = {
   id: string;
   submitter: string;
@@ -72,20 +74,12 @@ type RequestsGridRowData = {
   totalTimeRequested: string;
   submitterName?: string;
   events: Record<string, EventObject>;
-  submitterName?: string;
 };
 
-// TODO: implement this as Employee userData
-export interface User {
-  displayName: string;
-  email: string;
-  organization: string;
-}
-
-export interface Employee {
+export interface OrgEmployee {
   id: string;
   accessLevel: number;
-  userData: User;
+  userData: UserData;
 }
 
 interface TimeRecord {

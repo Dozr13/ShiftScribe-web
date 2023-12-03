@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { CustomSession } from "../../../types/session";
+import { CustomSession } from "../../../../types/session";
 import UserAppBar from "./UserAppBar";
 import UserSideBar from "./UserSideBar";
 
@@ -10,7 +10,7 @@ export interface UserSessionProps {
 const UserWrapper = ({ session }: UserSessionProps) => {
   return (
     <Box>
-      <UserAppBar />
+      <UserAppBar session={session} />
       <UserSideBar session={session} />
     </Box>
   );

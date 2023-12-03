@@ -1,5 +1,5 @@
 import { ColDef } from "ag-grid-community";
-import { OrgRequest } from "../../types/data";
+import { OrgRequest } from "../../../types/data";
 import {
   calculateTotalTime,
   extractDate,

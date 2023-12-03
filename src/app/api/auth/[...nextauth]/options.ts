@@ -4,10 +4,10 @@ import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
+import { OrgEmployee } from "../../../../../types/data";
+import { ShiftScribeUser } from "../../../../../types/session";
 import { firebaseAuth } from "../../../../services/firebase";
 import admin from "../../../../services/firebase-admin";
-import { Employee } from "../../../../types/data";
-import { ShiftScribeUser } from "../../../../types/session";
 
 interface MyJWT extends JWT {
   employee?: {
@@ -33,8 +33,6 @@ const jwtCallback = async ({
   account?: Account | null;
   profile?: Profile | null;
 }): Promise<MyJWT> => {
-  // console.log("JWT callback token:", token);
-
   const email = token.email || profile?.email;
 
   if (email) {
@@ -160,7 +158,7 @@ export const options = {
     }),
     GitHubProvider({
       profile(profile) {
-        const employee: Employee = {
+        const employee: OrgEmployee = {
           id: profile.id.toString(),
           accessLevel: determineAccessLevel(profile),
           userData: {

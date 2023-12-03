@@ -1,4 +1,4 @@
-import { Events } from "../types/data";
+import { Events } from "../../types/data";
 
 class TimeParser {
   /**

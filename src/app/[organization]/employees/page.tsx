@@ -1,8 +1,8 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { CustomSession } from "../../../../types/session";
 import PageHeader from "../../../components/containers/PageHeader";
 import EmployeeCard from "../../../components/employees/EmployeeCard";
-import { CustomSession } from "../../../types/session";
 import routes from "../../../utils/routes";
 import { options } from "../../api/auth/[...nextauth]/options";
 

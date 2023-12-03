@@ -1,24 +1,27 @@
-import { withAuth } from "next-auth/middleware";
+import { getToken } from "next-auth/jwt";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { PermissionLevel } from "./lib";
+import stringUtils from "./src/utils/StringUtils";
 
-export default withAuth(
-  function middleware(req) {
-    console.log(req.nextUrl.pathname);
-    console.log(req.nextauth?.token?.role);
+const secret = process.env.NEXTAUTH_SECRET;
 
-    if (
-      req.nextUrl.pathname.startsWith("/CreateUser") &&
-      req.nextauth?.token?.accessLevel !== PermissionLevel.MANAGER
-    ) {
-      return NextResponse.rewrite(new URL("/Denied", req.url));
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req, secret });
+
+  if (token) {
+    const organization = (token as any).organization;
+    const formattedOrganization = stringUtils.slugify(organization!);
+
+    if (organization) {
+      const url = req.nextUrl.clone();
+      url.pathname = `/${formattedOrganization}/dashboard`;
+      return NextResponse.redirect(url);
     }
-  },
-  {
-    callbacks: {
-      authorized: ({ token }) => !!token,
-    },
-  },
-);
+  } else {
+    const url = req.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
 
-export const config = { matcher: ["/temp-member"] };
+  return NextResponse.next();
+}

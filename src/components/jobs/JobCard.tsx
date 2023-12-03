@@ -2,13 +2,13 @@
 import { Box, Button, Modal } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
+import { OrgJob } from "../../../types/data";
 import {
   addJob,
   deleteJob,
   fetchJobs,
   updateJob,
 } from "../../app/actions/jobActions";
-import { OrgJob } from "../../types/data";
 import DeleteConfirmation from "../modals/DeleteConfirmation";
 import JobGrid from "./JobGrid";
 import JobModal from "./JobModal";

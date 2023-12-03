@@ -1,6 +1,6 @@
 import { get, onValue, ref, remove, set } from "firebase/database";
+import { EventObject, OrgRequest, UserData } from "../../../types/data";
 import { firebaseDatabase } from "../../services/firebase";
-import { EventObject, OrgRequest, User } from "../../types/data";
 
 export const fetchRequests = async (
   orgId: string,
@@ -23,7 +23,7 @@ export const fetchRequests = async (
 
       const userRef = ref(firebaseDatabase, `/users/${request.submitter}`);
       const userSnapshot = await get(userRef);
-      const userInfo = (userSnapshot.val() || {}) as User;
+      const userInfo = (userSnapshot.val() || {}) as UserData;
 
       requestsWithUserData.push({
         ...request,

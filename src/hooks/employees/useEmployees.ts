@@ -1,11 +1,11 @@
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
+import { OrgEmployee } from "../../../types/data";
 import { fetchEmployees } from "../../app/actions/employeeActions";
-import { Employee } from "../../types/data";
 
 export const useEmployees = (orgId: string) => {
   const { enqueueSnackbar } = useSnackbar();
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [employees, setEmployees] = useState<OrgEmployee[]>([]);
 
   useEffect(() => {
     let unsubscribe: () => void;

@@ -1,8 +1,11 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { getServerSession } from "next-auth";
-import Link from "next/link";
+import Head from "next/head";
 import { redirect } from "next/navigation";
-import { CustomSession } from "../types/session";
+import { CustomSession } from "../../types/session";
+import PageHeader from "../components/containers/PageHeader";
+import Landing from "../components/landing/Landing";
+import stringUtils from "../utils/StringUtils";
 import routes from "../utils/routes";
 import { options } from "./api/auth/[...nextauth]/options";
 
@@ -10,24 +13,21 @@ const HomePage = async () => {
   const session = (await getServerSession(options)) as CustomSession;
 
   if (session) {
-    redirect(routes.dashboard(session.user.organization));
+    const formattedOrganization = stringUtils.slugify(
+      session.user.organization ?? "",
+    );
+
+    redirect(routes.dashboard(formattedOrganization));
   }
 
   return (
-    <Box sx={{ textAlign: "center", padding: "20px" }}>
-      <Typography variant="h5">Welcome to ShiftScribe!</Typography>
-      <Typography variant="body1">Select an option to continue:</Typography>
-      <Box sx={{ mt: 2 }}>
-        <Link href={routes.signup} passHref>
-          <Button variant="outlined">Sign Up</Button>
-        </Link>
-        <Link href={routes.login} passHref>
-          <Button variant="outlined">Log In</Button>
-        </Link>
-        <Link href={routes.about} passHref>
-          <Button variant="outlined">About</Button>
-        </Link>
-      </Box>
+    <Box style={{ textAlign: "center", marginTop: "50px" }}>
+      <Head>
+        <title>Welcome to Our Site</title>
+        <meta name="description" content="Learn more about what we offer." />
+      </Head>
+      <PageHeader mainMessage={`Welcome to ShiftScribe!`} />
+      <Landing />
     </Box>
   );
 };

@@ -3,8 +3,9 @@ import {
   getAuth,
   updateProfile,
 } from "firebase/auth";
-import { getDatabase, ref, set } from "firebase/database";
-import { firebaseApp } from "../../services/firebase";
+import { ref, set } from "firebase/database";
+import { firebaseApp, firebaseDatabase } from "../../services/firebase";
+import stringUtils from "../../utils/StringUtils";
 
 export async function signup(
   email: string,
@@ -13,6 +14,10 @@ export async function signup(
   displayName: string,
 ) {
   const auth = getAuth(firebaseApp);
+  const formattedOrganization =
+    stringUtils.formatStringForFirebase(organization);
+  const slugifiedOrganization = stringUtils.slugify(organization);
+
   try {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
@@ -24,18 +29,35 @@ export async function signup(
       displayName: displayName,
     });
 
-    const userRef = ref(getDatabase(), `users/${userCredential.user.uid}`);
+    const uid = userCredential.user.uid;
+
+    const userRef = ref(firebaseDatabase, `users/${uid}`);
     await set(userRef, {
       displayName,
       email,
-      organization,
+      organization: organization,
+    });
+
+    const orgRef = ref(firebaseDatabase, `orgs/${formattedOrganization}`);
+    await set(orgRef, {
+      superuser: uid,
+      originalName: organization,
+    });
+
+    const orgMemberRef = ref(
+      firebaseDatabase,
+      `orgs/${formattedOrganization}/members/${uid}`,
+    );
+    await set(orgMemberRef, {
+      accessLevel: 4,
     });
 
     return {
       status: "success",
       data: {
         user: userCredential.user,
-        message: "User created successfully",
+        endpoint: formattedOrganization,
+        message: "Organization created successfully",
       },
     };
   } catch (error: any) {

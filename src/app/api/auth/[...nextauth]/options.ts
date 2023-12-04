@@ -31,6 +31,8 @@ const jwtCallback = async ({
   account?: Account | null;
   profile?: Profile | null;
 }): Promise<MyJWT> => {
+  console.log("JWT Callback Start");
+
   const email = token.email || profile?.email;
 
   if (email) {
@@ -87,6 +89,8 @@ const jwtCallback = async ({
     }
   }
 
+  console.log("JWT Callback End");
+
   return token as MyJWT;
 };
 
@@ -97,6 +101,8 @@ const sessionCallback = async ({
   session: Session;
   token: JWT;
 }) => {
+  console.log("Session Callback Start");
+
   if (token && "role" in token) {
     const myToken = token as MyJWT;
 
@@ -110,6 +116,8 @@ const sessionCallback = async ({
       user.role = myToken.role;
     }
   }
+
+  console.log("Session Callback End");
 
   return session;
 };

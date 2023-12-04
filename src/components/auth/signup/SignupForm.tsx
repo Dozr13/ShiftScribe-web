@@ -18,7 +18,7 @@ interface SignupFormValues {
   organization: string;
   email: string;
   password: string;
-  confirmPassword: "";
+  confirmPassword: string;
   displayName: string;
 }
 
@@ -102,7 +102,7 @@ const SignupForm = () => {
     <Container maxWidth="sm">
       <form onSubmit={formik.handleSubmit}>
         {renderTextField("organization", "Organization")}
-        {renderTextField("email", "Email", "email")}
+        {renderTextField("email", "Email", "email", "username")}
         {renderTextField("displayName", "Your Name")}
         {renderTextField("password", "Password", "password", "new-password")}
         {renderTextField(

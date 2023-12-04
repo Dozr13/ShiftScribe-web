@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { CustomSession } from "../../../../types/session";
 import PageHeader from "../../../components/containers/PageHeader";
-import RequestsCard from "../../../components/requests/RequestCard";
+import RequestsCard from "../../../components/card/RequestCard";
 import routes from "../../../utils/routes";
 import { options } from "../../api/auth/[...nextauth]/options";
 
@@ -17,7 +17,7 @@ const Requests = async () => {
 
   return (
     <>
-      <PageHeader mainMessage={`Requests made for: ${orgId}`} />
+      <PageHeader mainMessage={`Employee time change requests`} />
       <RequestsCard orgId={orgId} />
     </>
   );

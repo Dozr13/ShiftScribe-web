@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import Head from "next/head";
 import { redirect } from "next/navigation";
 import { CustomSession } from "../../types/session";
-import PageHeader from "../components/containers/PageHeader";
 import Landing from "../components/landing/Landing";
 import stringUtils from "../utils/StringUtils";
 import routes from "../utils/routes";
@@ -21,12 +20,26 @@ const HomePage = async () => {
   }
 
   return (
-    <Box style={{ textAlign: "center", marginTop: "50px" }}>
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        bgcolor: "background.default",
+        p: 3,
+        overflow: "auto",
+        boxSizing: "border-box",
+      }}
+    >
       <Head>
-        <title>Welcome to Our Site</title>
-        <meta name="description" content="Learn more about what we offer." />
+        <title>Welcome to ShiftScribe</title>
+        <meta
+          name="description"
+          content="ShiftScribe: Streamline your team's scheduling and time tracking with ease."
+        />
       </Head>
-      <PageHeader mainMessage={`Welcome to ShiftScribe!`} />
       <Landing />
     </Box>
   );

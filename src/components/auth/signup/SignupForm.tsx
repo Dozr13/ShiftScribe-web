@@ -1,38 +1,46 @@
 "use client";
-import { Button, Container, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  FormHelperText,
+  TextField,
+} from "@mui/material";
 import { useFormik } from "formik";
 import { signIn } from "next-auth/react";
-import Link from "next/link";
 import { useSnackbar } from "notistack";
 import { signup } from "../../../app/actions/signupActions";
 import routes from "../../../utils/routes";
-import validationSchema from "../signin/validation";
+import BackToLandingButton from "../../landing/BackToLandingButton";
+import { signupSchema } from "./signup.validation";
 
-interface FormValues {
+interface SignupFormValues {
+  organization: string;
   email: string;
   password: string;
-  confirmPassword: string;
-  organization: string;
+  confirmPassword: "";
+  displayName: string;
 }
 
 const SignupForm = () => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const formik = useFormik<FormValues>({
+  const formik = useFormik<SignupFormValues>({
     initialValues: {
+      organization: "",
       email: "",
       password: "",
       confirmPassword: "",
-      organization: "",
+      displayName: "",
     },
-    validationSchema: validationSchema,
+    validationSchema: signupSchema,
     onSubmit: async (values) => {
       try {
         const response = await signup(
-          values.email,
-          values.password,
           values.organization,
           values.email,
+          values.password,
+          values.displayName,
         );
 
         if (response.status === "success") {
@@ -62,51 +70,60 @@ const SignupForm = () => {
   });
 
   const renderTextField = (
-    name: keyof FormValues,
+    name: keyof SignupFormValues,
     label: string,
     type: string = "text",
+    autoComplete?: string,
   ) => (
-    <TextField
-      fullWidth
-      id={name}
-      name={name}
-      label={label}
-      type={type}
-      value={formik.values[name]}
-      onChange={formik.handleChange}
-      error={formik.touched[name] && Boolean(formik.errors[name])}
-      helperText={formik.touched[name] && formik.errors[name]}
-      margin="normal"
-    />
+    <Box>
+      <TextField
+        fullWidth
+        id={name}
+        name={name}
+        autoComplete={autoComplete}
+        label={label}
+        type={type}
+        value={formik.values[name]}
+        onChange={formik.handleChange}
+        error={formik.touched[name] && Boolean(formik.errors[name])}
+        margin="normal"
+      />
+      <FormHelperText
+        error={Boolean(formik.touched[name] && formik.errors[name])}
+      >
+        {formik.touched[name] && formik.errors[name]
+          ? formik.errors[name]
+          : " "}
+      </FormHelperText>
+    </Box>
   );
 
   return (
     <Container maxWidth="sm">
-      <Typography variant="h5" gutterBottom>
-        Sign Up
-      </Typography>
       <form onSubmit={formik.handleSubmit}>
         {renderTextField("organization", "Organization")}
         {renderTextField("email", "Email", "email")}
-        {renderTextField("password", "Password", "password")}
-        {renderTextField("confirmPassword", "Confirm Password", "password")}
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          size="large"
-          disabled={formik.isSubmitting}
-        >
-          Sign up
-        </Button>
+        {renderTextField("displayName", "Your Name")}
+        {renderTextField("password", "Password", "password", "new-password")}
+        {renderTextField(
+          "confirmPassword",
+          "Confirm Password",
+          "password",
+          "new-password",
+        )}
+        <Box my={2}>
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            size="large"
+            disabled={formik.isSubmitting}
+          >
+            Sign up
+          </Button>
+        </Box>
+        <BackToLandingButton />
       </form>
-      <Button
-        variant="outlined"
-        sx={{ display: "flex", justifyContent: "center" }}
-      >
-        <Link href="/">Back to Intro</Link>
-      </Button>
     </Container>
   );
 };

@@ -1,6 +1,6 @@
 import { ColDef } from "ag-grid-community";
 import { EmployeesGridRowData, OrgEmployee } from "../../../types/data";
-import GenericGrid from "../grid/GenericGrid";
+import GenericGrid from "./GenericGrid";
 
 interface EmployeeGridProps {
   employees: OrgEmployee[];

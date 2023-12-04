@@ -1,7 +1,7 @@
 import { Button, Card, CardActions, Grid, Typography } from "@mui/material";
 import Link from "next/link";
 import { dashboardLinkButtonStyle } from "../../../constants/styles";
-import { TEXT_COLOR } from "../../../constants/theme";
+import { TEXT_COLOR } from "../../../constants/colorPalette";
 
 interface DashboardLinkButtonProps {
   title: string;

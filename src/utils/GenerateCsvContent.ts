@@ -1,7 +1,7 @@
 import { DataSnapshot } from "firebase/database";
-import timeParser from "../../lib/TimeParser";
 import { TimeRecord, UserData, UserDataTotals } from "../../types/data";
 import stringUtils from "./StringUtils";
+import timeParser from "./TimeParserUtils";
 
 interface GenerateCSVContentParams {
   readUserFunction: (Path: string) => Promise<DataSnapshot>;

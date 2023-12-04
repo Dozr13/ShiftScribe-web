@@ -6,7 +6,6 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
-import SupportIcon from "@mui/icons-material/Support";
 import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 import { Session } from "next-auth";
 import routes from "../src/utils/routes";
@@ -30,16 +29,12 @@ export const getLinks = (
   },
 ];
 
-// export const PLACEHOLDER_LINKS = [
-//   { text: "Settings", href: "/temp-member", icon: SettingsIcon },
-//   { text: "Support", href: "/temp-client-member", icon: SupportIcon },
-// ];
 // TODO: Create Support page
 export const getAccountLinks = (
   organization: UserData["organization"] | null | undefined,
 ) => [
   { text: "Settings", href: routes.profile(organization), icon: SettingsIcon },
-  { text: "Support", href: "/temp-client-member", icon: SupportIcon },
+  // { text: "Support", href: "/temp-client-member", icon: SupportIcon },
 ];
 
 export const INTRO_LINKS = [

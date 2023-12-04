@@ -1,3 +1,4 @@
+import { FirebaseError } from "firebase/app";
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -8,15 +9,17 @@ import { firebaseApp, firebaseDatabase } from "../../services/firebase";
 import stringUtils from "../../utils/StringUtils";
 
 export async function signup(
+  organization: string,
   email: string,
   password: string,
-  organization: string,
   displayName: string,
 ) {
   const auth = getAuth(firebaseApp);
   const formattedOrganization =
     stringUtils.formatStringForFirebase(organization);
   const slugifiedOrganization = stringUtils.slugify(organization);
+
+  console.log("email", email);
 
   try {
     const userCredential = await createUserWithEmailAndPassword(
@@ -25,9 +28,7 @@ export async function signup(
       password,
     );
 
-    await updateProfile(userCredential.user, {
-      displayName: displayName,
-    });
+    await updateProfile(userCredential.user, { displayName });
 
     const uid = userCredential.user.uid;
 
@@ -35,7 +36,7 @@ export async function signup(
     await set(userRef, {
       displayName,
       email,
-      organization: organization,
+      organization: formattedOrganization,
     });
 
     const orgRef = ref(firebaseDatabase, `orgs/${formattedOrganization}`);
@@ -56,30 +57,30 @@ export async function signup(
       status: "success",
       data: {
         user: userCredential.user,
-        endpoint: formattedOrganization,
+        endpoint: slugifiedOrganization,
         message: "Organization created successfully",
       },
     };
   } catch (error: any) {
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      "message" in error
-    ) {
-      return {
-        status: "error",
-        data: {
-          message: error.message,
-        },
-      };
+    let errorMessage = "An unexpected error occurred";
+    if (error instanceof FirebaseError) {
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          errorMessage = "Email address is already in use";
+          break;
+        case "auth/weak-password":
+          errorMessage = "Password is too weak";
+          break;
+        default:
+          errorMessage = error.message;
+      }
+    } else if (typeof error === "object" && "message" in error) {
+      errorMessage = error.message;
     }
 
     return {
       status: "error",
-      data: {
-        message: "An unexpected error occurred",
-      },
+      data: { message: errorMessage },
     };
   }
 }

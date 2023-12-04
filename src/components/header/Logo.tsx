@@ -1,22 +1,23 @@
-import { Typography } from "@mui/material";
-import Link from "next/link";
-import * as theme from "../../../constants/theme";
+// import { Typography } from "@mui/material";
+// import Link from "next/link";
+// import { ACCENT_COLOR, TEXT_COLOR } from "../../../constants/colorPalette";
 
-const Logo = () => {
-  return (
-    <Link href="/">
-      <Typography
-        variant="h6"
-        sx={{
-          color: theme.TEXT_COLOR,
-          "&:hover": { color: theme.ACCENT_COLOR },
-          textDecoration: "none",
-        }}
-      >
-        ShiftScribe
-      </Typography>
-    </Link>
-  );
-};
+// TODO: Possibly implement a logo for in app use
+// const Logo = () => {
+//   return (
+//     <Link href="/">
+//       <Typography
+//         variant="h6"
+//         sx={{
+//           color: TEXT_COLOR,
+//           "&:hover": { color: ACCENT_COLOR },
+//           textDecoration: "none",
+//         }}
+//       >
+//         ShiftScribe
+//       </Typography>
+//     </Link>
+//   );
+// };
 
-export default Logo;
+// export default Logo;

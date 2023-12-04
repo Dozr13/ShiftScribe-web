@@ -10,8 +10,16 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   secondaryMessage,
 }) => {
   return (
-    <Box sx={{ textAlign: "center", mb: 4 }}>
-      <Typography variant="h3" component="h1">
+    <Box
+      sx={{
+        position: "absolute",
+        top: 0,
+        mt: `calc(10vh)`,
+        mx: 20,
+        textAlign: "center",
+      }}
+    >
+      <Typography variant="h4" component="h1">
         {mainMessage}
       </Typography>
       {secondaryMessage && (

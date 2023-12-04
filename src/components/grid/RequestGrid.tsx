@@ -6,7 +6,7 @@ import {
   extractJobs,
   extractTime,
 } from "../../utils/eventUtils";
-import GenericGrid from "../grid/GenericGrid";
+import GenericGrid from "./GenericGrid";
 
 interface RequestGridProps {
   requests: OrgRequest[];

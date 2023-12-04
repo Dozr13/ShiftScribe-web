@@ -140,7 +140,7 @@ export const options = {
           );
           const user = userCredential.user;
 
-          // console.log("UUUuuuuuuSSERRRRR", user);
+          // console.log("user in options", user);
 
           return {
             id: user.uid,

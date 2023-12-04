@@ -8,9 +8,9 @@ import {
   denyRequest,
   fetchRequests,
 } from "../../app/actions/requestActions";
+import RequestGrid from "../grid/RequestGrid";
 import DeleteConfirmation from "../modals/DeleteConfirmation";
-import RequestGrid from "./RequestGrid";
-import RequestModal from "./RequestModal";
+import RequestModal from "../modals/RequestModal";
 
 interface RequestCardProps {
   orgId: string;

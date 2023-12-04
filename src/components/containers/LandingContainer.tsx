@@ -1,31 +1,23 @@
 import { Box } from "@mui/material";
 import React from "react";
-import {
-  APP_BAR_HEIGHT,
-  DRAWER_WIDTH,
-  VERTICAL_PADDING,
-} from "../../../constants/sizes";
+import { APP_BAR_HEIGHT, VERTICAL_PADDING } from "../../../constants/sizes";
+import { ChildrenProps } from "./PageContainer";
 
-export interface ChildrenProps {
-  children: React.ReactNode;
-}
-
-const PageContainer: React.FC<ChildrenProps> = ({ children }) => {
+const LandingContainer: React.FC<ChildrenProps> = ({ children }) => {
   return (
     <Box
       component="main"
       sx={{
         height: `calc(100vh - ${APP_BAR_HEIGHT} - ${VERTICAL_PADDING})`,
+        width: "100vw",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
+        justifyContent: "space-around",
         alignItems: "center",
         bgcolor: "background.default",
-        ml: `${DRAWER_WIDTH}px`,
         mt: APP_BAR_HEIGHT,
         p: 3,
-        overflow: "auto",
-        boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       {children}
@@ -33,4 +25,4 @@ const PageContainer: React.FC<ChildrenProps> = ({ children }) => {
   );
 };
 
-export default PageContainer;
+export default LandingContainer;

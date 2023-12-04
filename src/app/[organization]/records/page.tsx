@@ -3,8 +3,8 @@ import { redirect } from "next/navigation";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { CustomSession } from "../../../../types/session";
+import RecordsCard from "../../../components/card/RecordsCard";
 import PageHeader from "../../../components/containers/PageHeader";
-import RecordsCard from "../../../components/records/RecordsCard";
 import routes from "../../../utils/routes";
 import { options } from "../../api/auth/[...nextauth]/options";
 
@@ -19,7 +19,10 @@ const Records = async () => {
 
   return (
     <>
-      <PageHeader mainMessage={`Records for: ${orgId}`} />
+      <PageHeader
+        mainMessage={`Records kept for Organization: ${orgId}`}
+        secondaryMessage={`Download, Remove, and View Records`}
+      />
       <RecordsCard orgId={orgId} />
     </>
   );

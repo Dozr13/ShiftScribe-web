@@ -1,5 +1,5 @@
 import PageHeader from "@/components/containers/PageHeader";
-import JobCard from "@/components/jobs/JobCard";
+import JobCard from "@/components/card/JobCard";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { CustomSession } from "types/session";
@@ -17,7 +17,7 @@ const JobsPage = async () => {
 
   return (
     <>
-      <PageHeader mainMessage={`Job List for ${orgId}`} />
+      <PageHeader mainMessage={`Current Job List`} />
       <JobCard orgId={orgId} />
     </>
   );

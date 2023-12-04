@@ -8,9 +8,9 @@ import {
   updateEmployee,
 } from "../../app/actions/employeeActions";
 import { useEmployees } from "../../hooks/employees/useEmployees";
+import EmployeeGrid from "../grid/EmployeeGrid";
 import DeleteConfirmation from "../modals/DeleteConfirmation";
-import EmployeeGrid from "./EmployeeGrid";
-import EmployeeModal from "./EmployeeModal";
+import EmployeeModal from "../modals/EmployeeModal";
 
 interface EmployeeCardProps {
   orgId: string;

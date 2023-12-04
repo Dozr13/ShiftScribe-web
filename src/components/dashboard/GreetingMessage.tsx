@@ -12,9 +12,6 @@ const GreetingMessage: React.FC = () => {
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
       }}
     >
-      <Typography variant="h4" gutterBottom mb={4} align="center">
-        Welcome to Your ShiftScribe Dashboard!
-      </Typography>
       <Typography variant="body1" gutterBottom>
         👋 Hello there! Welcome to ShiftScribe, your comprehensive tool for
         effortless time tracking and employee management. Here&apos;s a quick

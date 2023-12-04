@@ -1,3 +1,5 @@
+"use client";
+import SupportIcon from "@mui/icons-material/Support";
 import {
   Box,
   Divider,
@@ -7,8 +9,10 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Modal,
 } from "@mui/material";
 import Link from "next/link";
+import { useState } from "react";
 import { UserSessionProps } from ".";
 import {
   getAccountLinks,
@@ -17,12 +21,17 @@ import {
 } from "../../../../constants/navLinks";
 import { DRAWER_WIDTH } from "../../../../constants/sizes";
 import stringUtils from "../../../utils/StringUtils";
+import SupportContentModal from "../../modals/SupportContentModal";
 
 const UserSideBar = ({ session }: UserSessionProps) => {
   const authLink = getAuthLink(session);
   const organization = session?.user?.organization;
   const formattedOrganization = stringUtils.slugify(organization!);
+  const [supportModalOpen, setSupportModalOpen] = useState(false);
 
+  const handleSupportClick = () => {
+    setSupportModalOpen(true);
+  };
   const links = getLinks(formattedOrganization);
   const accountLinks = getAccountLinks(formattedOrganization);
 
@@ -70,6 +79,14 @@ const UserSideBar = ({ session }: UserSessionProps) => {
                 </ListItemButton>
               </ListItem>
             ))}
+            <ListItem disablePadding>
+              <ListItemButton onClick={handleSupportClick}>
+                <ListItemIcon>
+                  <SupportIcon />
+                </ListItemIcon>
+                <ListItemText primary="Support" />
+              </ListItemButton>
+            </ListItem>
             <ListItem key={authLink.text} disablePadding>
               <ListItemButton component={Link} href={authLink.href}>
                 <ListItemIcon>
@@ -80,6 +97,30 @@ const UserSideBar = ({ session }: UserSessionProps) => {
             </ListItem>
           </List>
         </Box>
+      )}
+      {supportModalOpen && (
+        <Modal
+          open={supportModalOpen}
+          onClose={() => setSupportModalOpen(false)}
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              bgcolor: "white",
+              p: 4,
+              minWidth: 500,
+              maxWidth: 600,
+              borderRadius: 2,
+              boxShadow: 24,
+              overflowY: "auto",
+            }}
+          >
+            <SupportContentModal />
+          </Box>
+        </Modal>
       )}
     </Drawer>
   );

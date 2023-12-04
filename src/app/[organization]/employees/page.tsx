@@ -1,8 +1,8 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { CustomSession } from "../../../../types/session";
+import EmployeeCard from "../../../components/card/EmployeeCard";
 import PageHeader from "../../../components/containers/PageHeader";
-import EmployeeCard from "../../../components/employees/EmployeeCard";
 import routes from "../../../utils/routes";
 import { options } from "../../api/auth/[...nextauth]/options";
 
@@ -17,7 +17,7 @@ const EmployeesPage = async () => {
 
   return (
     <>
-      <PageHeader mainMessage={`Employee List for ${orgId}`} />
+      <PageHeader mainMessage={`Current Employee List`} />
       <EmployeeCard orgId={orgId} />
     </>
   );

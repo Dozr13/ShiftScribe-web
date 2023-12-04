@@ -4,19 +4,16 @@ import { useSnackbar } from "notistack";
 import { useState } from "react";
 import { FaCalendar, FaTimes } from "react-icons/fa";
 import {
-  BORDER_COLOR,
-  HEADER_BACKGROUND_COLOR,
-} from "../../../constants/theme";
-import {
   fetchAndGenerateCSV,
   purgeOldRecords,
 } from "../../app/actions/recordsActions";
 import useDateRange from "../../hooks/useDateRange";
 import { getLastSundayTwoWeeksPrior } from "../../utils/dataService";
-import DateRangePicker from "./DateRangePicker";
-import DownloadCsvButton from "./DownloadCsvButton";
-import GenerateCsvButton from "./GenerateCsvButton";
-import PurgeOldRecords from "./PurgeOldRecords";
+import DateRangePicker from "../records/DateRangePicker";
+import DownloadCsvButton from "../records/DownloadCsvButton";
+import GenerateCsvButton from "../records/GenerateCsvButton";
+import PurgeOldRecords from "../records/PurgeOldRecords";
+import { BACKGROUND_COLOR } from "../../../constants/colorPalette";
 
 interface RecordsCardProps {
   orgId: string;
@@ -42,6 +39,9 @@ const RecordsCard: React.FC<RecordsCardProps> = ({ orgId }) => {
     );
 
     if (success && csv) {
+      enqueueSnackbar(message || "CSV successfully generated", {
+        variant: "success",
+      });
       setCsv(csv);
     } else {
       // TODO: Implement better error message for if the dates selected don't have any records
@@ -52,6 +52,18 @@ const RecordsCard: React.FC<RecordsCardProps> = ({ orgId }) => {
 
   const handleShowDateRange = () => {
     setShowDateRange((prevShow) => !prevShow);
+  };
+
+  const handleModalClose = () => {
+    setShowDateRange(false);
+
+    // Display Snackbar message only if dates are selected
+    if (dateState[0].startDate && dateState[0].endDate) {
+      enqueueSnackbar(
+        `Start Date set to: ${dateState[0].startDate.toLocaleDateString()}, End Date set to: ${dateState[0].endDate.toLocaleDateString()}`,
+        { variant: "info" },
+      );
+    }
   };
 
   const purgeOldRecordsWrapper = async () => {
@@ -72,12 +84,11 @@ const RecordsCard: React.FC<RecordsCardProps> = ({ orgId }) => {
     <>
       <Paper
         sx={{
-          p: 4,
-          border: 2,
-          borderColor: BORDER_COLOR,
-          bgcolor: HEADER_BACKGROUND_COLOR,
+          backgroundColor: "rgba(255, 255, 255, 0.85)",
           borderRadius: 2,
-          width: "50vw",
+          p: 4,
+          boxShadow: 3,
+          bgcolor: BACKGROUND_COLOR,
         }}
       >
         <Grid container justifyContent="center" alignItems="center" spacing={2}>
@@ -141,7 +152,8 @@ const RecordsCard: React.FC<RecordsCardProps> = ({ orgId }) => {
       </Paper>
 
       {showDateRange && (
-        <Modal open={showDateRange} onClose={handleShowDateRange}>
+        // <Modal open={showDateRange} onClose={handleShowDateRange}>
+        <Modal open={showDateRange} onClose={handleModalClose}>
           <Box
             sx={{
               position: "absolute",

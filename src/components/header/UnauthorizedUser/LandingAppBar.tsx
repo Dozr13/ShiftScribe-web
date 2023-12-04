@@ -1,8 +1,8 @@
-import DashboardIcon from "@mui/icons-material/Dashboard";
+import ScheduleIcon from "@mui/icons-material/Schedule";
 import { AppBar, Toolbar, Typography } from "@mui/material";
 import React from "react";
 
-const UserAppBar: React.FC<{}> = () => {
+const LandingAppBar: React.FC<{}> = () => {
   return (
     <AppBar position="fixed" sx={{ zIndex: 2000 }}>
       <Toolbar
@@ -12,9 +12,7 @@ const UserAppBar: React.FC<{}> = () => {
           justifyContent: "center",
         }}
       >
-        <DashboardIcon
-          sx={{ color: "#444", mr: 2, transform: "translateY(-2px)" }}
-        />
+        <ScheduleIcon sx={{ color: "#444", mr: 2 }} />
         <Typography variant="h6" color="text.primary" align="center">
           Welcome to ShiftScribe
         </Typography>
@@ -23,4 +21,4 @@ const UserAppBar: React.FC<{}> = () => {
   );
 };
 
-export default UserAppBar;
+export default LandingAppBar;

@@ -9,9 +9,9 @@ import {
   fetchJobs,
   updateJob,
 } from "../../app/actions/jobActions";
+import JobGrid from "../grid/JobGrid";
 import DeleteConfirmation from "../modals/DeleteConfirmation";
-import JobGrid from "./JobGrid";
-import JobModal from "./JobModal";
+import JobModal from "../modals/JobModal";
 
 interface JobCardProps {
   orgId: string;
@@ -171,7 +171,6 @@ const JobCard = ({ orgId }: JobCardProps) => {
         </Button>
       </Box>
 
-      {/* Modals */}
       {jobModalOpen && (
         <Modal open={jobModalOpen} onClose={() => setJobModalOpen(false)}>
           <Box

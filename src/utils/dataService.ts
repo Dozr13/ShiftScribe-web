@@ -1,6 +1,6 @@
 import { QueryConstraint, endAt, orderByKey, startAt } from "firebase/database";
-import { StringUtils } from "../../lib"; // Assuming this is the correct import path
 import { TimeRecords } from "../../types/data";
+import stringUtils from "./StringUtils";
 
 // Utility to format and set dates for Firebase
 export const formatAndSetDates = (
@@ -12,7 +12,7 @@ export const formatAndSetDates = (
 ): string | null => {
   if (!date) return null;
   date.setHours(hours, minutes, seconds, milliseconds);
-  return StringUtils.formatDateForFirebase(date);
+  return stringUtils.formatDateForFirebase(date);
 };
 
 // Utility to get the last Sunday two weeks prior

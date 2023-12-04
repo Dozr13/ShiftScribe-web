@@ -38,78 +38,95 @@ const jwtCallback = async ({
   const email = token.email || profile?.email;
 
   console.log("JWT Callback email", email);
+  // if (email) {
+  //   console.log("IN IF email", email);
+
+  //   console.log(" admin.database()", admin.database().ref("/users"));
+
+  //   const usersRef = admin
+  //     .database()
+  //     .ref(`/users`)
+  //     .orderByChild("email")
+  //     .equalTo(email);
+  //   console.log("usersRef: ", usersRef);
+
+  //   const usersData = await usersRef.once("value");
+  //   console.log("usersData: ", usersData);
+
+  //   const usersSnapshot = usersData.val();
+  //   console.log("usersSnapshot: ", usersSnapshot);
   if (email) {
-    console.log("IN IF email", email);
-
-    console.log(" admin.database()", admin.database().ref("/users"));
-
-    const usersRef = admin
-      .database()
-      .ref(`/users`)
-      .orderByChild("email")
-      .equalTo(email);
-    console.log("usersRef", usersRef);
-
-    const usersData = await usersRef.once("value");
-    console.log("usersData", usersData);
-
-    const usersSnapshot = usersData.val();
-    console.log("usersSnapshot", usersSnapshot);
-
-    let userSnapshot;
-    if (usersSnapshot) {
-      const userId = Object.keys(usersSnapshot)[0];
-      userSnapshot = { ...usersSnapshot[userId], id: userId };
-      console.log("User fetched successfully");
-    }
-    // for (const userId in usersSnapshot) {
-    //   if (usersSnapshot[userId].email === email) {
-    //     userSnapshot = { ...usersSnapshot[userId], id: userId };
-    //     break;
-    //   }
-    // }
-
-    if (userSnapshot) {
-      token.uid = userSnapshot.id;
-      const orgRef = admin
+    console.log("Fetching user data for email:", email);
+    try {
+      const usersRef = admin
         .database()
-        .ref(`/orgs/${userSnapshot.organization}/members/${userSnapshot.id}`);
-      const orgData = await orgRef.once("value");
-      const orgSnapshot = orgData.val();
+        .ref(`/users`)
+        .orderByChild("email")
+        .equalTo(email);
+      console.log("Firebase ref created:", usersRef.toString());
 
-      token.employee = {
-        id: userSnapshot.id,
-        accessLevel: orgSnapshot?.accessLevel,
-        userData: {
-          displayName: userSnapshot.displayName,
-          email: userSnapshot.email,
-          organization: userSnapshot.organization,
-          accessLevel: userSnapshot.accessLevel,
-        },
-      };
+      const usersData = await usersRef.once("value");
+      console.log("Firebase data fetched");
 
-      switch (orgSnapshot?.accessLevel) {
-        case 0:
-          token.role = "Unverified";
-          break;
-        case 1:
-          token.role = "User";
-          break;
-        case 2:
-          token.role = "Manager";
-          break;
-        case 3:
-          token.role = "Admin";
-          break;
-        case 4:
-          token.role = "Superuser";
-          break;
-        default:
-          token.role = "UNKNOWN";
+      const usersSnapshot = usersData.val();
+      if (usersSnapshot) {
+        console.log("Users data:", usersSnapshot);
+
+        let userSnapshot;
+        if (usersSnapshot) {
+          const userId = Object.keys(usersSnapshot)[0];
+          userSnapshot = { ...usersSnapshot[userId], id: userId };
+          console.log("User fetched successfully");
+        }
+
+        if (userSnapshot) {
+          token.uid = userSnapshot.id;
+          const orgRef = admin
+            .database()
+            .ref(
+              `/orgs/${userSnapshot.organization}/members/${userSnapshot.id}`,
+            );
+          const orgData = await orgRef.once("value");
+          const orgSnapshot = orgData.val();
+
+          token.employee = {
+            id: userSnapshot.id,
+            accessLevel: orgSnapshot?.accessLevel,
+            userData: {
+              displayName: userSnapshot.displayName,
+              email: userSnapshot.email,
+              organization: userSnapshot.organization,
+              accessLevel: userSnapshot.accessLevel,
+            },
+          };
+
+          switch (orgSnapshot?.accessLevel) {
+            case 0:
+              token.role = "Unverified";
+              break;
+            case 1:
+              token.role = "User";
+              break;
+            case 2:
+              token.role = "Manager";
+              break;
+            case 3:
+              token.role = "Admin";
+              break;
+            case 4:
+              token.role = "Superuser";
+              break;
+            default:
+              token.role = "UNKNOWN";
+          }
+        }
+      } else {
+        console.log("No user found with the provided email");
       }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
     }
   }
-
   console.log("JWT Callback End");
 
   return token as MyJWT;

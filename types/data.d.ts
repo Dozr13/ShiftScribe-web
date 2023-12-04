@@ -5,17 +5,19 @@ export interface UserData {
 }
 
 export interface OrgData {
-  members?: {
+  members: {
     [key: number]: OrgProfile;
   };
   joinRequests?: {
     [key: number]: true;
   };
-  superuser?: string;
+  originalName: string;
+  superuser: string;
   timeRecords?: TimeRecords;
 }
 
 export interface OrgJob {
+  id: string;
   jobName: string;
   jobNumber: string;
   jobAddress: string;
@@ -46,6 +48,38 @@ type Events = Record<string, EventObject>;
 export interface OrgProfile {
   accessLevel?: number;
   events?: Events;
+}
+
+type EmployeesGridRowData = {
+  id: string;
+  accessLevel: number;
+  userData: User;
+};
+
+type JobsGridRowData = {
+  id: string;
+  jobName: string;
+  jobNumber: string;
+  jobAddress: string;
+};
+
+// TODO: Refine and base on events
+type RequestsGridRowData = {
+  id: string;
+  submitter: string;
+  dateRequest: string;
+  inRequest: string;
+  outRequest: string;
+  jobs: string;
+  totalTimeRequested: string;
+  submitterName?: string;
+  events: Record<string, EventObject>;
+};
+
+export interface OrgEmployee {
+  id: string;
+  accessLevel: number;
+  userData: UserData;
 }
 
 interface TimeRecord {
@@ -105,16 +139,13 @@ type UserProfileDataGeneric<T> = {
 
 export type UserProfileDataTimestamps = DateOrNumber<UserProfileData>;
 
-type RequestData = {
-  id: number;
+type OrgRequest = {
+  id: string;
   submitter: string;
-  dateRequest: number;
-  inRequest: number;
-  outRequest: number;
-  jobs: EventObject[];
-  totalTimeRequested: number;
+  events: Events;
+  submitterName?: string;
 };
 
-type FullProfileData = UserProfileData & RequestData;
+type FullProfileData = UserProfileData & OrgRequest;
 
-export type EitherProfileData = UserProfileData | RequestData;
+export type EitherProfileData = UserProfileData | OrgRequest;

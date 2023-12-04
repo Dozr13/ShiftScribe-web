@@ -211,14 +211,17 @@ export const options = {
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        console.log("credentials in provider", credentials);
+        console.log("Authorizing credentials:", credentials);
         if (!credentials) {
           throw new Error("No credentials provided");
         }
 
         try {
-          const email = credentials.email;
-          const password = credentials.password;
+          // const email = credentials.email;
+          // const password = credentials.password;
+          const { email, password } = credentials;
+
+          console.log(`Attempting to sign in user: ${email}`);
 
           const userCredential = await signInWithEmailAndPassword(
             firebaseAuth,
@@ -227,7 +230,7 @@ export const options = {
           );
           const user = userCredential.user;
 
-          // console.log("user in options", user);
+          console.log(`User signed in successfully: ${user.uid}`);
 
           return {
             id: user.uid,
@@ -235,10 +238,12 @@ export const options = {
             email: user.email,
           };
         } catch (error) {
+          console.error("Error during user sign-in:", error);
+
           if (error instanceof Error) {
             throw new Error(error.message);
           } else {
-            throw new Error("An unknown error occurred");
+            throw new Error("An unknown error occurred during sign-in");
           }
         }
       },

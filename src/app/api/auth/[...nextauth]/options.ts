@@ -37,10 +37,15 @@ const jwtCallback = async ({
 
   const email = token.email || profile?.email;
 
+  console.log("JWT Callback email", email);
   if (email) {
+    console.log("IN IF email", email);
     const usersRef = admin.database().ref("/users");
     const usersData = await usersRef.once("value");
     const usersSnapshot = usersData.val();
+    console.log("usersRef", usersRef);
+    console.log("usersData", usersData);
+    console.log("usersSnapshot", usersSnapshot);
 
     let userSnapshot;
     for (const userId in usersSnapshot) {

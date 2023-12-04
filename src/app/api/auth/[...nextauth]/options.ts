@@ -2,9 +2,7 @@ import { signInWithEmailAndPassword } from "@firebase/auth";
 import { Account, Profile, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
-import { OrgEmployee } from "../../../../../types/data";
 import { ShiftScribeUser } from "../../../../../types/session";
 import { firebaseAuth } from "../../../../services/firebase";
 import admin from "../../../../services/firebase-admin";
@@ -98,30 +96,38 @@ const jwtCallback = async ({
   console.log("JWT Callback Start");
 
   const email = token.email || profile?.email;
+  console.log("JWT Callback Email:", email);
 
   if (email) {
+    console.log("Starting Firebase user query for email:", email);
     try {
-      console.log(`Querying Firebase for email: ${email}`);
-
       const usersRef = admin.database().ref("/users");
       const usersQuery = usersRef.orderByChild("email").equalTo(email);
-      console.log("Querying user with email:", email);
+      console.log("Firebase user query created, awaiting response...");
 
       const usersData = await usersQuery.once("value");
+      console.log("Firebase user query response received");
+
       const usersSnapshot = usersData.val();
+      console.log("Firebase user snapshot:", usersSnapshot);
 
       if (usersSnapshot) {
+        console.log("User data found in snapshot, processing...");
         const userId = Object.keys(usersSnapshot)[0];
         const userSnapshot = usersSnapshot[userId];
-
-        console.log("User data found:", userSnapshot);
+        console.log("User found:", userSnapshot);
 
         token.uid = userSnapshot.id;
         const orgRef = admin
           .database()
           .ref(`/orgs/${userSnapshot.organization}/members/${userSnapshot.id}`);
+        console.log("Fetching organization data for user");
+
         const orgData = await orgRef.once("value");
+        console.log("Organization data received");
+
         const orgSnapshot = orgData.val();
+        console.log("Organization snapshot:", orgSnapshot);
 
         token.employee = {
           id: userSnapshot.id,
@@ -133,6 +139,7 @@ const jwtCallback = async ({
             accessLevel: userSnapshot.accessLevel,
           },
         };
+
         switch (orgSnapshot?.accessLevel) {
           case 0:
             token.role = "Unverified";
@@ -152,16 +159,15 @@ const jwtCallback = async ({
           default:
             token.role = "UNKNOWN";
         }
-
-        console.log("Firebase query completed");
+        console.log("User and organization data processed");
       } else {
-        console.log("No user found with email:", email);
+        console.log("No user data found for email:", email);
       }
     } catch (error) {
-      console.error("Error in JWT callback:", error);
+      console.error("Error during Firebase operations:", error);
     }
   } else {
-    console.log("Email not found in token or profile");
+    console.log("Email not found in JWT token or profile");
   }
 
   console.log("JWT Callback End");
@@ -237,28 +243,27 @@ export const options = {
         }
       },
     }),
+    // GitHubProvider({
+    //   profile(profile) {
+    //     const employee: OrgEmployee = {
+    //       id: profile.id.toString(),
+    //       accessLevel: determineAccessLevel(profile),
+    //       userData: {
+    //         displayName:
+    //           profile.name ?? "Err on displayName in GitHubProvider options",
+    //         email: profile.email ?? "Err on email in GitHubProvider options",
+    //         organization:
+    //           profile.organization ??
+    //           "Err on organization in GitHubProvider options",
+    //       },
+    //     };
 
-    GitHubProvider({
-      profile(profile) {
-        const employee: OrgEmployee = {
-          id: profile.id.toString(),
-          accessLevel: determineAccessLevel(profile),
-          userData: {
-            displayName:
-              profile.name ?? "Err on displayName in GitHubProvider options",
-            email: profile.email ?? "Err on email in GitHubProvider options",
-            organization:
-              profile.organization ??
-              "Err on organization in GitHubProvider options",
-          },
-        };
+    //     return employee;
+    //   },
 
-        return employee;
-      },
-
-      clientId: process.env.GITHUB_ID ?? "",
-      clientSecret: process.env.GITHUB_SECRET ?? "",
-    }),
+    //   clientId: process.env.GITHUB_ID ?? "",
+    //   clientSecret: process.env.GITHUB_SECRET ?? "",
+    // }),
     GoogleProvider({
       profile(profile) {
         return {
@@ -276,12 +281,11 @@ export const options = {
     jwt: jwtCallback,
     session: sessionCallback,
   },
-  firebaseAuth,
 };
 
-function determineAccessLevel(profile: any): number {
-  if (profile.email === "dev@deploy.com") {
-    return 4;
-  }
-  return 1;
-}
+// function determineAccessLevel(profile: any): number {
+//   if (profile.email === "dev@deploy.com") {
+//     return 4;
+//   }
+//   return 1;
+// }

@@ -2,7 +2,9 @@ import { signInWithEmailAndPassword } from "@firebase/auth";
 import { Account, Profile, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
+import { OrgEmployee } from "../../../../../types/data";
 import { ShiftScribeUser } from "../../../../../types/session";
 import { firebaseAuth } from "../../../../services/firebase";
 import admin from "../../../../services/firebase-admin";
@@ -161,6 +163,28 @@ export const options = {
           }
         }
       },
+    }),
+
+    GitHubProvider({
+      profile(profile) {
+        const employee: OrgEmployee = {
+          id: profile.id.toString(),
+          accessLevel: determineAccessLevel(profile),
+          userData: {
+            displayName:
+              profile.name ?? "Err on displayName in GitHubProvider options",
+            email: profile.email ?? "Err on email in GitHubProvider options",
+            organization:
+              profile.organization ??
+              "Err on organization in GitHubProvider options",
+          },
+        };
+
+        return employee;
+      },
+
+      clientId: process.env.GITHUB_ID ?? "",
+      clientSecret: process.env.GITHUB_SECRET ?? "",
     }),
     GoogleProvider({
       profile(profile) {

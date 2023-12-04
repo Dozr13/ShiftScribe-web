@@ -101,6 +101,8 @@ const jwtCallback = async ({
 
   if (email) {
     try {
+      console.log(`Querying Firebase for email: ${email}`);
+
       const usersRef = admin.database().ref("/users");
       const usersQuery = usersRef.orderByChild("email").equalTo(email);
       console.log("Querying user with email:", email);
@@ -150,12 +152,13 @@ const jwtCallback = async ({
           default:
             token.role = "UNKNOWN";
         }
+
+        console.log("Firebase query completed");
       } else {
         console.log("No user found with email:", email);
       }
     } catch (error) {
       console.error("Error in JWT callback:", error);
-      // Handle the error appropriately
     }
   } else {
     console.log("Email not found in token or profile");
@@ -273,6 +276,7 @@ export const options = {
     jwt: jwtCallback,
     session: sessionCallback,
   },
+  firebaseAuth,
 };
 
 function determineAccessLevel(profile: any): number {

@@ -40,20 +40,34 @@ const jwtCallback = async ({
   console.log("JWT Callback email", email);
   if (email) {
     console.log("IN IF email", email);
-    const usersRef = admin.database().ref("/users");
-    const usersData = await usersRef.once("value");
-    const usersSnapshot = usersData.val();
+
+    console.log(" admin.database()", admin.database().ref("/users"));
+
+    const usersRef = admin
+      .database()
+      .ref(`/users`)
+      .orderByChild("email")
+      .equalTo(email);
     console.log("usersRef", usersRef);
+
+    const usersData = await usersRef.once("value");
     console.log("usersData", usersData);
+
+    const usersSnapshot = usersData.val();
     console.log("usersSnapshot", usersSnapshot);
 
     let userSnapshot;
-    for (const userId in usersSnapshot) {
-      if (usersSnapshot[userId].email === email) {
-        userSnapshot = { ...usersSnapshot[userId], id: userId };
-        break;
-      }
+    if (usersSnapshot) {
+      const userId = Object.keys(usersSnapshot)[0];
+      userSnapshot = { ...usersSnapshot[userId], id: userId };
+      console.log("User fetched successfully");
     }
+    // for (const userId in usersSnapshot) {
+    //   if (usersSnapshot[userId].email === email) {
+    //     userSnapshot = { ...usersSnapshot[userId], id: userId };
+    //     break;
+    //   }
+    // }
 
     if (userSnapshot) {
       token.uid = userSnapshot.id;
@@ -138,6 +152,7 @@ export const options = {
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
+        console.log("credentials in provider", credentials);
         if (!credentials) {
           throw new Error("No credentials provided");
         }

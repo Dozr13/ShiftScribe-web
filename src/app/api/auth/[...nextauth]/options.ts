@@ -22,6 +22,68 @@ interface MyJWT extends JWT {
   role?: string;
 }
 
+// const jwtCallback = async ({
+//   token,
+//   user,
+//   account,
+//   profile,
+// }: {
+//   token: JWT;
+//   user?: User | null;
+//   account?: Account | null;
+//   profile?: Profile | null;
+// }): Promise<MyJWT> => {
+//   console.log("JWT Callback Start");
+
+//   const email = token.email || profile?.email;
+
+//   console.log("JWT Callback email", email);
+
+//   if (email) {
+//     console.log("Fetching user data for email:", email);
+//     try {
+//       const usersRef = admin
+//         .database()
+//         .ref(`/users`)
+//         .orderByChild("email")
+//         .equalTo(email);
+//       console.log("Firebase ref created:", usersRef.toString());
+
+//       const usersData = await usersRef.once("value");
+//       console.log("Firebase data fetched");
+
+//       const usersSnapshot = usersData.val();
+//       if (usersSnapshot) {
+//         console.log("Users data:", usersSnapshot);
+
+//         let userSnapshot;
+//         if (usersSnapshot) {
+//           const userId = Object.keys(usersSnapshot)[0];
+//           userSnapshot = { ...usersSnapshot[userId], id: userId };
+//           console.log("User fetched successfully");
+//         }
+
+//         if (userSnapshot) {
+//           token.uid = userSnapshot.id;
+//           const orgRef = admin
+//             .database()
+//             .ref(
+//               `/orgs/${userSnapshot.organization}/members/${userSnapshot.id}`,
+//             );
+//           const orgData = await orgRef.once("value");
+//           const orgSnapshot = orgData.val();
+
+//           token.employee = {
+//             id: userSnapshot.id,
+//             accessLevel: orgSnapshot?.accessLevel,
+//             userData: {
+//               displayName: userSnapshot.displayName,
+//               email: userSnapshot.email,
+//               organization: userSnapshot.organization,
+//               accessLevel: userSnapshot.accessLevel,
+//             },
+//           };
+
 const jwtCallback = async ({
   token,
   user,
@@ -37,99 +99,70 @@ const jwtCallback = async ({
 
   const email = token.email || profile?.email;
 
-  console.log("JWT Callback email", email);
-  // if (email) {
-  //   console.log("IN IF email", email);
-
-  //   console.log(" admin.database()", admin.database().ref("/users"));
-
-  //   const usersRef = admin
-  //     .database()
-  //     .ref(`/users`)
-  //     .orderByChild("email")
-  //     .equalTo(email);
-  //   console.log("usersRef: ", usersRef);
-
-  //   const usersData = await usersRef.once("value");
-  //   console.log("usersData: ", usersData);
-
-  //   const usersSnapshot = usersData.val();
-  //   console.log("usersSnapshot: ", usersSnapshot);
   if (email) {
-    console.log("Fetching user data for email:", email);
     try {
-      const usersRef = admin
-        .database()
-        .ref(`/users`)
-        .orderByChild("email")
-        .equalTo(email);
-      console.log("Firebase ref created:", usersRef.toString());
+      const usersRef = admin.database().ref("/users");
+      const usersQuery = usersRef.orderByChild("email").equalTo(email);
+      console.log("Querying user with email:", email);
 
-      const usersData = await usersRef.once("value");
-      console.log("Firebase data fetched");
-
+      const usersData = await usersQuery.once("value");
       const usersSnapshot = usersData.val();
+
       if (usersSnapshot) {
-        console.log("Users data:", usersSnapshot);
+        const userId = Object.keys(usersSnapshot)[0];
+        const userSnapshot = usersSnapshot[userId];
 
-        let userSnapshot;
-        if (usersSnapshot) {
-          const userId = Object.keys(usersSnapshot)[0];
-          userSnapshot = { ...usersSnapshot[userId], id: userId };
-          console.log("User fetched successfully");
-        }
+        console.log("User data found:", userSnapshot);
 
-        if (userSnapshot) {
-          token.uid = userSnapshot.id;
-          const orgRef = admin
-            .database()
-            .ref(
-              `/orgs/${userSnapshot.organization}/members/${userSnapshot.id}`,
-            );
-          const orgData = await orgRef.once("value");
-          const orgSnapshot = orgData.val();
+        token.uid = userSnapshot.id;
+        const orgRef = admin
+          .database()
+          .ref(`/orgs/${userSnapshot.organization}/members/${userSnapshot.id}`);
+        const orgData = await orgRef.once("value");
+        const orgSnapshot = orgData.val();
 
-          token.employee = {
-            id: userSnapshot.id,
-            accessLevel: orgSnapshot?.accessLevel,
-            userData: {
-              displayName: userSnapshot.displayName,
-              email: userSnapshot.email,
-              organization: userSnapshot.organization,
-              accessLevel: userSnapshot.accessLevel,
-            },
-          };
-
-          switch (orgSnapshot?.accessLevel) {
-            case 0:
-              token.role = "Unverified";
-              break;
-            case 1:
-              token.role = "User";
-              break;
-            case 2:
-              token.role = "Manager";
-              break;
-            case 3:
-              token.role = "Admin";
-              break;
-            case 4:
-              token.role = "Superuser";
-              break;
-            default:
-              token.role = "UNKNOWN";
-          }
+        token.employee = {
+          id: userSnapshot.id,
+          accessLevel: orgSnapshot?.accessLevel,
+          userData: {
+            displayName: userSnapshot.displayName,
+            email: userSnapshot.email,
+            organization: userSnapshot.organization,
+            accessLevel: userSnapshot.accessLevel,
+          },
+        };
+        switch (orgSnapshot?.accessLevel) {
+          case 0:
+            token.role = "Unverified";
+            break;
+          case 1:
+            token.role = "User";
+            break;
+          case 2:
+            token.role = "Manager";
+            break;
+          case 3:
+            token.role = "Admin";
+            break;
+          case 4:
+            token.role = "Superuser";
+            break;
+          default:
+            token.role = "UNKNOWN";
         }
       } else {
-        console.log("No user found with the provided email");
+        console.log("No user found with email:", email);
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("Error in JWT callback:", error);
+      // Handle the error appropriately
     }
+  } else {
+    console.log("Email not found in token or profile");
   }
-  console.log("JWT Callback End");
 
-  return token as MyJWT;
+  console.log("JWT Callback End");
+  return token;
 };
 
 const sessionCallback = async ({

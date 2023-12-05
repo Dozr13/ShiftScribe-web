@@ -3,7 +3,6 @@ import type { NextAuthOptions } from "next-auth";
 import NextAuth, { Account, Profile, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
 import { ShiftScribeUser } from "../../../../types/session";
 import { firebaseAuth } from "../../../services/firebase";
 import fetchUserData, {
@@ -157,18 +156,18 @@ export const authOptions: NextAuthOptions = {
     //   clientId: process.env.GITHUB_ID ?? "",
     //   clientSecret: process.env.GITHUB_SECRET ?? "",
     // }),
-    GoogleProvider({
-      profile(profile) {
-        return {
-          id: profile.sub,
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture,
-        };
-      },
-      clientId: process.env.GOOGLE_ID ?? "",
-      clientSecret: process.env.GOOGLE_SECRET ?? "",
-    }),
+    // GoogleProvider({
+    //   profile(profile) {
+    //     return {
+    //       id: profile.sub,
+    //       name: profile.name,
+    //       email: profile.email,
+    //       image: profile.picture,
+    //     };
+    //   },
+    //   clientId: process.env.GOOGLE_ID ?? "",
+    //   clientSecret: process.env.GOOGLE_SECRET ?? "",
+    // }),
   ],
   callbacks: {
     jwt: jwtCallback,

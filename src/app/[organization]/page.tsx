@@ -1,10 +1,7 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "../../pages/api/auth/[...nextauth]";
+import Dashboard from "./dashboard/page";
 
-const Dashboard = async () => {
-  const session = await getServerSession(authOptions);
-
+const OrganizationBase = async () => {
   return <Dashboard />;
 };
 
-export default Dashboard;
+export default OrganizationBase;

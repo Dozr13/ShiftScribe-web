@@ -7,13 +7,17 @@ const TempMember = async () => {
 
   return (
     <Box>
-      <Typography>{session?.user?.uid}</Typography>
-      <Typography>{session?.user?.email}</Typography>
-      <Typography>{session?.user?.name}</Typography>
-      <Typography>{session?.user?.accessLevel}</Typography>
-      <Typography>{session?.user?.role}</Typography>
-      <Typography>{session?.user?.organization}</Typography>
       <Typography variant="h4">User Profile Settings coming soon!</Typography>
+      {/* <Typography>{session?.user?.uid}</Typography> */}
+      <br />
+      <br />
+      <Typography>Current email: {session?.user?.email}</Typography>
+      <Typography>Name: {session?.user?.name}</Typography>
+      <Typography>
+        Current Access Level: {session?.user?.accessLevel}
+      </Typography>
+      <Typography>Current Role: {session?.user?.role}</Typography>
+      <Typography>Your Organization: {session?.user?.organization}</Typography>
     </Box>
   );
 };

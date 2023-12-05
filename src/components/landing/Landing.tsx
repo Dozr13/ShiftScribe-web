@@ -8,6 +8,7 @@ import {
 } from "../../../constants/colorPalette";
 import routes from "../../utils/routes";
 
+// TODO: Implement a OrgInput check at signup to determine route
 const Landing = () => {
   return (
     <Box

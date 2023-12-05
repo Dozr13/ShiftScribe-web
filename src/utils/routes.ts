@@ -1,5 +1,7 @@
 const routes = {
   home: "/",
+  organizationBase: (organization: string | null | undefined) =>
+    `/${organization}`,
   dashboard: (organization: string | null | undefined) =>
     `/${organization}/dashboard`,
   employees: (organization: string | null | undefined) =>

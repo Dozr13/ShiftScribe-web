@@ -1,16 +1,16 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { CustomSession } from "../../../../types/session";
-import PageHeader from "../../../components/containers/PageHeader";
 import RequestsCard from "../../../components/card/RequestCard";
+import PageHeader from "../../../components/containers/PageHeader";
+import { authOptions } from "../../../pages/api/auth/[...nextauth]";
 import routes from "../../../utils/routes";
-import { options } from "../../api/auth/[...nextauth]/options";
 
 const Requests = async () => {
-  const session = (await getServerSession(options)) as CustomSession;
+  const session = await getServerSession(authOptions);
 
   if (!session || session.user.accessLevel <= 1 || !session.user.organization) {
-    redirect(routes.profile(session.user.organization));
+    // TODO: Ensure working correctly
+    redirect(routes.profile(session?.user.organization));
   }
 
   const orgId = session.user.organization;

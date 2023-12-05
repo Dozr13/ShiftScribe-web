@@ -1,10 +1,9 @@
 import { Box, Typography } from "@mui/material";
 import { getServerSession } from "next-auth";
-import { CustomSession } from "../../../../types/session";
-import { options } from "../../api/auth/[...nextauth]/options";
+import { authOptions } from "../../../pages/api/auth/[...nextauth]";
 
 const TempMember = async () => {
-  const session = (await getServerSession(options)) as CustomSession;
+  const session = await getServerSession(authOptions);
 
   return (
     <Box>

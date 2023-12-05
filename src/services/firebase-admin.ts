@@ -48,7 +48,7 @@ const serviceAccount: ServiceAccount = {
 
 const initializeFirebaseAdmin = () => {
   if (!admin.apps.length) {
-    console.log("Initializing Firebase Admin SDK");
+    console.log("Initializing Firebase Admin SDK", serviceAccount);
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
       databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,

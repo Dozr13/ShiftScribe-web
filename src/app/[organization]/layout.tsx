@@ -1,12 +1,11 @@
-import { getServerSession } from "next-auth";
 import React from "react";
-import { CustomSession } from "../../../types/session";
 import PageContainer from "../../components/containers/PageContainer";
 import UserWrapper from "../../components/header/AuthUser";
-import { options } from "../api/auth/[...nextauth]/options";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../pages/api/auth/[...nextauth]";
 
 const Layout = async ({ children }: { children: React.ReactNode }) => {
-  const session = (await getServerSession(options)) as CustomSession;
+  const session = await getServerSession(authOptions);
 
   return (
     <>

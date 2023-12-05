@@ -2,14 +2,13 @@ import { Box } from "@mui/material";
 import { getServerSession } from "next-auth";
 import Head from "next/head";
 import { redirect } from "next/navigation";
-import { CustomSession } from "../../types/session";
 import Landing from "../components/landing/Landing";
 import stringUtils from "../utils/StringUtils";
 import routes from "../utils/routes";
-import { options } from "./api/auth/[...nextauth]/options";
+import { authOptions } from "../pages/api/auth/[...nextauth]";
 
 const HomePage = async () => {
-  const session = (await getServerSession(options)) as CustomSession;
+  const session = await getServerSession(authOptions);
 
   if (session) {
     const formattedOrganization = stringUtils.slugify(

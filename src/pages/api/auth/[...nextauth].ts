@@ -1,11 +1,12 @@
 import { signInWithEmailAndPassword } from "@firebase/auth";
-import { Account, Profile, Session, User } from "next-auth";
+import type { NextAuthOptions } from "next-auth";
+import NextAuth, { Account, Profile, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { ShiftScribeUser } from "../../../../../types/session";
-import { firebaseAuth } from "../../../../services/firebase";
-import admin from "../../../../services/firebase-admin";
+import { ShiftScribeUser } from "../../../../types/session";
+import { firebaseAuth } from "../../../services/firebase";
+import admin from "../../../services/firebase-admin";
 
 interface MyJWT extends JWT {
   employee?: {
@@ -19,68 +20,6 @@ interface MyJWT extends JWT {
   };
   role?: string;
 }
-
-// const jwtCallback = async ({
-//   token,
-//   user,
-//   account,
-//   profile,
-// }: {
-//   token: JWT;
-//   user?: User | null;
-//   account?: Account | null;
-//   profile?: Profile | null;
-// }): Promise<MyJWT> => {
-//   console.log("JWT Callback Start");
-
-//   const email = token.email || profile?.email;
-
-//   console.log("JWT Callback email", email);
-
-//   if (email) {
-//     console.log("Fetching user data for email:", email);
-//     try {
-//       const usersRef = admin
-//         .database()
-//         .ref(`/users`)
-//         .orderByChild("email")
-//         .equalTo(email);
-//       console.log("Firebase ref created:", usersRef.toString());
-
-//       const usersData = await usersRef.once("value");
-//       console.log("Firebase data fetched");
-
-//       const usersSnapshot = usersData.val();
-//       if (usersSnapshot) {
-//         console.log("Users data:", usersSnapshot);
-
-//         let userSnapshot;
-//         if (usersSnapshot) {
-//           const userId = Object.keys(usersSnapshot)[0];
-//           userSnapshot = { ...usersSnapshot[userId], id: userId };
-//           console.log("User fetched successfully");
-//         }
-
-//         if (userSnapshot) {
-//           token.uid = userSnapshot.id;
-//           const orgRef = admin
-//             .database()
-//             .ref(
-//               `/orgs/${userSnapshot.organization}/members/${userSnapshot.id}`,
-//             );
-//           const orgData = await orgRef.once("value");
-//           const orgSnapshot = orgData.val();
-
-//           token.employee = {
-//             id: userSnapshot.id,
-//             accessLevel: orgSnapshot?.accessLevel,
-//             userData: {
-//               displayName: userSnapshot.displayName,
-//               email: userSnapshot.email,
-//               organization: userSnapshot.organization,
-//               accessLevel: userSnapshot.accessLevel,
-//             },
-//           };
 
 const jwtCallback = async ({
   token,
@@ -209,7 +148,7 @@ const sessionCallback = async ({
   return session;
 };
 
-export const options = {
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -294,9 +233,4 @@ export const options = {
   },
 };
 
-// function determineAccessLevel(profile: any): number {
-//   if (profile.email === "dev@deploy.com") {
-//     return 4;
-//   }
-//   return 1;
-// }
+export default NextAuth(authOptions);

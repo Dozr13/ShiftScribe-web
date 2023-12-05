@@ -6,8 +6,10 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { ShiftScribeUser } from "../../../../types/session";
 import { firebaseAuth } from "../../../services/firebase";
-import admin from "../../../services/firebase-admin";
-import fetchUserData from "../../../utils/fetchUserData";
+import fetchUserData, {
+  determineRoleBasedOnAccessLevel,
+  fetchUserDataByEmail,
+} from "../../../utils/fetchUserData";
 
 interface MyJWT extends JWT {
   employee?: {
@@ -39,79 +41,23 @@ const jwtCallback = async ({
   console.log("JWT Callback Email:", email);
 
   if (email) {
-    console.log("JWT Callback Starting Firebase user query for email:", email);
     try {
-      const usersRef = admin.database().ref("/users");
-      console.log("JWT Callback usersRef", usersRef);
-      const usersQuery = usersRef.orderByChild("email").equalTo(email);
-      console.log(
-        "JWT Callback Firebase user query created, awaiting response... and usersQuery: ",
-        usersQuery,
-      );
-
-      const usersData = await usersQuery.once("value");
-      console.log(
-        "JWT Callback Firebase user query response received and usersData is: ",
-        usersData,
-      );
-
-      const usersSnapshot = usersData.val();
-      console.log("JWT Callback Firebase user snapshot:", usersSnapshot);
-
-      if (usersSnapshot) {
-        console.log("JWT Callback User data found in snapshot, processing...");
-        const userId = Object.keys(usersSnapshot)[0];
-        const userSnapshot = usersSnapshot[userId];
-        console.log("JWT Callback User found:", userSnapshot);
-
-        token.uid = userSnapshot.id;
-        const orgRef = admin
-          .database()
-          .ref(`/orgs/${userSnapshot.organization}/members/${userSnapshot.id}`);
-        console.log("JWT Callback Fetching organization data for user");
-
-        const orgData = await orgRef.once("value");
-        console.log("JWT Callback Organization data received");
-
-        const orgSnapshot = orgData.val();
-        console.log("JWT Callback Organization snapshot:", orgSnapshot);
-
+      const userData = await fetchUserDataByEmail(email);
+      if (userData) {
+        console.log("JWT Callback User data found:", userData);
         token.employee = {
-          id: userSnapshot.id,
-          accessLevel: orgSnapshot?.accessLevel,
+          id: userData.uid,
+          accessLevel: userData.accessLevel,
           userData: {
-            displayName: userSnapshot.displayName,
-            email: userSnapshot.email,
-            organization: userSnapshot.organization,
-            accessLevel: userSnapshot.accessLevel,
+            displayName: userData.displayName,
+            email: userData.email,
+            organization: userData.organization,
           },
         };
-
-        switch (orgSnapshot?.accessLevel) {
-          case 0:
-            token.role = "Unverified";
-            break;
-          case 1:
-            token.role = "User";
-            break;
-          case 2:
-            token.role = "Manager";
-            break;
-          case 3:
-            token.role = "Admin";
-            break;
-          case 4:
-            token.role = "Superuser";
-            break;
-          default:
-            token.role = "UNKNOWN";
-        }
-        console.log("JWT Callback User and organization data processed");
-      } else {
-        console.log("JWT Callback No user data found for email:", email);
+        token.role = determineRoleBasedOnAccessLevel(userData.accessLevel);
       }
     } catch (error) {
-      console.error("Error during Firebase operations:", error);
+      console.error("Error during user data retrieval:", error);
     }
   } else {
     console.log("JWT Callback Email not found in JWT token or profile");
@@ -164,47 +110,6 @@ export const authOptions: NextAuthOptions = {
           throw new Error("No credentials provided");
         }
 
-        //   try {
-        //     console.log(
-        //       "Attempting to sign in with email and password",
-        //       credentials.email,
-        //       credentials.password,
-        //     );
-        //     const userCredential = await signInWithEmailAndPassword(
-        //       firebaseAuth,
-        //       credentials.email,
-        //       credentials.password,
-        //     );
-        //     // console.log("Signed in successfully:", userCredential.user);
-
-        //     const uid = userCredential.user.uid;
-        //     // console.log("Signed in successfully:", userCredential);
-        //     // console.log("Signed in successfully:", userCredential.user.email);
-        //     console.log("Fetching user data for UID:", uid);
-
-        //     const userRef = admin.database().ref(`/users/${uid}`);
-        //     console.log("userRef ", userRef);
-        //     const userDataSnapshot = await userRef.once("value");
-        //     const userData = userDataSnapshot.val();
-        //     console.log("User data fetched:", userData);
-
-        //     if (userData) {
-        //       console.log("User data found, returning user data for NextAuth");
-        //       return {
-        //         id: uid,
-        //         name: userData.displayName,
-        //         email: userData.email,
-        //         ...userData,
-        //       };
-        //     } else {
-        //       console.log("No user data found for the given credentials");
-        //       return null;
-        //     }
-        //   } catch (error) {
-        //     console.error("Error during user sign-in:", error);
-        //     return null;
-        //   }
-        // },
         try {
           const userCredential = await signInWithEmailAndPassword(
             firebaseAuth,
@@ -212,7 +117,6 @@ export const authOptions: NextAuthOptions = {
             credentials.password,
           );
 
-          // Assuming you have a method to fetch user data from your database
           const userData = await fetchUserData(userCredential.user.uid);
 
           if (userData) {

@@ -105,12 +105,15 @@ const jwtCallback = async ({
       console.log("usersRef", usersRef);
       const usersQuery = usersRef.orderByChild("email").equalTo(email);
       console.log(
-        "Firebase user query created, awaiting response... and usersQuery",
+        "Firebase user query created, awaiting response... and usersQuery: ",
         usersQuery,
       );
 
       const usersData = await usersQuery.once("value");
-      console.log("Firebase user query response received");
+      console.log(
+        "Firebase user query response received and usersData is: ",
+        usersData,
+      );
 
       const usersSnapshot = usersData.val();
       console.log("Firebase user snapshot:", usersSnapshot);
@@ -243,7 +246,7 @@ export const options = {
               ...userData,
             };
           } else {
-            return null; // User not found
+            return null;
           }
         } catch (error) {
           console.error("Error during user sign-in:", error);

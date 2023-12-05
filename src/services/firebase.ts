@@ -18,10 +18,10 @@ const firebaseConfig = {
 
 let firebaseApp: FirebaseApp;
 if (!getApps().length) {
-  // console.log("Initializing new Firebase app");
+  console.log("Initializing new Firebase app");
   firebaseApp = initializeApp(firebaseConfig);
 } else {
-  // console.log("Using existing Firebase app");
+  console.log("Using existing Firebase app");
   firebaseApp = getApps()[0];
 }
 

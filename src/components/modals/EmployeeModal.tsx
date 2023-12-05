@@ -39,8 +39,8 @@ const EmployeeModal = ({ employee, onSave }: EmployeeModalProps) => {
       .required("Email is required"),
     accessLevel: Yup.number()
       .required("Access Level is required")
-      .min(0, "Access Level must be between 0 and 4")
-      .max(4, "Access Level must be between 0 and 4"),
+      .min(1, "Access Level must be between 1 and 4")
+      .max(4, "Access Level must be between 1 and 4"),
   });
 
   const initialValues = {
@@ -91,7 +91,6 @@ const EmployeeModal = ({ employee, onSave }: EmployeeModalProps) => {
                 fullWidth
                 margin="normal"
               />
-              {/* Assuming organization is not editable */}
               <FormikTextField
                 name="organization"
                 type="text"

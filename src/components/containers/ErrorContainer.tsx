@@ -1,10 +1,7 @@
 import { Box, Typography } from "@mui/material";
+import { ChildrenProps } from "../../interfaces/interfaces";
 
-interface ErrorContainerProps {
-  children: React.ReactNode;
-}
-
-const ErrorContainer: React.FC<ErrorContainerProps> = ({ children }) => {
+const ErrorContainer: React.FC<ChildrenProps> = ({ children }) => {
   return (
     <Box mt={1}>
       <Typography variant="body2" color="error.main">

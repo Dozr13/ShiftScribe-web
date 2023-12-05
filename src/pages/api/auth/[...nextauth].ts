@@ -8,6 +8,7 @@ import { ShiftScribeUser } from "../../../../types/session";
 import { firebaseAuth } from "../../../services/firebase";
 import fetchUserData, {
   determineRoleBasedOnAccessLevel,
+  fetchUserAccessLevel,
   fetchUserDataByEmail,
 } from "../../../utils/fetchUserData";
 
@@ -35,35 +36,34 @@ const jwtCallback = async ({
   account?: Account | null;
   profile?: Profile | null;
 }): Promise<MyJWT> => {
-  console.log("JWT Callback Start");
-
   const email = token.email || profile?.email;
-  console.log("JWT Callback Email:", email);
 
   if (email) {
     try {
-      const userData = await fetchUserDataByEmail(email);
-      if (userData) {
-        console.log("JWT Callback User data found:", userData);
+      const basicUserData = await fetchUserDataByEmail(email);
+      if (basicUserData) {
+        const accessLevel = await fetchUserAccessLevel(
+          basicUserData.organization,
+          basicUserData.uid,
+        );
+
         token.employee = {
-          id: userData.uid,
-          accessLevel: userData.accessLevel,
+          id: basicUserData.uid,
+          accessLevel: accessLevel,
           userData: {
-            displayName: userData.displayName,
-            email: userData.email,
-            organization: userData.organization,
+            displayName: basicUserData.displayName,
+            email: basicUserData.email,
+            organization: basicUserData.organization,
           },
         };
-        token.role = determineRoleBasedOnAccessLevel(userData.accessLevel);
+        token.role = determineRoleBasedOnAccessLevel(accessLevel);
       }
     } catch (error) {
       console.error("Error during user data retrieval:", error);
     }
-  } else {
-    console.log("JWT Callback Email not found in JWT token or profile");
   }
 
-  console.log("JWT Callback End");
+  // console.log("JWT Callback End", token);
   return token;
 };
 
@@ -74,7 +74,7 @@ const sessionCallback = async ({
   session: Session;
   token: JWT;
 }) => {
-  console.log("Session Callback Start");
+  // console.log("Session Callback Start");
 
   if (token && "role" in token) {
     const myToken = token as MyJWT;
@@ -90,7 +90,7 @@ const sessionCallback = async ({
     }
   }
 
-  console.log("Session Callback End");
+  // console.log("Session Callback End", session);
 
   return session;
 };
@@ -104,9 +104,9 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        console.log("Authorizing credentials:", credentials);
+        // console.log("Authorizing credentials:", credentials);
         if (!credentials) {
-          console.error("No credentials provided");
+          // console.error("No credentials provided");
           throw new Error("No credentials provided");
         }
 
@@ -127,11 +127,11 @@ export const authOptions: NextAuthOptions = {
               ...userData,
             };
           } else {
-            console.log("No user data found for the given credentials");
+            // console.log("No user data found for the given credentials");
             return null;
           }
         } catch (error) {
-          console.error("Error during user sign-in:", error);
+          // console.error("Error during user sign-in:", error);
           return null;
         }
       },

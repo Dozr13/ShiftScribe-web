@@ -2,21 +2,19 @@
 import { Box, Button, Modal } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
+import { FOOTER_HEIGHT } from "../../../constants/sizes";
 import { OrgRequest } from "../../../types/data";
 import {
   approveRequest,
   denyRequest,
   fetchRequests,
 } from "../../app/actions/requestActions";
+import { OrganizationIDProps } from "../../interfaces/interfaces";
 import RequestGrid from "../grid/RequestGrid";
 import DeleteConfirmation from "../modals/DeleteConfirmation";
 import RequestModal from "../modals/RequestModal";
 
-interface RequestCardProps {
-  orgId: string;
-}
-
-const RequestCard = ({ orgId }: RequestCardProps) => {
+const RequestCard: React.FC<OrganizationIDProps> = ({ orgId }) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [requests, setRequests] = useState<OrgRequest[]>([]);
@@ -65,7 +63,7 @@ const RequestCard = ({ orgId }: RequestCardProps) => {
         });
         fetchRequests(orgId, setRequests);
       } catch (error) {
-        console.error("Error approving request:", error);
+        // console.error("Error approving request:", error);
         enqueueSnackbar("Error approving request", { variant: "error" });
       }
     }
@@ -87,7 +85,6 @@ const RequestCard = ({ orgId }: RequestCardProps) => {
     }
   };
 
-  const footerHeight = "50px";
   return (
     <Box
       sx={{
@@ -99,11 +96,10 @@ const RequestCard = ({ orgId }: RequestCardProps) => {
         overflow: "hidden",
       }}
     >
-      {/* Main grid container */}
       <Box
         sx={{
           flexGrow: 1,
-          marginBottom: footerHeight,
+          marginBottom: FOOTER_HEIGHT,
         }}
       >
         <RequestGrid
@@ -112,14 +108,13 @@ const RequestCard = ({ orgId }: RequestCardProps) => {
         />
       </Box>
 
-      {/* Footer with page size selector and action buttons */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-evenly",
           alignItems: "center",
           padding: 2,
-          height: footerHeight,
+          height: FOOTER_HEIGHT,
           width: "50%",
         }}
       >

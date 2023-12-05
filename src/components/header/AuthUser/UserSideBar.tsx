@@ -21,11 +21,14 @@ import {
 } from "../../../../constants/navLinks";
 import { DRAWER_WIDTH } from "../../../../constants/sizes";
 import stringUtils from "../../../utils/StringUtils";
+import { getUserAccessLevel } from "../../../utils/accessLevelUtils";
 import SupportContentModal from "../../modals/SupportContentModal";
 
 const UserSideBar = ({ session }: UserSessionProps) => {
   const authLink = getAuthLink(session);
+  const accessLevel = getUserAccessLevel(session);
   const organization = session?.user?.organization;
+
   const formattedOrganization = stringUtils.slugify(organization!);
   const [supportModalOpen, setSupportModalOpen] = useState(false);
 
@@ -34,6 +37,13 @@ const UserSideBar = ({ session }: UserSessionProps) => {
   };
   const links = getLinks(formattedOrganization);
   const accountLinks = getAccountLinks(formattedOrganization);
+
+  const linksToShow =
+    accessLevel >= 2
+      ? links
+      : links.filter(
+          (link) => link.text !== "Records" && link.text !== "Requests",
+        );
 
   return (
     <Drawer
@@ -56,7 +66,7 @@ const UserSideBar = ({ session }: UserSessionProps) => {
       {session && (
         <Box height={"100%"}>
           <List>
-            {links.map(({ text, href, icon: Icon }) => (
+            {linksToShow.map(({ text, href, icon: Icon }) => (
               <ListItem key={href} disablePadding>
                 <ListItemButton component={Link} href={href}>
                   <ListItemIcon>

@@ -1,9 +1,9 @@
 import { Grid } from "@mui/material";
-import React, { ReactNode } from "react";
+import React from "react";
 import { flexGrowStyle } from "../../../constants/styles";
+import { ChildrenProps } from "../../interfaces/interfaces";
 
-interface GridItemWrapperProps {
-  children: ReactNode;
+interface GridItemWrapperProps extends ChildrenProps {
   md?: number;
   sm?: number;
   xs?: number;

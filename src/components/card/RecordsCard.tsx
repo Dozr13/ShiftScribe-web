@@ -3,23 +3,20 @@ import { Box, Grid, IconButton, Modal, Paper, Typography } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
 import { FaCalendar, FaTimes } from "react-icons/fa";
+import { BACKGROUND_COLOR } from "../../../constants/colorPalette";
 import {
   fetchAndGenerateCSV,
   purgeOldRecords,
 } from "../../app/actions/recordsActions";
 import useDateRange from "../../hooks/useDateRange";
+import { OrganizationIDProps } from "../../interfaces/interfaces";
 import { getLastSundayTwoWeeksPrior } from "../../utils/dataService";
 import DateRangePicker from "../records/DateRangePicker";
 import DownloadCsvButton from "../records/DownloadCsvButton";
 import GenerateCsvButton from "../records/GenerateCsvButton";
 import PurgeOldRecords from "../records/PurgeOldRecords";
-import { BACKGROUND_COLOR } from "../../../constants/colorPalette";
 
-interface RecordsCardProps {
-  orgId: string;
-}
-
-const RecordsCard: React.FC<RecordsCardProps> = ({ orgId }) => {
+const RecordsCard: React.FC<OrganizationIDProps> = ({ orgId }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { dateState, setDateState } = useDateRange();
   const [showDateRange, setShowDateRange] = useState(false);

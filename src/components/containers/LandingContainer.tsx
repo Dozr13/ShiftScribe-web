@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import React from "react";
 import { APP_BAR_HEIGHT, VERTICAL_PADDING } from "../../../constants/sizes";
-import { ChildrenProps } from "./PageContainer";
+import { ChildrenProps } from "../../interfaces/interfaces";
 
 const LandingContainer: React.FC<ChildrenProps> = ({ children }) => {
   return (

@@ -5,10 +5,7 @@ import {
   DRAWER_WIDTH,
   VERTICAL_PADDING,
 } from "../../../constants/sizes";
-
-export interface ChildrenProps {
-  children: React.ReactNode;
-}
+import { ChildrenProps } from "../../interfaces/interfaces";
 
 const PageContainer: React.FC<ChildrenProps> = ({ children }) => {
   return (

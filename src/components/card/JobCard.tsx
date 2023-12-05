@@ -2,6 +2,7 @@
 import { Box, Button, Modal } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
+import { FOOTER_HEIGHT } from "../../../constants/sizes";
 import { OrgJob } from "../../../types/data";
 import {
   addJob,
@@ -9,15 +10,12 @@ import {
   fetchJobs,
   updateJob,
 } from "../../app/actions/jobActions";
+import { OrganizationIDProps } from "../../interfaces/interfaces";
 import JobGrid from "../grid/JobGrid";
 import DeleteConfirmation from "../modals/DeleteConfirmation";
 import JobModal from "../modals/JobModal";
 
-interface JobCardProps {
-  orgId: string;
-}
-
-const JobCard = ({ orgId }: JobCardProps) => {
+const JobCard: React.FC<OrganizationIDProps> = ({ orgId }) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [jobs, setJobs] = useState<OrgJob[]>([]);
@@ -118,7 +116,6 @@ const JobCard = ({ orgId }: JobCardProps) => {
     }
   };
 
-  const footerHeight = "50px";
   return (
     <Box
       sx={{
@@ -134,7 +131,7 @@ const JobCard = ({ orgId }: JobCardProps) => {
       <Box
         sx={{
           flexGrow: 1,
-          marginBottom: footerHeight,
+          marginBottom: FOOTER_HEIGHT,
         }}
       >
         <JobGrid jobs={jobs} setSelectedJob={setSelectedJob} />
@@ -147,7 +144,7 @@ const JobCard = ({ orgId }: JobCardProps) => {
           justifyContent: "space-evenly",
           alignItems: "center",
           padding: 2,
-          height: footerHeight,
+          height: FOOTER_HEIGHT,
           width: "50%",
         }}
       >

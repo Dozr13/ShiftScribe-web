@@ -10,6 +10,7 @@ import { Fragment } from "react";
 import { UserSessionProps } from ".";
 import { TEXT_COLOR } from "../../../../constants/colorPalette";
 import stringUtils from "../../../utils/StringUtils";
+import { getUserAccessLevel } from "../../../utils/accessLevelUtils";
 import routes from "../../../utils/routes";
 
 const CustomTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -31,6 +32,8 @@ const CustomTooltip = styled(({ className, ...props }: TooltipProps) => (
 }));
 
 const UserAppBar = ({ session }: UserSessionProps) => {
+  const accessLevel = getUserAccessLevel(session);
+
   const organization = session?.user?.organization;
   const organizationSlug = stringUtils.slugify(organization ?? "");
 
@@ -43,32 +46,33 @@ const UserAppBar = ({ session }: UserSessionProps) => {
         <Typography variant="h6" color="text.primary" sx={{ flexGrow: 1 }}>
           ShiftScribe
         </Typography>
-
-        <CustomTooltip
-          title={
-            <Fragment>
-              <Typography color="inherit" variant="button">
-                Organization Options
-              </Typography>
-              <em>{"Click here"}</em>{" "}
-              {"To view and change options for your organization"}
-            </Fragment>
-          }
-        >
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Link
-              href={routes.orgOptions(organizationSlug)}
-              style={{ textDecoration: "none" }}
-            >
-              <Typography variant="button" sx={{ cursor: "pointer" }}>
-                Current Account: {organization}
-              </Typography>
-            </Link>
-            <IconButton size="small" sx={{ color: TEXT_COLOR }}>
-              <InfoIcon />
-            </IconButton>
-          </Box>
-        </CustomTooltip>
+        {accessLevel >= 2 && (
+          <CustomTooltip
+            title={
+              <Fragment>
+                <Typography color="inherit" variant="button">
+                  Organization Options
+                </Typography>
+                <em>{"Click here"}</em>{" "}
+                {"To view and change options for your organization"}
+              </Fragment>
+            }
+          >
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Link
+                href={routes.orgOptions(organizationSlug)}
+                style={{ textDecoration: "none" }}
+              >
+                <Typography variant="button" sx={{ cursor: "pointer" }}>
+                  Current Account: {organization}
+                </Typography>
+              </Link>
+              <IconButton size="small" sx={{ color: TEXT_COLOR }}>
+                <InfoIcon />
+              </IconButton>
+            </Box>
+          </CustomTooltip>
+        )}
       </Toolbar>
     </AppBar>
   );

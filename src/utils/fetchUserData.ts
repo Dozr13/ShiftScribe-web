@@ -1,26 +1,27 @@
 import { equalTo, get, orderByChild, query, ref } from "firebase/database";
 import { firebaseDatabase } from "../services/firebase";
 
-export async function fetchUserData(uid: string) {
+export const fetchUserData = async (uid: string) => {
   try {
     const userRef = ref(firebaseDatabase, `users/${uid}`);
     const snapshot = await get(userRef);
     if (snapshot.exists()) {
       return snapshot.val();
     } else {
-      console.log("No user data found for UID:", uid);
+      // console.log("No user data found for UID:", uid);
       return null;
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
     throw error;
   }
-}
+};
 
 export const fetchUserDataByEmail = async (email: string) => {
   const usersRef = ref(firebaseDatabase, "/users");
   const usersQuery = query(usersRef, orderByChild("email"), equalTo(email));
   const snapshot = await get(usersQuery);
+
   if (snapshot.exists()) {
     const users = snapshot.val();
     const uid = Object.keys(users)[0];
@@ -29,9 +30,28 @@ export const fetchUserDataByEmail = async (email: string) => {
   return null;
 };
 
+export const fetchUserAccessLevel = async (
+  organization: string,
+  uid: string,
+) => {
+  const orgRef = ref(firebaseDatabase, `orgs/${organization}/members/${uid}`);
+  const orgSnapshot = await get(orgRef);
+
+  if (orgSnapshot.exists()) {
+    const memberData = orgSnapshot.val();
+    return memberData.accessLevel;
+  } else {
+    // console.log(
+    //   `No member data found for UID: ${uid} in organization: ${organization}`,
+    // );
+    return undefined;
+  }
+};
+
 export const determineRoleBasedOnAccessLevel = (
   accessLevel: number,
 ): string => {
+  // console.log("ACCESS LEVEL',", accessLevel);
   switch (accessLevel) {
     case 0:
       return "Unverified";

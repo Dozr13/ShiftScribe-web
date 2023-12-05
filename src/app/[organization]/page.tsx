@@ -1,11 +1,10 @@
-import GreetingMessage from "../../components/dashboard/GreetingMessage";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../pages/api/auth/[...nextauth]";
 
 const Dashboard = async () => {
-  return (
-    <>
-      <GreetingMessage />
-    </>
-  );
+  const session = await getServerSession(authOptions);
+
+  return <Dashboard />;
 };
 
 export default Dashboard;

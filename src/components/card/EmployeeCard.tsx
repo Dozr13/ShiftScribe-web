@@ -2,25 +2,19 @@
 import { Box, Button, Modal } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
+import { FOOTER_HEIGHT } from "../../../constants/sizes";
 import { OrgEmployee } from "../../../types/data";
 import {
   deleteEmployee,
   updateEmployee,
 } from "../../app/actions/employeeActions";
 import { useEmployees } from "../../hooks/employees/useEmployees";
+import { OrganizationIDProps } from "../../interfaces/interfaces";
 import EmployeeGrid from "../grid/EmployeeGrid";
 import DeleteConfirmation from "../modals/DeleteConfirmation";
 import EmployeeModal from "../modals/EmployeeModal";
 
-interface EmployeeCardProps {
-  orgId: string;
-}
-
-interface EmployeeCardProps {
-  orgId: string;
-}
-
-const EmployeeCard = ({ orgId }: EmployeeCardProps) => {
+const EmployeeCard = ({ orgId }: OrganizationIDProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const { employees, refreshEmployees } = useEmployees(orgId);
 
@@ -29,6 +23,8 @@ const EmployeeCard = ({ orgId }: EmployeeCardProps) => {
   >(undefined);
   const [employeeModalOpen, setEmployeeModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  // TODO: Figure out implementation
   // const [isAddMode, setIsAddMode] = useState(false);
 
   // const openAddEmployeeModal = () => {
@@ -105,75 +101,6 @@ const EmployeeCard = ({ orgId }: EmployeeCardProps) => {
     }
   };
 
-  //   return (
-  //     <Box style={{ height: "100%", width: "50%", padding: "20px" }}>
-  //       <EmployeeGrid
-  //         employees={employees}
-  //         setSelectedEmployee={setSelectedEmployee}
-  //       />
-
-  //       <Box display="flex" justifyContent="space-around" mt={2} sx={{ p: 4 }}>
-  //         {/* // TODO: Figure out implementation with firebase */}
-  //         {/* <Button variant="contained" onClick={openAddEmployeeModal}>
-  //           Add
-  //         </Button> */}
-  //         <Button
-  //           variant="contained"
-  //           onClick={openEmployeeModal}
-  //           disabled={!selectedEmployee}
-  //         >
-  //           Edit
-  //         </Button>
-  //         <Button
-  //           variant="contained"
-  //           onClick={() => setDeleteModalOpen(true)}
-  //           disabled={!selectedEmployee}
-  //         >
-  //           Delete
-  //         </Button>
-  //       </Box>
-
-  //       {employeeModalOpen && (
-  //         <Modal
-  //           open={employeeModalOpen}
-  //           onClose={() => setEmployeeModalOpen(false)}
-  //         >
-  //           <Box
-  //             sx={{
-  //               position: "absolute",
-  //               top: "50%",
-  //               left: "50%",
-  //               transform: "translate(-50%, -50%)",
-  //               bgcolor: "white",
-  //               p: 4,
-  //               minWidth: 300,
-  //               maxWidth: 600,
-  //               borderRadius: 2,
-  //               boxShadow: 24,
-  //               overflowY: "auto",
-  //             }}
-  //           >
-  //             <EmployeeModal employee={selectedEmployee!} onSave={handleEdit} />
-  //           </Box>
-  //         </Modal>
-  //       )}
-
-  //       {deleteModalOpen && (
-  //         <Modal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
-  //           <DeleteConfirmation
-  //             onConfirm={handleDelete}
-  //             onClose={() => setDeleteModalOpen(false)}
-  //             message="Are you sure you want to remove this employee and their data?"
-  //           />
-  //         </Modal>
-  //       )}
-  //     </Box>
-  //   );
-  // };
-
-  // export default EmployeeCard;
-
-  const footerHeight = "50px";
   return (
     <Box
       sx={{
@@ -189,7 +116,7 @@ const EmployeeCard = ({ orgId }: EmployeeCardProps) => {
       <Box
         sx={{
           flexGrow: 1,
-          marginBottom: footerHeight,
+          marginBottom: FOOTER_HEIGHT,
         }}
       >
         <EmployeeGrid
@@ -205,7 +132,7 @@ const EmployeeCard = ({ orgId }: EmployeeCardProps) => {
           justifyContent: "space-evenly",
           alignItems: "center",
           padding: 2,
-          height: footerHeight,
+          height: FOOTER_HEIGHT,
           width: "50%",
         }}
       >

@@ -1,8 +1,8 @@
 import { Box } from "@mui/material";
 import React from "react";
+import { ChildrenProps } from "../../interfaces/interfaces";
 
-interface ButtonContainerProps {
-  children: React.ReactNode;
+interface ButtonContainerProps extends ChildrenProps {
   direction?: "row" | "column";
   size?: "small" | "medium" | "large";
 }

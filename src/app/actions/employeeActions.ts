@@ -84,7 +84,7 @@ export const fetchOrgMembers = (
   return () => off(orgMembersRef, "value", unsubscribe);
 };
 
-export const fetchUserData = async (
+export const fetchEmployeeData = async (
   membersData: Record<string, { accessLevel: number }>,
 ): Promise<OrgEmployee[]> => {
   const db = getDatabase();
@@ -114,7 +114,7 @@ export const fetchEmployees = async (
   const handleMembersFetched = async (
     membersData: Record<string, { accessLevel: number }>,
   ) => {
-    const employeeData = await fetchUserData(membersData);
+    const employeeData = await fetchEmployeeData(membersData);
     setEmployees(employeeData);
   };
 

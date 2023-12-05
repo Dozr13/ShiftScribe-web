@@ -7,6 +7,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { ShiftScribeUser } from "../../../../types/session";
 import { firebaseAuth } from "../../../services/firebase";
 import admin from "../../../services/firebase-admin";
+import fetchUserData from "../../../utils/fetchUserData";
 
 interface MyJWT extends JWT {
   employee?: {
@@ -163,27 +164,60 @@ export const authOptions: NextAuthOptions = {
           throw new Error("No credentials provided");
         }
 
+        //   try {
+        //     console.log(
+        //       "Attempting to sign in with email and password",
+        //       credentials.email,
+        //       credentials.password,
+        //     );
+        //     const userCredential = await signInWithEmailAndPassword(
+        //       firebaseAuth,
+        //       credentials.email,
+        //       credentials.password,
+        //     );
+        //     // console.log("Signed in successfully:", userCredential.user);
+
+        //     const uid = userCredential.user.uid;
+        //     // console.log("Signed in successfully:", userCredential);
+        //     // console.log("Signed in successfully:", userCredential.user.email);
+        //     console.log("Fetching user data for UID:", uid);
+
+        //     const userRef = admin.database().ref(`/users/${uid}`);
+        //     console.log("userRef ", userRef);
+        //     const userDataSnapshot = await userRef.once("value");
+        //     const userData = userDataSnapshot.val();
+        //     console.log("User data fetched:", userData);
+
+        //     if (userData) {
+        //       console.log("User data found, returning user data for NextAuth");
+        //       return {
+        //         id: uid,
+        //         name: userData.displayName,
+        //         email: userData.email,
+        //         ...userData,
+        //       };
+        //     } else {
+        //       console.log("No user data found for the given credentials");
+        //       return null;
+        //     }
+        //   } catch (error) {
+        //     console.error("Error during user sign-in:", error);
+        //     return null;
+        //   }
+        // },
         try {
-          console.log("Attempting to sign in with email and password");
           const userCredential = await signInWithEmailAndPassword(
             firebaseAuth,
             credentials.email,
             credentials.password,
           );
-          console.log("Signed in successfully:", userCredential.user);
 
-          const uid = userCredential.user.uid;
-          console.log("Fetching user data for UID:", uid);
-
-          const userRef = admin.database().ref(`/users/${uid}`);
-          const userDataSnapshot = await userRef.once("value");
-          const userData = userDataSnapshot.val();
-          console.log("User data fetched:", userData);
+          // Assuming you have a method to fetch user data from your database
+          const userData = await fetchUserData(userCredential.user.uid);
 
           if (userData) {
-            console.log("User data found, returning user data for NextAuth");
             return {
-              id: uid,
+              id: userCredential.user.uid,
               name: userData.displayName,
               email: userData.email,
               ...userData,

@@ -38,42 +38,42 @@ const jwtCallback = async ({
   console.log("JWT Callback Email:", email);
 
   if (email) {
-    console.log("Starting Firebase user query for email:", email);
+    console.log("JWT Callback Starting Firebase user query for email:", email);
     try {
       const usersRef = admin.database().ref("/users");
-      console.log("usersRef", usersRef);
+      console.log("JWT Callback usersRef", usersRef);
       const usersQuery = usersRef.orderByChild("email").equalTo(email);
       console.log(
-        "Firebase user query created, awaiting response... and usersQuery: ",
+        "JWT Callback Firebase user query created, awaiting response... and usersQuery: ",
         usersQuery,
       );
 
       const usersData = await usersQuery.once("value");
       console.log(
-        "Firebase user query response received and usersData is: ",
+        "JWT Callback Firebase user query response received and usersData is: ",
         usersData,
       );
 
       const usersSnapshot = usersData.val();
-      console.log("Firebase user snapshot:", usersSnapshot);
+      console.log("JWT Callback Firebase user snapshot:", usersSnapshot);
 
       if (usersSnapshot) {
-        console.log("User data found in snapshot, processing...");
+        console.log("JWT Callback User data found in snapshot, processing...");
         const userId = Object.keys(usersSnapshot)[0];
         const userSnapshot = usersSnapshot[userId];
-        console.log("User found:", userSnapshot);
+        console.log("JWT Callback User found:", userSnapshot);
 
         token.uid = userSnapshot.id;
         const orgRef = admin
           .database()
           .ref(`/orgs/${userSnapshot.organization}/members/${userSnapshot.id}`);
-        console.log("Fetching organization data for user");
+        console.log("JWT Callback Fetching organization data for user");
 
         const orgData = await orgRef.once("value");
-        console.log("Organization data received");
+        console.log("JWT Callback Organization data received");
 
         const orgSnapshot = orgData.val();
-        console.log("Organization snapshot:", orgSnapshot);
+        console.log("JWT Callback Organization snapshot:", orgSnapshot);
 
         token.employee = {
           id: userSnapshot.id,
@@ -105,15 +105,15 @@ const jwtCallback = async ({
           default:
             token.role = "UNKNOWN";
         }
-        console.log("User and organization data processed");
+        console.log("JWT Callback User and organization data processed");
       } else {
-        console.log("No user data found for email:", email);
+        console.log("JWT Callback No user data found for email:", email);
       }
     } catch (error) {
       console.error("Error during Firebase operations:", error);
     }
   } else {
-    console.log("Email not found in JWT token or profile");
+    console.log("JWT Callback Email not found in JWT token or profile");
   }
 
   console.log("JWT Callback End");
@@ -159,25 +159,29 @@ export const authOptions: NextAuthOptions = {
       authorize: async (credentials) => {
         console.log("Authorizing credentials:", credentials);
         if (!credentials) {
+          console.error("No credentials provided");
           throw new Error("No credentials provided");
         }
 
         try {
-          const email = credentials.email;
-          const password = credentials.password;
-
+          console.log("Attempting to sign in with email and password");
           const userCredential = await signInWithEmailAndPassword(
             firebaseAuth,
-            email,
-            password,
+            credentials.email,
+            credentials.password,
           );
+          console.log("Signed in successfully:", userCredential.user);
+
           const uid = userCredential.user.uid;
+          console.log("Fetching user data for UID:", uid);
 
           const userRef = admin.database().ref(`/users/${uid}`);
           const userDataSnapshot = await userRef.once("value");
           const userData = userDataSnapshot.val();
+          console.log("User data fetched:", userData);
 
           if (userData) {
+            console.log("User data found, returning user data for NextAuth");
             return {
               id: uid,
               name: userData.displayName,
@@ -185,6 +189,7 @@ export const authOptions: NextAuthOptions = {
               ...userData,
             };
           } else {
+            console.log("No user data found for the given credentials");
             return null;
           }
         } catch (error) {

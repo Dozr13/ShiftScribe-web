@@ -102,8 +102,12 @@ const jwtCallback = async ({
     console.log("Starting Firebase user query for email:", email);
     try {
       const usersRef = admin.database().ref("/users");
+      console.log("usersRef", usersRef);
       const usersQuery = usersRef.orderByChild("email").equalTo(email);
-      console.log("Firebase user query created, awaiting response...");
+      console.log(
+        "Firebase user query created, awaiting response... and usersQuery",
+        usersQuery,
+      );
 
       const usersData = await usersQuery.once("value");
       console.log("Firebase user query response received");
@@ -217,34 +221,33 @@ export const options = {
         }
 
         try {
-          // const email = credentials.email;
-          // const password = credentials.password;
-          const { email, password } = credentials;
-
-          console.log(`Attempting to sign in user: ${email}`);
+          const email = credentials.email;
+          const password = credentials.password;
 
           const userCredential = await signInWithEmailAndPassword(
             firebaseAuth,
             email,
             password,
           );
-          const user = userCredential.user;
+          const uid = userCredential.user.uid;
 
-          console.log(`User signed in successfully: ${user.uid}`);
+          const userRef = admin.database().ref(`/users/${uid}`);
+          const userDataSnapshot = await userRef.once("value");
+          const userData = userDataSnapshot.val();
 
-          return {
-            id: user.uid,
-            name: user.displayName,
-            email: user.email,
-          };
+          if (userData) {
+            return {
+              id: uid,
+              name: userData.displayName,
+              email: userData.email,
+              ...userData,
+            };
+          } else {
+            return null; // User not found
+          }
         } catch (error) {
           console.error("Error during user sign-in:", error);
-
-          if (error instanceof Error) {
-            throw new Error(error.message);
-          } else {
-            throw new Error("An unknown error occurred during sign-in");
-          }
+          return null;
         }
       },
     }),

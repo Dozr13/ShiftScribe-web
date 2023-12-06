@@ -25,7 +25,6 @@ export async function signup(
 
   try {
     // console.log("Before createUserWithEmailAndPassword");
-
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
@@ -36,36 +35,36 @@ export async function signup(
     await updateProfile(userCredential.user, { displayName });
 
     const uid = userCredential.user.uid;
-
     // console.log("Before setting userRef");
 
     const userRef = ref(firebaseDatabase, `users/${uid}`);
-    await set(userRef, {
-      displayName,
-      email,
-      organization: formattedOrganization,
-    });
-    // console.log("After setting userRef");
-
-    // console.log("Before setting orgRef");
-
     const orgRef = ref(firebaseDatabase, `orgs/${formattedOrganization}`);
-    await set(orgRef, {
-      superuser: uid,
-      originalName: organization,
-    });
-    // console.log("After setting orgRef");
-
-    // console.log("Before setting orgMemberRef");
     const orgMemberRef = ref(
       firebaseDatabase,
       `orgs/${formattedOrganization}/members/${uid}`,
     );
 
-    await set(orgMemberRef, {
-      accessLevel: 4,
-    });
-    // console.log("After setting orgMemberRef");
+    try {
+      await set(userRef, {
+        displayName,
+        email,
+        organization: formattedOrganization,
+      });
+      // console.log("User ref set successfully");
+
+      await set(orgRef, {
+        superuser: uid,
+        originalName: organization,
+      });
+      // console.log("Org ref set successfully");
+
+      await set(orgMemberRef, {
+        accessLevel: 4,
+      });
+      // console.log("Org member ref set successfully");
+    } catch (error) {
+      console.error("Error in Firebase operation:", error);
+    }
 
     // console.log("Signup Function End");
     return {

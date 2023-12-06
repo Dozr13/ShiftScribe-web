@@ -1,34 +1,27 @@
-import admin from "../services/firebase-admin";
+import { get, ref, set, update } from "firebase/database";
+import { firebaseDatabase } from "../services/firebase";
 
-export const checkOrgExists = async (organizationName: string) => {
-  const db = admin.database();
-  const orgRef = db.ref(`orgs/${organizationName}`);
-  const snapshot = await orgRef.once("value");
-  return snapshot.exists();
-};
-
-export const createOrg = async (organizationName: string, userID: string) => {
-  const db = admin.database();
-  const orgRef = db.ref(`orgs/${organizationName}`);
-  await orgRef.set({ superuser: userID });
-  await db.ref(`orgs/${organizationName}/members/${userID}`).set({
-    accessLevel: 4,
-  });
-  const snapshot = await orgRef.once("value");
+export const checkOrgExists = async (
+  organizationName: string,
+): Promise<boolean> => {
+  const orgRef = ref(firebaseDatabase, `orgs/${organizationName}`);
+  const snapshot = await get(orgRef);
   return snapshot.exists();
 };
 
 export const handleJoinRequest = async (
   organizationName: string,
   userID: string,
-) => {
-  const db = admin.database();
-  const joinRequestsRef = db.ref(`orgs/${organizationName}/joinRequests`);
-  const snapshot = await joinRequestsRef.once("value");
+): Promise<void> => {
+  const joinRequestsRef = ref(
+    firebaseDatabase,
+    `orgs/${organizationName}/joinRequests`,
+  );
+  const snapshot = await get(joinRequestsRef);
   const joinRequests = snapshot.val();
   if (joinRequests === null) {
-    await joinRequestsRef.set({ [userID]: true });
+    await set(joinRequestsRef, { [userID]: true });
   } else {
-    await joinRequestsRef.update({ [userID]: true });
+    await update(joinRequestsRef, { [userID]: true });
   }
 };

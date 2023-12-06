@@ -4,12 +4,13 @@ import { useFormik } from "formik";
 import { signIn } from "next-auth/react";
 import { useSnackbar } from "notistack";
 import { signup } from "../../../app/actions/signupActions";
+import { SignupFormValues } from "../../../interfaces/interfaces";
 import routes from "../../../utils/routes";
 import BackToLandingButton from "../../landing/BackToLandingButton";
 import SignupTextField from "../../textField/SignupTextField";
 import { signupSchema } from "./signup.validation";
-import { SignupFormValues } from "../../../interfaces/interfaces";
 
+// TODO: Implement actions functionality from CreateOrganizationAction and userActions
 const SignupForm = () => {
   const { enqueueSnackbar } = useSnackbar();
 

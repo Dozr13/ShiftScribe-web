@@ -49,13 +49,17 @@ class StringUtils {
     return date ? date.getTime().toString() : "";
   }
 
+  formatEmailForFirebase = (email: string) => {
+    if (!email) return "";
+    return email.trim().toLowerCase();
+  };
+
   /**
    * Formats a string to be Firebase-friendly by replacing spaces and special characters.
    * @param {string} inputString - The string to be formatted.
    * @returns {string} - The formatted string.
    */
   formatStringForFirebase(inputString: string): string {
-    // Replace spaces with hyphens and remove special characters
     return inputString
       .toLowerCase()
       .replace(/\s+/g, "-")

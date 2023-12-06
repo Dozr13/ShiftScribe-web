@@ -1,4 +1,4 @@
-import { get, onValue, ref, remove, set } from "firebase/database";
+import { get, onValue, push, ref, remove, set } from "firebase/database";
 import { EventObject, OrgRequest, UserData } from "../../../types/data";
 import { firebaseDatabase } from "../../services/firebase";
 
@@ -63,4 +63,19 @@ export const denyRequest = async (
     `orgs/${orgId}/adjustmentRequests/${requestId}`,
   );
   await remove(requestRef);
+};
+
+export const submitRequest = async (
+  orgId: string,
+  userId: string,
+  requestData: any, // TODO: Replace 'any'
+): Promise<void> => {
+  const joinRequestsRef = ref(firebaseDatabase, `orgs/${orgId}/joinRequests`);
+
+  const newRequestRef = push(joinRequestsRef);
+  await set(newRequestRef, {
+    ...requestData,
+    userId,
+    status: "pending",
+  });
 };

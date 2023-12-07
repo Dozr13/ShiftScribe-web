@@ -44,7 +44,7 @@ const GreetingMessage = ({ accessLevel }: UserAccessLevelProps) => {
             3. <strong>Employee Directory at Your Fingertips</strong>: View all
             the employees registered in your company. Need to make changes? You
             can add, remove, or edit employee details effortlessly, keeping your
-            team&aposs info up-to-date.
+            team&apos;s info up-to-date.
           </Typography>
           <Typography variant="body1" gutterBottom>
             4. <strong>Job Management Made Easy</strong>: Whether it&apos;s a

@@ -1,11 +1,7 @@
 import { FirebaseError } from "firebase/app";
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  updateProfile,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { ref, set } from "firebase/database";
-import { firebaseApp, firebaseDatabase } from "../../services/firebase";
+import { firebaseAuth, firebaseDatabase } from "../../services/firebase";
 import stringUtils from "../../utils/StringUtils";
 
 export async function signup(
@@ -16,7 +12,6 @@ export async function signup(
 ) {
   // console.log("Signup Function Start");
 
-  const auth = getAuth(firebaseApp);
   const formattedOrganization =
     stringUtils.formatStringForFirebase(organization);
   const slugifiedOrganization = stringUtils.slugify(organization);
@@ -26,7 +21,7 @@ export async function signup(
   try {
     // console.log("Before createUserWithEmailAndPassword");
     const userCredential = await createUserWithEmailAndPassword(
-      auth,
+      firebaseAuth,
       email,
       password,
     );

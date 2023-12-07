@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import EmployeeCard from "../../../components/card/EmployeeCard";
 import PageHeader from "../../../components/containers/PageHeader";
-import { authOptions } from "../../../pages/api/auth/[...nextauth]";
+import { authOptions } from "../../../lib/auth";
 import routes from "../../../utils/routes";
 
 const EmployeesPage = async () => {

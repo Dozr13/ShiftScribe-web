@@ -2,8 +2,8 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import RequestsCard from "../../../components/card/RequestCard";
 import PageHeader from "../../../components/containers/PageHeader";
-import { authOptions } from "../../../pages/api/auth/[...nextauth]";
 import routes from "../../../utils/routes";
+import { authOptions } from "../../../lib/auth";
 
 const Requests = async () => {
   const session = await getServerSession(authOptions);

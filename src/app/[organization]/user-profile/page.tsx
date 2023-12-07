@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../../pages/api/auth/[...nextauth]";
+import { authOptions } from "../../../lib/auth";
 
 const TempMember = async () => {
   const session = await getServerSession(authOptions);

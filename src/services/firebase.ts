@@ -1,6 +1,6 @@
 import { FirebaseApp, getApps, initializeApp } from "firebase/app";
 import "firebase/auth";
-import { browserLocalPersistence, initializeAuth } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
@@ -14,21 +14,17 @@ const firebaseConfig = {
   measurementId: "G-5QGQ8TNS3F",
 };
 
-// const firebaseApp = initializeApp(firebaseConfig);
-
 let firebaseApp: FirebaseApp;
+
 if (!getApps().length) {
-  // console.log("Initializing new Firebase app");
+  console.log("Initializing new Firebase app");
   firebaseApp = initializeApp(firebaseConfig);
+  console.log("Initialized app");
 } else {
-  // console.log("Using existing Firebase app");
   firebaseApp = getApps()[0];
 }
 
-const firebaseAuth = initializeAuth(firebaseApp, {
-  persistence: browserLocalPersistence,
-});
-
+const firebaseAuth = getAuth(firebaseApp);
 const firebaseDatabase = getDatabase(firebaseApp);
 
-export { firebaseApp, firebaseAuth, firebaseDatabase };
+export { firebaseAuth, firebaseDatabase };

@@ -1,5 +1,5 @@
 import * as employeeApi from "@/lib/employeeApi";
-import { get, getDatabase, off, onValue, ref, update } from "firebase/database";
+import { get, off, onValue, ref, update } from "firebase/database";
 import { OrgEmployee } from "../../../types/data";
 import { firebaseDatabase } from "../../services/firebase";
 
@@ -87,11 +87,9 @@ export const fetchOrgMembers = (
 export const fetchEmployeeData = async (
   membersData: Record<string, { accessLevel: number }>,
 ): Promise<OrgEmployee[]> => {
-  const db = getDatabase();
-
   const employees = await Promise.all(
     Object.entries(membersData).map(async ([userId, { accessLevel }]) => {
-      const userRef = ref(db, `users/${userId}`);
+      const userRef = ref(firebaseDatabase, `users/${userId}`);
       const userSnapshot = await get(userRef);
 
       return {

@@ -53,7 +53,9 @@ const UserAppBar = ({ session }: UserSessionProps) => {
                 <Typography color="inherit" variant="button">
                   Organization Options
                 </Typography>
-                <em>{"Click here"}</em>{" "}
+                <br />
+                <em>{"Click"}</em>
+                <br />
                 {"To view and change options for your organization"}
               </Fragment>
             }

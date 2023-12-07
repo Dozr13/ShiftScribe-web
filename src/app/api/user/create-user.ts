@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createUserAction } from "../../../app/actions/userActions";
+import { createUserAction } from "../../actions/userActions";
 
 export default async function handler(
   req: NextApiRequest,

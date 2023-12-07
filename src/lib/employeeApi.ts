@@ -3,7 +3,6 @@ import {
   QueryConstraint,
   child,
   get,
-  getDatabase,
   limitToFirst,
   onValue,
   push,
@@ -14,7 +13,7 @@ import {
   update,
 } from "firebase/database";
 import { OrgEmployee } from "../../types/data";
-import { firebaseApp } from "../services/firebase";
+import { firebaseDatabase } from "../services/firebase";
 
 /**
  * Delete data at a given path.
@@ -22,7 +21,7 @@ import { firebaseApp } from "../services/firebase";
  * @returns Promise<void>
  */
 export const deleteData = (Path: string): Promise<void> => {
-  return remove(ref(getDatabase(), Path));
+  return remove(ref(firebaseDatabase, Path));
 };
 
 /**
@@ -31,7 +30,7 @@ export const deleteData = (Path: string): Promise<void> => {
  * @returns Promise<boolean>
  */
 export const exists = async (Path: string): Promise<boolean> => {
-  const Query = query(ref(getDatabase(), Path), limitToFirst(1));
+  const Query = query(ref(firebaseDatabase, Path), limitToFirst(1));
   let Res = await get(Query);
   return Res.exists();
 };
@@ -44,8 +43,9 @@ export const exists = async (Path: string): Promise<boolean> => {
 export const fetchEmployeeData = async (
   orgId: string,
 ): Promise<OrgEmployee[]> => {
-  const db = getDatabase(firebaseApp);
-  const orgMembersSnapshot = await get(child(ref(db), `orgs/${orgId}/members`));
+  const orgMembersSnapshot = await get(
+    child(ref(firebaseDatabase), `orgs/${orgId}/members`),
+  );
 
   if (!orgMembersSnapshot.exists()) {
     return [];
@@ -56,7 +56,9 @@ export const fetchEmployeeData = async (
 
   const employeesArray: OrgEmployee[] = await Promise.all(
     memberIds.map(async (memberId) => {
-      const userSnapshot = await get(child(ref(db), `users/${memberId}`));
+      const userSnapshot = await get(
+        child(ref(firebaseDatabase), `users/${memberId}`),
+      );
       const userData = userSnapshot.val();
 
       return {
@@ -88,7 +90,7 @@ export const pushData = (
   Path: string,
   Data: Record<string, unknown>,
 ): string | null => {
-  const newChildRef = push(ref(getDatabase(), Path));
+  const newChildRef = push(ref(firebaseDatabase, Path));
   set(newChildRef, Data);
   return newChildRef.key;
 };
@@ -103,7 +105,7 @@ export const queryData = (
   Path: string,
   ...Data: QueryConstraint[]
 ): Promise<DataSnapshot> => {
-  const Query = query(ref(getDatabase(), Path), ...Data);
+  const Query = query(ref(firebaseDatabase, Path), ...Data);
   return get(Query);
 };
 
@@ -117,7 +119,7 @@ export const rawWrite = (
   Path: string,
   Data: Record<string, unknown> | null,
 ): Promise<void> => {
-  return set(ref(getDatabase(), Path), Data);
+  return set(ref(firebaseDatabase, Path), Data);
 };
 
 /**
@@ -126,7 +128,7 @@ export const rawWrite = (
  * @returns Promise<DataSnapshot>
  */
 export const readData = (Path: string): Promise<DataSnapshot> => {
-  return get(child(ref(getDatabase()), Path));
+  return get(child(ref(firebaseDatabase), Path));
 };
 
 /**
@@ -157,7 +159,7 @@ export const updateData = (
   Path: string,
   Data: Record<string, unknown>,
 ): Promise<void> => {
-  return update(ref(getDatabase(), Path), Data);
+  return update(ref(firebaseDatabase, Path), Data);
 };
 
 /**
@@ -170,7 +172,7 @@ export const watchData = (
   Path: string,
   Callback: (Snapshot: DataSnapshot) => void,
 ): (() => void) => {
-  const Ref = ref(getDatabase(), Path);
+  const Ref = ref(firebaseDatabase, Path);
   const unsubscribe = onValue(Ref, Callback);
   return unsubscribe;
 };

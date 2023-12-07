@@ -18,16 +18,25 @@ export const fetchUserData = async (uid: string) => {
 };
 
 export const fetchUserDataByEmail = async (email: string) => {
-  const usersRef = ref(firebaseDatabase, "/users");
-  const usersQuery = query(usersRef, orderByChild("email"), equalTo(email));
-  const snapshot = await get(usersQuery);
+  // console.log("fetchUserDataByEmail called with email:", email);
 
-  if (snapshot.exists()) {
-    const users = snapshot.val();
-    const uid = Object.keys(users)[0];
-    return { ...users[uid], uid };
+  try {
+    const usersRef = ref(firebaseDatabase, "/users");
+    const usersQuery = query(usersRef, orderByChild("email"), equalTo(email));
+    const snapshot = await get(usersQuery);
+
+    // console.log("Firebase query executed. Snapshot exists:", snapshot.exists());
+
+    if (snapshot.exists()) {
+      const users = snapshot.val();
+      const uid = Object.keys(users)[0];
+      return { ...users[uid], uid };
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching user data by email:", error);
+    throw error;
   }
-  return null;
 };
 
 export const fetchUserAccessLevel = async (

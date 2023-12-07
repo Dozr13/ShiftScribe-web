@@ -1,15 +1,15 @@
 import { signInWithEmailAndPassword } from "@firebase/auth";
 import type { NextAuthOptions } from "next-auth";
-import NextAuth, { Account, Profile, Session, User } from "next-auth";
+import { Account, Profile, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { ShiftScribeUser } from "../../../../types/session";
-import { firebaseAuth } from "../../../services/firebase";
+import { ShiftScribeUser } from "../../types/session";
+import { firebaseAuth } from "../services/firebase";
 import fetchUserData, {
   determineRoleBasedOnAccessLevel,
   fetchUserAccessLevel,
   fetchUserDataByEmail,
-} from "../../../utils/fetchUserData";
+} from "../utils/fetchUserData";
 
 interface MyJWT extends JWT {
   employee?: {
@@ -39,12 +39,17 @@ const jwtCallback = async ({
 
   if (email) {
     try {
+      // console.log("in jwtCallback [...nextauth].ts", email);
       const basicUserData = await fetchUserDataByEmail(email);
       if (basicUserData) {
         const accessLevel = await fetchUserAccessLevel(
           basicUserData.organization,
           basicUserData.uid,
         );
+        // console.log(
+        //   "in jwtCallback basicUserData [...nextauth].ts",
+        //   basicUserData,
+        // );
 
         token.employee = {
           id: basicUserData.uid,
@@ -135,44 +140,9 @@ export const authOptions: NextAuthOptions = {
         }
       },
     }),
-    // GitHubProvider({
-    //   profile(profile) {
-    //     const employee: OrgEmployee = {
-    //       id: profile.id.toString(),
-    //       accessLevel: determineAccessLevel(profile),
-    //       userData: {
-    //         displayName:
-    //           profile.name ?? "Err on displayName in GitHubProvider options",
-    //         email: profile.email ?? "Err on email in GitHubProvider options",
-    //         organization:
-    //           profile.organization ??
-    //           "Err on organization in GitHubProvider options",
-    //       },
-    //     };
-
-    //     return employee;
-    //   },
-
-    //   clientId: process.env.GITHUB_ID ?? "",
-    //   clientSecret: process.env.GITHUB_SECRET ?? "",
-    // }),
-    // GoogleProvider({
-    //   profile(profile) {
-    //     return {
-    //       id: profile.sub,
-    //       name: profile.name,
-    //       email: profile.email,
-    //       image: profile.picture,
-    //     };
-    //   },
-    //   clientId: process.env.GOOGLE_ID ?? "",
-    //   clientSecret: process.env.GOOGLE_SECRET ?? "",
-    // }),
   ],
   callbacks: {
     jwt: jwtCallback,
     session: sessionCallback,
   },
 };
-
-export default NextAuth(authOptions);

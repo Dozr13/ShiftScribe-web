@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import Landing from "../components/landing/Landing";
 import stringUtils from "../utils/StringUtils";
 import routes from "../utils/routes";
-import { authOptions } from "../pages/api/auth/[...nextauth]";
+import { authOptions } from "../lib/auth";
 
 const HomePage = async () => {
   const session = await getServerSession(authOptions);

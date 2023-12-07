@@ -126,7 +126,11 @@ class StringUtils {
    * @param {string} input - The string to be slugified.
    * @returns {string} - The slugified string.
    */
-  slugify(input: string): string {
+  slugify(input: string | null | undefined): string {
+    if (!input) {
+      // Handle null, undefined, or empty string
+      return "";
+    }
     return input
       .toLowerCase()
       .replace(/\s+/g, "-")

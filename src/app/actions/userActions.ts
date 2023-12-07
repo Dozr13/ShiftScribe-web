@@ -6,6 +6,7 @@ import {
 import { ref, set } from "firebase/database";
 import { firebaseDatabase } from "../../services/firebase";
 import stringUtils from "../../utils/StringUtils";
+import admin from "../../services/firebaseAdmin";
 
 export const createUserAction = async (
   email: string,
@@ -45,5 +46,15 @@ export const createUserAction = async (
       return { success: false, error: error.message };
     }
     return { success: false, error: "An unknown error occurred" };
+  }
+};
+
+export const deleteUserAction = async (userId: string) => {
+  try {
+    await admin.auth().deleteUser(userId);
+    return { success: true, message: "User deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return { success: false, error: "Internal Server Error" };
   }
 };

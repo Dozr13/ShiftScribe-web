@@ -4,8 +4,8 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import RecordsCard from "../../../components/card/RecordsCard";
 import PageHeader from "../../../components/containers/PageHeader";
-import { authOptions } from "../../../pages/api/auth/[...nextauth]";
 import routes from "../../../utils/routes";
+import { authOptions } from "../../../lib/auth";
 
 const Records = async () => {
   const session = await getServerSession(authOptions);

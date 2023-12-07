@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import {
   acceptJoinRequest,
   denyJoinRequest,
-} from "../../../app/actions/joinRequestActions";
+} from "../../actions/joinRequestActions";
 
 export default async function handler(
   req: NextApiRequest,

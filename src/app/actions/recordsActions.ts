@@ -1,18 +1,11 @@
-import {
-  QueryConstraint,
-  get,
-  getDatabase,
-  query,
-  ref,
-  update,
-} from "firebase/database";
+import { QueryConstraint, get, query, ref, update } from "firebase/database";
 import { TimeRecord, UserData, UserDataTotals } from "../../../types/data";
 import { firebaseDatabase } from "../../services/firebase";
 import stringUtils from "../../utils/StringUtils";
 import timeParser from "../../utils/TimeParserUtils";
 
 const readUserData = async (userId: string): Promise<UserData> => {
-  const snapshot = await get(ref(getDatabase(), `/users/${userId}`));
+  const snapshot = await get(ref(firebaseDatabase, `/users/${userId}`));
   return snapshot.val();
 };
 
@@ -291,7 +284,7 @@ export const purgeOldRecords = async (
     );
 
     if (Object.keys(recordUpdates).length > 0) {
-      await update(ref(getDatabase()), recordUpdates);
+      await update(ref(firebaseDatabase), recordUpdates);
       return { success: true, message: "Records purged successfully." };
     } else {
       return { success: false, message: "No records to purge." };

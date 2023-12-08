@@ -13,6 +13,7 @@ declare module "next-auth" {
       accessLevel: number;
       role?: string | null;
       organization?: string | null;
+      darkMode?: boolean;
     };
   }
 }

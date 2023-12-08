@@ -127,7 +127,8 @@ export const authOptions: NextAuthOptions = {
             return {
               id: userCredential.user.uid,
               name: userData.displayName,
-              email: userData.email,
+              // TODO: Ensure this is still ok
+              // email: userData.email,
               ...userData,
             };
           } else {

@@ -3,10 +3,15 @@ import {
   getAuth,
   updateProfile,
 } from "firebase/auth";
-import { ref, set } from "firebase/database";
+import { ref, set, update } from "firebase/database";
 import { firebaseDatabase } from "../../services/firebase";
 import stringUtils from "../../utils/StringUtils";
-import admin from "../../services/firebaseAdmin";
+
+export interface UserProfileUpdate {
+  displayName?: string;
+  email?: string;
+  darkMode?: boolean;
+}
 
 export const createUserAction = async (
   email: string,
@@ -49,12 +54,27 @@ export const createUserAction = async (
   }
 };
 
-export const deleteUserAction = async (userId: string) => {
+export const updateUserProfile = async (
+  uid: string,
+  updates: UserProfileUpdate,
+) => {
   try {
-    await admin.auth().deleteUser(userId);
-    return { success: true, message: "User deleted successfully" };
+    const updatesRef: Record<string, any> = {};
+
+    if (updates.displayName !== undefined) {
+      updatesRef[`/users/${uid}/displayName`] = updates.displayName;
+    }
+    if (updates.email !== undefined) {
+      updatesRef[`/users/${uid}/email`] = updates.email;
+    }
+    if (updates.darkMode !== undefined) {
+      updatesRef[`/users/${uid}/darkMode`] = updates.darkMode;
+    }
+
+    await update(ref(firebaseDatabase), updatesRef);
+    return { success: true, message: "Profile updated successfully" };
   } catch (error) {
-    console.error("Error deleting user:", error);
-    return { success: false, error: "Internal Server Error" };
+    console.error("Error updating profile:", error);
+    return { success: false, error: "Failed to update profile" };
   }
 };

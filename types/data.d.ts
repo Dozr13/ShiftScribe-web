@@ -2,6 +2,7 @@ export interface UserData {
   organization: string;
   email: string;
   displayName: string;
+  darkMode?: boolean;
 }
 
 export interface OrgData {

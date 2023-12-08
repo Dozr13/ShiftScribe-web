@@ -1,14 +1,23 @@
 import { equalTo, get, orderByChild, query, ref } from "firebase/database";
+import { UserData } from "../../types/data";
 import { firebaseDatabase } from "../services/firebase";
 
-export const fetchUserData = async (uid: string) => {
+export const fetchUserData = async (uid: string): Promise<UserData | null> => {
   try {
     const userRef = ref(firebaseDatabase, `users/${uid}`);
     const snapshot = await get(userRef);
     if (snapshot.exists()) {
-      return snapshot.val();
+      const data = snapshot.val();
+
+      const userData: UserData = {
+        organization: data.organization || "",
+        email: data.email || "",
+        displayName: data.displayName || "",
+        darkMode: typeof data.darkMode !== "undefined" ? data.darkMode : false,
+      };
+
+      return userData;
     } else {
-      // console.log("No user data found for UID:", uid);
       return null;
     }
   } catch (error) {

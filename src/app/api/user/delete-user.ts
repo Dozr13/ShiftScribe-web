@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { deleteUserAction } from "../../actions/userActions";
+import { deleteUserAction } from "../../actions/adminUserActions";
 
 export default async function handler(
   req: NextApiRequest,

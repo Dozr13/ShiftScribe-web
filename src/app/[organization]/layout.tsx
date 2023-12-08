@@ -25,6 +25,8 @@
 
 // export default Layout;
 
+// TODO: Looking into Parallel Routes
+
 import { getServerSession } from "next-auth";
 import React from "react";
 import PageContainer from "../../components/containers/PageContainer";
@@ -33,6 +35,8 @@ import { authOptions } from "../../lib/auth";
 
 const Layout = async ({ children }: { children: React.ReactNode }) => {
   const session = await getServerSession(authOptions);
+
+  const darkMode = session?.user?.darkMode ?? false;
 
   return (
     <>

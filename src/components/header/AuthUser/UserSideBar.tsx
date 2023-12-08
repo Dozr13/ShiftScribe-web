@@ -1,4 +1,5 @@
 "use client";
+import SettingsIcon from "@mui/icons-material/Settings";
 import SupportIcon from "@mui/icons-material/Support";
 import {
   Box,
@@ -14,15 +15,12 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import { UserSessionProps } from ".";
-import {
-  getAccountLinks,
-  getAuthLink,
-  getLinks,
-} from "../../../../constants/navLinks";
+import { getAuthLink, getLinks } from "../../../../constants/navLinks";
 import { DRAWER_WIDTH } from "../../../../constants/sizes";
 import stringUtils from "../../../utils/StringUtils";
 import { getUserAccessLevel } from "../../../utils/accessLevelUtils";
 import SupportContentModal from "../../modals/SupportContentModal";
+import UserProfileSettingsModal from "../../modals/user/UserProfileSettingsModal";
 
 const UserSideBar = ({ session }: UserSessionProps) => {
   const authLink = getAuthLink(session);
@@ -30,13 +28,19 @@ const UserSideBar = ({ session }: UserSessionProps) => {
   const organization = session?.user?.organization;
 
   const formattedOrganization = stringUtils.slugify(organization!);
-  const [supportModalOpen, setSupportModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] =
+    useState<boolean>(false);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState<boolean>(false);
+
+  const handleSettingsClick = () => {
+    setIsSettingsModalOpen(true);
+  };
 
   const handleSupportClick = () => {
-    setSupportModalOpen(true);
+    setIsSupportModalOpen(true);
   };
   const links = getLinks(formattedOrganization);
-  const accountLinks = getAccountLinks(formattedOrganization);
+  // const accountLinks = getAccountLinks(formattedOrganization);
 
   const linksToShow =
     accessLevel >= 2
@@ -79,16 +83,14 @@ const UserSideBar = ({ session }: UserSessionProps) => {
           </List>
           <List sx={{ width: "100%", position: "absolute", bottom: 0 }}>
             <Divider sx={{ mt: "auto" }} />
-            {accountLinks.map(({ text, href, icon: Icon }) => (
-              <ListItem key={href} disablePadding>
-                <ListItemButton component={Link} href={href}>
-                  <ListItemIcon>
-                    <Icon />
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
+            <ListItem disablePadding>
+              <ListItemButton onClick={handleSettingsClick}>
+                <ListItemIcon>
+                  <SettingsIcon />
+                </ListItemIcon>
+                <ListItemText primary="Settings" />
+              </ListItemButton>
+            </ListItem>
             <ListItem disablePadding>
               <ListItemButton onClick={handleSupportClick}>
                 <ListItemIcon>
@@ -108,10 +110,37 @@ const UserSideBar = ({ session }: UserSessionProps) => {
           </List>
         </Box>
       )}
-      {supportModalOpen && (
+      {isSettingsModalOpen && (
         <Modal
-          open={supportModalOpen}
-          onClose={() => setSupportModalOpen(false)}
+          open={isSettingsModalOpen}
+          onClose={() => setIsSettingsModalOpen(false)}
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              bgcolor: "white",
+              p: 4,
+              minWidth: 500,
+              maxWidth: 600,
+              borderRadius: 2,
+              boxShadow: 24,
+              overflowY: "auto",
+            }}
+          >
+            <UserProfileSettingsModal
+              uid={session?.user?.uid!}
+              onClose={() => setIsSettingsModalOpen(false)}
+            />
+          </Box>
+        </Modal>
+      )}
+      {isSupportModalOpen && (
+        <Modal
+          open={isSupportModalOpen}
+          onClose={() => setIsSupportModalOpen(false)}
         >
           <Box
             sx={{

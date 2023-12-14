@@ -2,8 +2,8 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import RequestsCard from "../../../components/card/RequestCard";
 import PageHeader from "../../../components/containers/PageHeader";
-import routes from "../../../utils/routes";
 import { authOptions } from "../../../lib/auth";
+import routes from "../../../utils/routes";
 
 const Requests = async () => {
   const session = await getServerSession(authOptions);
@@ -17,7 +17,7 @@ const Requests = async () => {
 
   return (
     <>
-      <PageHeader mainMessage={`Employee time change requests`} />
+      <PageHeader mainMessage={`Employee Time Change Requests`} />
       <RequestsCard orgId={orgId} />
     </>
   );
